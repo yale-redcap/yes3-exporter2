@@ -1,0 +1,78 @@
+
+<!-- DOWNLOAD -->
+
+<div id="yes3-fmapr-download-panel" class="yes3-panel yes3-draggable yes3-panel-small" style="display:none">
+
+    <div class="yes3-panel-header-row">
+        <div class="yes3-panel-row-left">
+            YES3 Exporter: Download Options
+        </div>
+        <div class="yes3-panel-row-right">
+            <a href="javascript: FMAPR.closeDownloadForm()"><i class="fas fa-times fa-x"></i></a>
+        </div>
+    </div>
+
+    <div class="yes3-panel-row yes3-fmapr-data-download-enabled yes3-duck" >
+        Please indicate what you would like to do:
+    </div>
+
+    <!--div class="yes3-panel-row yes3-fmapr-data-download-disabled yes3-duck" >
+        Note: User data downloads are disabled for this project. Only filesystem exports are enabled.
+    </div-->
+
+    <div class="yes3-panel-row">
+
+        <input type="radio" class="balloon" value="datadictionary" name="yes3-fmapr-export" id="yes3-fmapr-export-datadictionary" checked />
+        <label for="yes3-fmapr-export-datadictionary">Download the <span class='yes3-bold-highlighted'>data dictionary file</span></label>
+
+        <br class="yes3-fmapr-data-download-enabled">
+
+        <input type="radio" class="balloon yes3-fmapr-data-download-enabled" value="data" name="yes3-fmapr-export" id="yes3-fmapr-export-data" />
+        <label for="yes3-fmapr-export-data" class="yes3-fmapr-data-download-enabled">Download the <span class='yes3-bold-highlighted'>data file</span></label>
+
+        <br class="yes3-fmapr-data-download-enabled">
+
+        <input type="radio" class="balloon yes3-fmapr-data-download-enabled" value="zip" name="yes3-fmapr-export" id="yes3-fmapr-export-zip" />
+        <label for="yes3-fmapr-export-zip" class="yes3-fmapr-data-download-enabled">Download the <span class='yes3-bold-highlighted'>full export payload</span> <br><span style="margin-left: 20px">(zip of the data dictionary, data, export information file and optional code)</span></label>
+
+        <br class="yes3-fmapr-data-download-enabled">
+
+        <input type="radio" class="balloon yes3-fmapr-data-download-enabled" value="dmsp" name="yes3-fmapr-export" id="yes3-fmapr-export-dmsp" />
+        <label for="yes3-fmapr-export-dmsp" class="yes3-fmapr-data-download-enabled">Download the <span class='yes3-bold-highlighted'>datamart support package</span><br><span style="margin-left: 20px">(zip of the data dictionary, export information file and optional code)</span></label>
+        
+        <!--br class="yes3-fmapr-data-download-enabled">
+
+        <input type="radio" class="balloon yes3-fmapr-data-download-enabled" value="sas" name="yes3-fmapr-export" id="yes3-fmapr-export-sas" />
+        <label for="yes3-fmapr-export-dmsp" class="yes3-fmapr-data-download-enabled">Download the <span class='yes3-bold-highlighted'>SAS support package</span><br><span style="margin-left: 20px">(zip of the data dictionary, export information file and SAS code files)</span></label-->
+
+    </div>
+
+    <div class="yes3-panel-row">
+
+        <div class="yes3-flex-container-evenly-distributed">
+
+            <div class="yes3-flex-vcenter-hleft">
+
+            </div>
+
+            <div class="yes3-flex-vcenter-hright">
+
+                <div class="yes3-flex-container-right-aligned">
+
+                    <div class="yes3-flex-vcenter-hright">
+                        <input type="button" onClick="FMAPR.closeDownloadForm();" class="yes3-panel-button yes3-button-caption-close" />
+                    </div>
+
+                    <div class="yes3-flex-vcenter-hright">
+                        <input type="button" onClick="FMAPR.downloadExecute();" class="yes3-panel-button yes3-button-caption-proceed" />
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

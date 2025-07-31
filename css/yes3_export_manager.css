@@ -1,0 +1,85 @@
+table#yes3-fmapr-export-table i:not(.yes3-selected) {
+    color: var(--yes3-td-color);
+}
+
+table#yes3-fmapr-export-table i:hover {
+    font-weight: 800;
+    cursor: pointer;
+    color: var(--yes3-hover-color);
+}
+
+table#yes3-fmapr-export-table {
+    display: none;
+}
+
+table#yes3-fmapr-export-table tbody, table#yes3-fmapr-export-table thead, table#yes3-fmapr-export-table tfoot {
+    display: block;
+}
+
+table#yes3-fmapr-export-table tbody {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+table#yes3-fmapr-export-table tbody tr:hover {
+    background-color: var(--yes3-selected-background-color);
+}
+
+table#yes3-fmapr-export-table tbody tr.yes3-fmapr-selected-row {
+    background-color: var(--yes3-selected-background-color);
+}
+
+table#yes3-fmapr-export-table tfoot {
+    border-top: 1px solid var(--yes3-th-border-color);
+    border-left: 0;
+    border-right: 0;
+    width: 100%;
+}
+
+.yes3-controls input[type=date],
+.yes3-controls select{
+    font-size: 0.9rem !important;
+    padding: .5rem !important;
+}
+
+.yes3-controls div {
+    font-size: 0.9rem !important;
+}
+
+.yes3-fmapr-flex-range-container {
+    width: 100%;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: stretch;
+    align-content: flex-start;
+}
+
+.yes3-fmapr-flex-range-container div {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-left: 1em;    
+}
+
+/* we don't want bootstrap row margins since this is rendered within a redcap div */
+div#yes3-fmapr-footer {
+    margin: 0;
+}
+
+i.yes3-fmapr-edited {
+    color: var(--yes3-color) !important;
+    font-weight: 800 !important;
+}
+
+/* these are live links in the manager */
+
+div#yes3-message i:hover {
+    cursor: pointer !important;
+    color: var(--yes3-hover-color) !important;
+}
+
+br.yes3-fmapr-data-download-enabled {
+    margin-top: 10px;;
+}

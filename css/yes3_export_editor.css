@@ -1,0 +1,627 @@
+/* === SETTINGS === */
+
+div.yes3-fmapr-settings-section {
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+    color: var(--yes3-panel-title-color);
+    font-weight: var(--yes3-font-weight-semibold);
+}
+
+table.yes3-fmapr-settings {
+    border-collapse: collapse;
+}
+
+table.yes3-fmapr-settings td,
+table.yes3-fmapr-editor td {
+    color: var(--yes3-td-color);
+    background-color: var(--yes3-table-background-color);
+    font-size: var(--yes3-font-size);
+    font-weight:  var(--yes3-font-weight-semibold) !important;
+    border: 0;
+    padding-right: 1em;
+    height: 2em;
+ }
+
+ table.yes3-fmapr-settings td textarea,
+ table.yes3-fmapr-settings td input[type=text],
+ table.yes3-fmapr-editor td input[type=text]
+ {
+     /*font-family: var(--yes3-input-font-family); */
+     font-size: var(--yes3-input-font-size);
+     font-weight: var(--yes3-input-font-weight);
+     color: var(--yes3-input-color);
+     background-color: var(--yes3-input-background-color);
+     border: 1px solid var(--yes3-input-border-color);
+     border-radius: 0;
+     padding-left: var(--yes3-input-font-size);
+     padding-right: var(--yes3-input-font-size);
+     padding-top: var(--yes3-padding);
+     padding-bottom: var(--yes3-padding);
+ }
+
+ table.yes3-fmapr-settings td select,
+ table.yes3-fmapr-editor td select
+ {
+     /*font-family: var(--yes3-input-font-family); */
+     font-size: var(--yes3-input-font-size);
+     font-weight: var(--yes3-input-font-weight);
+     color: var(--yes3-input-color);
+     background-color: var(--yes3-input-background-color);
+     border: 1px solid var(--yes3-input-border-color);
+     border-radius: 0;
+     padding-left: calc(var(--yes3-input-font-size) - 4px); /* ?? helps to align with input element padding */
+     padding-right: var(--yes3-input-font-size);
+     padding-top: var(--yes3-padding);
+     padding-bottom: var(--yes3-padding);
+}
+table.yes3-fmapr-settings td select,
+table.yes3-fmapr-settings td input[type=text]:not(.yes3-full-width) {
+    width: 200px;
+}
+
+table.yes3-fmapr-settings td input[type=text].yes3-full-width {
+    width: 100%;
+    height: 2em;
+}
+
+.yes3-full-width {
+
+    width: 100% !important;
+}
+
+table.yes3-fmapr-settings td textarea {
+
+    height: calc( 2*var(--yes3-padding) + 3*var(--yes3-input-font-size) );
+    resize: vertical;
+}
+/*
+table.yes3-fmapr-settings td select,
+table.yes3-fmapr-settings td input[type=text] {
+    width: 300px;
+}
+    */
+
+/* === FIELD INSERTION === */
+
+div#yes3-fmapr-fieldinsertion-panel select {
+    width: 100% !important;
+    max-width: 400px;
+    min-width: 150px;
+}
+
+div#yes3-fmapr-fieldinsertion-panel {
+    width: 90% !important;
+    max-width: 600px !important; 
+}
+
+td.yes3-fmapr-fieldinsertion-td-left {
+    width: 30%;
+}
+
+td.yes3-fmapr-fieldinsertion-td-right {
+    width: 70%;
+}
+
+th i.yes3-fmapr-item-editor {
+    color: var(--yes3-th-title-color);
+}
+
+td i.yes3-fmapr-item-editor {
+    color: var(--yes3-color);
+}
+
+div.yes3-fmapr td.yes3-gutter-left, div.yes3-fmapr th.yes3-gutter-left {
+    width: var(--yes3-fmapr-gutter-width); 
+    min-width: var(--yes3-fmapr-gutter-width); 
+    max-width: var(--yes3-fmapr-gutter-width); 
+ 
+    vertical-align: top;
+    text-align: left;
+}
+ 
+div.yes3-fmapr td.yes3-gutter-right, 
+div.yes3-fmapr th.yes3-gutter-right
+{
+    width: var(--yes3-fmapr-gutter-width); 
+    min-width: var(--yes3-fmapr-gutter-width); 
+    max-width: var(--yes3-fmapr-gutter-width); 
+ 
+    vertical-align: middle;
+    text-align: center;
+}
+
+th.yes3-fmapr-row-number,
+td.yes3-fmapr-row-number {
+    /*
+    width: calc(2 * var(--yes3-fmapr-gutter-width)) !important; 
+    min-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important; 
+    max-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important; 
+    */
+
+    vertical-align: middle !important;
+    text-align: center !important;
+
+    font-size: 0.8rem !important;
+
+    opacity: 0.5 !important;
+}
+
+td.yes3-fmapr-redcap-object-editor {
+    /*
+    width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    min-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    max-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    */
+
+    vertical-align: middle !important;
+    text-align: center !important;
+}
+
+td.yes3-fmapr-redcap-object-type {
+    /*
+    width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    min-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    max-width: calc(2 * var(--yes3-fmapr-gutter-width)) !important;
+    */
+}
+
+td.yes3-fmapr-redcap-object-event {
+    /*
+    width: calc(4 * var(--yes3-fmapr-gutter-width)) !important;
+    min-width: calc(4 * var(--yes3-fmapr-gutter-width)) !important;
+    max-width: calc(4 * var(--yes3-fmapr-gutter-width)) !important;
+    */
+}
+/*
+td.yes3-fmapr-row-number {
+
+    border-left:  1px solid var(--yes3-table-border-color) !important;
+    border-right: 1px solid var(--yes3-table-border-color) !important;
+}
+*/
+td.yes3-fmapr-row-number:hover {
+    background-color: var(--yes3-fmapr-row-selected-color) !important;
+    cursor: pointer;
+}
+ 
+div.yes3-fmapr td.yes3-gutter-right-top, div.yes3-fmapr th.yes3-gutter-right-top {
+    width: var(--yes3-fmapr-gutter-width); 
+    min-width: var(--yes3-fmapr-gutter-width); 
+    max-width: var(--yes3-fmapr-gutter-width); 
+ 
+    vertical-align: top;
+    text-align: right;
+}
+ 
+div.yes3-fmapr td.yes3-gutter-right-center, div.yes3-fmapr th.yes3-gutter-right-center {
+
+    width: var(--yes3-fmapr-gutter-width); 
+    min-width: var(--yes3-fmapr-gutter-width); 
+    max-width: var(--yes3-fmapr-gutter-width); 
+ 
+    vertical-align: middle;
+    text-align: right;
+}
+
+/* mark row as unsaved */
+tr.yes3-fmapr-data-element.yes3-unsaved td.yes3-fmapr-row-number {
+
+    /*color: var(--yes3-message-color) !important;*/
+    opacity: 1 !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-unsaved td.yes3-fmapr-row-number::before {
+
+    content: "*";
+}
+
+/**
+ * all this to determine the color of the export item row label
+ */
+tr:not(.yes3-fmapr-new-field) span.yes3-fmapr-redcap-element {
+    color: var(--yes3-fmapr-redcap-element-color);
+    font-style: normal !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-form .yes3-fmapr-redcap-object-name,
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-form .yes3-fmapr-redcap-object-type {
+    color: var(--yes3-fmapr-redcap-form-color) !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-form .yes3-fmapr-redcap-object-event {
+    color: var(--yes3-fmapr-redcap-form-color) !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-field .yes3-fmapr-redcap-object-event {
+    color: var(--yes3-fmapr-redcap-field-color) !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-field:not(.yes3-fmapr-new-field) .yes3-fmapr-redcap-object-name, 
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-field .yes3-fmapr-redcap-object-type
+{
+    color: var(--yes3-fmapr-redcap-field-color);
+    font-weight: var(--yes3-font-weight);
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-redcap-field.yes3-fmapr-new-field .yes3-fmapr-redcap-element {
+    font-style: italic !important;
+    color: var(--yes3-fmapr-new-item-label-color) !important;
+    font-weight: var(--yes3-font-weight) !important;
+}
+
+tr.yes3-fmapr-data-element span.yes3-fmapr-field-label {
+    color: var(--yes3-subdued-color) !important;
+}
+
+tr.yes3-fmapr-data-element.yes3-fmapr-specmap .yes3-fmapr-specmap-element {
+    color: var(--yes3-fmapr-specmap-color) !important;
+    font-weight: var(--yes3-font-weight) !important;
+}
+
+/*
+tr:not(.yes3-fmapr-new-field) .yes3-fmapr-redcap-element:hover {
+    cursor: pointer;
+    color: var(--yes3-alert-color);
+}
+*/
+.yes3-fmapr-row-selected {
+    background-color: rgb(9, 63, 73, 0.25);
+}
+
+.yes3-fmapr-insertion-row {
+    background-color: rgb(9, 63, 73, 0.25);
+    border-top: 2px solid indianred;
+}
+
+a.yes3-fmapr-value-picker-toggler, a.yes3-fmapr-lov-toggler {
+    opacity: 50% !important;
+}
+
+a.yes3-fmapr-value-picker-toggler {
+    display:none;
+}
+
+tr.yes3-row-copied td.yes3-fmapr-redcap-object-type::before {
+    /*content: "\25B6"; arrow */
+    content: "\2714"; /* checkmark */
+    font-size: 1.5;
+    font-style: normal !important;
+    vertical-align: middle;
+    margin-right: 10px;
+}
+
+tr.yes3-row-cut td.yes3-fmapr-redcap-object-type::before {
+    /*content: "\25B6"; arrow */
+    content: "\2702"; /* scissors */
+    font-size: 1.5em;
+    font-style: normal !important;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+
+tr.yes3-lov {
+    display: none;
+}
+
+tr.yes3-fmapr-lov {
+    display: none;
+}
+ 
+div.yes3-fmapr td.yes3-fmapr-lov {
+    color: var(--yes3-fmapr-lov-color);
+    font-weight: var(--yes3-font-weight) !important;
+    font-style: italic;
+}
+
+div.yes3-fmapr td.yes3-fmapr-lov a {
+    color: var(--yes3-fmapr-lov-color);
+    text-decoration: none;
+}
+
+
+table.yes3-fmapr td.yes3-site-basis, table.yes3-fmapr th.yes3-site-basis {
+    text-align: center;
+}
+
+table#yes3-fmapr-export-items-table {
+    display: none;
+}
+ 
+ 
+input[type=text].yes3-fmapr-input-lov {
+    margin-left: 10%;
+    width: 90% !important;
+}
+ 
+div.yes3-fmapr-value-picker-wrapper {
+    margin-left: 10%;
+    width: 90% !important;
+    display: none;
+}
+
+div#yes3-fmapr-settings {
+
+    margin-top: var(--yes3-margin);
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.yes3-fmapr-settings-block {
+
+    display: none;
+    font-weight: 600 !important;
+}
+
+div.yes3-fmapr-filter-option {
+    margin-top: 0;
+    margin-bottom: calc( 0.5 * var(--yes3-margin) );
+    width: 100%;
+}
+
+div#yes3-fmapr-uspec-editor textarea {
+
+    width: 100%;
+    height: 500px;
+    resize: vertical;
+    background-color: var(--yes3-input-background-color);
+    padding: 1rem;
+    color: var(--yes3-input-color);
+}
+
+div#yes3-fmapr-uspec-editor {
+    width: 50%;
+    min-width: 440px;
+}
+
+.yes3-fmapr-export-uspec-json-length {
+    margin-left: var(--yes3-margin);
+    color: var(--yes3-nonessential-information-color);
+}
+
+/* remove the bootstrap padding on the settings form */
+/*
+div#yes3-fmapr-settings div.col-md-6,
+div#yes3-fmapr-footer   div.col-md-6 {
+    padding-left: 0 !important;
+}
+*/
+
+div#yes3-fmapr-new-item-options {
+    padding-top: 0.5em;
+}
+
+table.yes3-fmapr-settings tr td:nth-child(1){
+    width: 20em;
+}
+
+/* === item rapid entry form === */
+
+tr#yes3-fmapr-rapidentry-row td {
+    padding-top: var(--yes3-padding);
+    padding-bottom: 0;
+    padding-left: 0;
+    border: 0;
+    /* height: 200px !important; */
+    vertical-align: top !important;
+}
+
+tr#yes3-fmapr-rapidentry-row td:not(.yes3-nopadding){
+    padding-right: var(--yes3-padding);
+}
+
+tr#yes3-fmapr-rapidentry-row td.yes3-nopadding {
+    padding-right: 0;
+}
+
+tr#yes3-fmapr-rapidentry-row select{
+    width: 100%;
+    border: 2px solid var(--yes3-color) !important;
+    background-color: var(--yes3-input-background-color) !important;
+    color: var(--yes3-input-color) !important;
+    padding-top: var(--yes3-padding) !important;
+    padding-bottom: var(--yes3-padding) !important;
+    padding-right: 1px !important;
+    padding-left: 1px !important;
+}
+
+tr#yes3-fmapr-rapidentry-row input#yes3-fmapr-rapidentry-object-name {
+    /*
+    width: calc( 100% - var(--yes3-padding) - 100px );
+    min-width: 60px;
+    */
+    width: 200px !important;
+    border: 2px solid var(--yes3-color) !important;
+    background-color: var(--yes3-input-background-color) !important;
+    color: var(--yes3-input-color) !important;
+    padding: calc( var(--yes3-padding) + 1px) !important;
+}
+
+tr#yes3-fmapr-rapidentry-row input[type=button] {
+    /*
+    width: 100px;
+    */
+    border: 2px solid var(--yes3-color) !important;
+    background-color: var(--yes3-fmapr-control-background-color) !important;
+    color: var(--yes3-fmapr-control-color) !important;
+    /*
+    padding-top: calc( var(--yes3-padding) + 1px) !important;
+    padding-bottom: calc( var(--yes3-padding) + 1px) !important;
+    */
+    height: 2.5em;
+    padding-left:  1.25em;
+    padding-right: 1.25em;
+    border-radius: 1.25em;
+}
+
+tr#yes3-fmapr-rapidentry-row input[type=button]:hover {
+    border: 2px solid var(--yes3-color) !important;
+    color: var(--yes3-fmapr-control-background-color) !important;
+    background-color: var(--yes3-color) !important;
+}
+
+
+/*  
+    the first cell of the rapid entry form must have the combined width of the 'number' and 'editor link' cells
+    of the item rows (currently, 4 gutter widths)
+*/
+tr#yes3-fmapr-rapidentry-row td:first-child {
+    width: calc(4 * var(--yes3-fmapr-gutter-width)) !important; 
+    min-width: calc(4 * var(--yes3-fmapr-gutter-width)) !important; 
+    max-width: calc(4 * var(--yes3-fmapr-gutter-width)) !important; 
+    padding: var(--yes3-padding);
+}
+
+/*
+   NEW ITEM OPTIONS SECTION
+   yes3-fmapr-new-item-options
+*/
+
+div#yes3-fmapr-new-item-options select{
+    border: 1px solid var(--yes3-color) !important;
+    background-color: var(--yes3-input-background-color) !important;
+    color: var(--yes3-color) !important;
+    font-weight: var(--yes3-font-weight-normal) !important;
+    padding-right: 0.5em !important;
+    padding-left: 0.5em !important;
+    border-radius: 6px;
+    height: 2em;
+}
+
+div#yes3-fmapr-new-item-options input#yes3-fmapr-rapidentry-object-name {
+    /*
+    width: calc( 100% - var(--yes3-padding) - 100px );
+    min-width: 60px;
+    */
+    border: 1px solid var(--yes3-color) !important;
+    background-color: var(--yes3-input-background-color) !important;
+    color: var(--yes3-color) !important;
+    font-weight: var(--yes3-font-weight-normal) !important;
+    border-radius: 6px;
+    width: 250px !important;
+    height: 2em;
+    padding-left: 0.5em !important;
+    padding-right: 0.5em !important;
+}
+
+div#yes3-fmapr-new-item-options input[type=button] {
+    /*
+    width: 100px;
+    */
+    border: 1px solid var(--yes3-color) !important;
+    background-color: var(--yes3-fmapr-control-background-color) !important;
+    color: var(--yes3-color) !important;
+    font-weight: var(--yes3-font-weight-normal) !important;
+    /*
+    padding-top: calc( var(--yes3-padding) + 1px) !important;
+    padding-bottom: calc( var(--yes3-padding) + 1px) !important;
+    */
+    height: 2em;
+    padding-left:  1em;
+    padding-right: 1em;
+    border-radius: 1em;
+}
+
+div#yes3-fmapr-new-item-options input[type=button]:hover {
+    border: 1px solid var(--yes3-color) !important;
+    color: var(--yes3-fmapr-control-background-color) !important;
+    background-color: var(--yes3-color) !important;
+}
+
+
+div#yes3-fmapr-page-footer {
+    position: absolute;
+    bottom: var(--bs-gutter-x);
+    left: var(--bs-gutter-x);
+    padding: 0;
+    margin: 0;
+}
+
+div#yes3-fmapr-system-message {
+    width: 100%;
+    padding-bottom: 0;
+    padding-top: 10px;
+}
+
+.yes3-fmapr-system-message-0 {
+    font-style: italic;
+    color: var(--yes3-message-color) !important;
+}
+
+.yes3-fmapr-system-message-0 a {
+    color: inherit !important;
+    text-decoration: underline !important;
+}
+
+.yes3-fmapr-system-message-1 {
+    color: var(--yes3-message-color);
+}
+
+.yes3-fmapr-system-message-2 {
+    color: var(--yes3-message-color);
+}
+
+.yes3-fmapr-system-message-3 {
+    color: var(--yes3-message-color);
+}
+
+#yes3-fmapr-error-report div {
+    margin-top: 0 !important;
+}
+
+.yes3-fmapr-list {
+    /*
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    */
+}
+
+ol.yes3-fmapr-list {
+    /* list-style-type: circle !important; */
+    /*list-style-position: inside !important;*/
+    padding-left: 20px !important; /* must match the parent's left padding */
+    margin-left: 0;
+}
+
+ol.yes3-fmapr-list li {
+    padding-top: 0 !important;
+    padding-left: 2px;
+    padding-bottom: 4px !important;
+}
+
+ol.yes3-fmapr-list li:not(:first-child) {
+    margin-top: 0 !important;
+}
+
+div#yes3-fmapr-error-report-title {
+    font-weight: bold;
+    color: var(--yes3-message-color);
+    width: 100%;
+    padding-bottom: 0.5rem !important;
+}
+
+div#yes3-fmapr-error-report-note {
+    font-weight: normal;
+    font-style: italic;
+    color: var(--yes3-message-color);
+    width: 100%;
+    padding-bottom: 0.5rem !important;
+}
+
+div#yes3-fmapr-error-report-content {
+    width: 100%;
+    max-height: 500px;
+    overflow-y: auto;
+    color: var(--yes3-message-color);
+}
+
+/* modify the yes3 container to not center the form */
+/*
+div#yes3-container {
+    margin: 0;
+    padding-bottom: 20px;
+}
+*/
+
+ 

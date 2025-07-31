@@ -1,0 +1,59 @@
+table#yes3-fmapr-export-log-table td i:not(.yes3-selected) {
+    color: var(--yes3-td-color);
+}
+
+table#yes3-fmapr-export-log-table td i:hover {
+    color: turquoise;
+}
+
+table#yes3-fmapr-export-log-table {
+    display: none;
+}
+
+.yes3-controls input[type=date],
+.yes3-controls select{
+    font-size: 0.9rem !important;
+    padding: .5rem !important;
+}
+
+.yes3-controls div {
+    font-size: 0.9rem !important;
+}
+
+.yes3-fmapr-flex-range-container {
+    width: 100%;
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: stretch;
+    align-content: flex-start;
+}
+
+.yes3-fmapr-flex-range-container div {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin-left: 1em;    
+}
+
+.yes3-fmapr-value-cell {
+
+    color: var(--yes3-input-color) !important;
+}
+
+table.yes3-fmapr-inspector-table tr:not(#yes3-export-specification) td {
+
+    vertical-align: top !important;
+}
+
+tr#yes3-export-specification td {
+
+    vertical-align: middle;
+}
+
+div#yes3-specification-inspector div.yes3-panel-content {
+
+    max-height: 600px;
+    overflow-y: auto;
+}

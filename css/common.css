@@ -1,0 +1,362 @@
+[data-theme="light"] {
+    /*color-scheme: light;*/
+
+    --yes3-fmapr-divider-color: sandybrown;
+    --yes3-fmapr-title-color: rgb(7, 55, 65);
+ 
+    --yes3-fmapr-color: rgb(7, 55, 65);
+    --yes3-fmapr-header-color: white;
+ 
+    --yes3-fmapr-input-color: black;
+    --yes3-fmapr-input-background-color: white;
+    --yes3-fmapr-input-border-color: lightgrey;
+
+    --yes3-fmapr-redcap-element-color: slategray;
+    --yes3-fmapr-redcap-field-color: darkslategrey;
+    --yes3-fmapr-redcap-form-color: steelblue;
+    --yes3-fmapr-redcap-event-color: lightcoral;
+    --yes3-fmapr-specmap-color: rgb(49, 84, 85);
+
+    --yes3-fmapr-gutter-width: 30px;
+
+    --yes3-fmapr-control-color: rgb(7, 55, 65);
+    --yes3-fmapr-control-background-color: white;
+    --yes3-fmapr-control-border-color: rgb(7, 55, 65);
+
+    --yes3-fmapr-dirty-color: indianred;
+
+    --yes3-fmapr-message-color-normal: rgb(7, 55, 65);
+    --yes3-fmapr-message-color-urgent: indianred;
+
+    --yes3-fmapr-row-selected-color: rgb(7, 55, 65, 0.1);
+
+    --yes3-fmapr-panel-title-color: darkslategray;
+
+    --yes3-fmapr-lov-color: steelblue;
+
+    --yes3-fmapr-action-icon-color: rgb(7, 55, 65);
+
+    --yes3-fmapr-new-item-label-color: darkcyan;
+}
+
+[data-theme="dark"] {
+    /*color-scheme: dark;*/
+
+    --yes3-fmapr-divider-color: sandybrown;
+    --yes3-fmapr-title-color: rgb(49, 148, 168);
+ 
+    --yes3-fmapr-color: rgb(49, 148, 168);
+    --yes3-fmapr-header-color: black;
+ 
+    --yes3-fmapr-input-color: darkseagreen;
+    --yes3-fmapr-input-background-color: black;
+    --yes3-fmapr-input-border-color: black;
+
+    --yes3-fmapr-redcap-element-color: silver;
+    --yes3-fmapr-redcap-field-color: sandybrown;
+    --yes3-fmapr-redcap-form-color: darksalmon;
+    --yes3-fmapr-redcap-event-color: tan;
+    --yes3-fmapr-specmap-color: cadetblue;
+
+    --yes3-fmapr-gutter-width: 30px;
+ 
+    --yes3-fmapr-gutter-width: 30px;
+
+    --yes3-fmapr-control-color: gainsboro;
+    --yes3-fmapr-control-background-color: rgb(24, 24, 24);;
+    --yes3-fmapr-control-border-color: rgb(64, 64, 64);
+
+    --yes3-fmapr-dirty-color: orangered;
+
+    --yes3-fmapr-message-color-normal: rgb(49, 148, 168);
+    --yes3-fmapr-message-color-urgent: indianred;
+
+    --yes3-fmapr-row-selected-color: rgba(1, 133, 133, 0.25);
+
+    --yes3-fmapr-panel-title-color: linen;
+
+    --yes3-fmapr-lov-color: aliceblue;
+
+    --yes3-fmapr-action-icon-color: linen;
+
+    --yes3-fmapr-new-item-label-color: seagreen;
+}
+
+/* === MAPPER === */
+
+.yes3-fmapr-msgclass-normal {
+    color: var(--yes3-fmapr-message-color-normal) !important;
+    font-weight: var(--yes3-font-weight) !important;
+}
+
+.yes3-fmapr-msgclass-urgent {
+    color: var(--yes3-fmapr-message-color-urgent) !important;
+    font-weight: var(--yes3-font-weight) !important;
+}
+
+.yes3-fmapr-dirty {
+    color: var(--yes3-fmapr-message-color-urgent) !important;
+    font-size: 2.5rem !important;
+}
+
+.yes3-fmapr-action-icon {
+    font-size: 1.25rem;
+    line-height: 1.25rem;
+    /*color: var(--yes3-fmapr-action-icon-color);*/
+    color: var(--yes3-fmapr-color);
+    margin:0;
+    margin-left: 0.5rem;
+}
+
+.yes3-fmapr-action-icon-inline {
+    font-size: 1rem !important;
+    line-height: 1rem !important;
+    /*color: var(--yes3-fmapr-action-icon-color);*/
+    color: var(--yes3-fmapr-color);
+    margin:0 !important;
+}
+
+.yes3-fmapr-action-icon:not(.yes3-action-disabled):hover {
+    cursor: pointer;
+    color: dodgerblue;
+}
+
+.yes3-fmapr-gutter-icon {
+    font-size: 1.25rem;
+    color: var(--yes3-fmapr-color);
+    margin: 0;
+}
+
+
+.yes3-action-disabled {
+    opacity: 0.3 !important;
+}
+/*
+table.yes3-fmapr:not(.yes3-fmapr-export-specification) input[type=checkbox] {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin:0;
+    vertical-align: bottom;
+    position: relative;
+    top: -2px;
+    margin-right:2px;
+    *overflow: hidden;
+ }
+ 
+ table.yes3-fmapr label {
+    font-style: normal;
+    font-size: 13px;
+    font-weight: normal;
+    margin-bottom: 0;
+ }
+ */
+ /*
+  * field mapper color scheme
+  */
+ 
+ div.yes3-fmapr .yes3-fmapr-title,
+ div.yes3-fmapr .yes3-fmapr-subtitle
+ {
+    color: var(--yes3-fmapr-color) !important;
+ }
+ 
+ div.yes3-fmapr .yes3-fmapr-divider {
+    border-color: var(--yes3-table-border-color);
+ }
+
+ div.yes3-fmapr input[type=button].yes3-small-button {
+    color: var(--yes3-fmapr-color) !important;
+    background-color: transparent;
+    border-color: var(--yes3-fmapr-color) !important;
+ }
+ 
+ div.yes3-fmapr input[type=button].yes3-small-button:hover {
+    cursor: pointer;
+    color: white !important;
+    background-color: var(--yes3-fmapr-color) !important;
+    border-color: var(--yes3-fmapr-color) !important;
+ }
+ 
+ div.yes3-fmapr > div > a, div.yes3-fmapr td > a {
+    color: inherit;
+ }
+ 
+ div.yes3-fmapr > div > a:hover, div.yes3-fmapr td > a:hover {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: underline;
+ }
+ 
+ div.yes3-fmapr th > a {
+    color: white !important;
+ }
+ 
+ .yes3-fmapr-divider {
+    width: 100%;
+    margin-top: 0;
+    margin-bottom: calc( 2 * var(--yes3-margin) );
+    border-top: 2px solid;
+ }
+
+ div#yes3-fmapr-wrapper div.col-md-8, div#yes3-fmapr-wrapper div.col-md-6,
+ div#yes3-fmapr-wrapper div.col-md-4 {
+    margin-bottom: calc( 2 * var(--yes3-margin) );
+ }
+
+ .yes3-fmapr-title {
+    font-size: 2rem !important;
+    font-weight: 600;
+    color: var(--yes3-fmapr-title-color);
+ }
+ 
+ .yes3-fmapr-subtitle {
+    font-size: 2rem !important;
+    font-weight: var(--yes3-font-weight-light);
+    letter-spacing: -1px;
+    word-spacing: -3px;
+    color: var(--yes3-fmapr-title-color);
+ }
+ 
+input.yes3-fmapr-button {
+    font-size: 1rem;
+    float: right !important;
+    height: calc(0.8 * var(--yes3-block-height)) !important;
+    max-width: 180px !important;
+}
+
+div.row.yes3-fmapr-controls {
+
+    /*border-bottom: 1px solid var(--yes3-th-border-color);
+    padding-bottom: 1rem;*/
+}
+
+.yes3-fmapr-controls select {
+
+    font-size: 1rem;
+
+    font-family: var(--yes3-button-font-family);
+
+    color: var(--yes3-fmapr-control-color);
+    background-color: var(--yes3-fmapr-control-background-color);
+
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+
+    border: 1px solid var(--yes3-fmapr-control-border-color);
+    border-radius: 4px;
+
+    width: calc(100% - 10rem);
+}
+
+.yes3-fmapr-controls input[type=button] {
+
+    font-size: .8rem;
+
+    color: var(--yes3-fmapr-control-color);
+    background-color: var(--yes3-fmapr-control-background-color);
+
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    border: 1px solid var(--yes3-fmapr-control-border-color);
+    border-radius: 4px;
+
+    margin-left: 2rem;
+}
+
+.yes3-fmapr-controls input[type=button]:hover {
+
+    cursor: pointer;
+    color: var(--yes3-fmapr-control-background-color);
+    background-color: var(--yes3-fmapr-control-color);
+}
+
+div.yes3-fmapr-footnote {
+    margin-top: 0;
+    margin-left: 10px;
+    float: left;
+    clear: both;
+    margin-bottom: calc( 4 * var(--yes3-margin) );
+}
+
+
+div#yes3-fmapr-footer {
+    border-top: 1px solid var(--yes3-border-color);
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+}
+
+div#yes3-fmapr-status {
+   color: var(--yes3-td-color);
+   font-size: 1rem;
+   width: 100%;
+}
+
+.yes3-fmapr-longitudinal-only {
+    display: none;
+}
+
+/* these elements are assumed hidden when the page is loaded */
+.yes3-fmapr-hidden,
+.yes3-fmapr-when-initialized,
+.yes3-fmapr-when-uninitialized,
+.yes3-fmapr-longitudinal-only,
+.yes3-fmapr-beta
+{
+    display: none;
+}
+
+/*** HELP PANELS ***/
+
+table.yes3-fmapr-panel-table td {
+    text-align: left;
+    vertical-align: top;
+    font-family: var(--yes3-font-family) !important;
+    font-weight: var(--yes3-font-weight) !important;
+    font-size: var(--yes3-font-size) !important;
+}
+
+table.yes3-fmapr-panel-table td {
+    text-align: left;
+    vertical-align: top;
+    font-family: var(--yes3-font-family) !important;
+    font-weight: 400 !important;
+    font-size: var(--yes3-font-size) !important;
+}
+
+table.yes3-fmapr-panel-table td.propvalue {
+    color: var(--yes3-information-em-color) !important;
+    /*width: 80%;*/
+}
+
+table.yes3-fmapr-help-valueset {
+    width: 100%;
+    padding: 0;
+}
+
+table.yes3-fmapr-help-valueset tbody {
+    width: calc(100% - 20px);
+}
+
+table.yes3-fmapr-help-valueset td {
+    padding-top: 3px;
+    padding-bottom: 0;
+    padding-left: 0;
+    padding-right: 10px;
+}
+
+table.yes3-fmapr-help-valueset tr td:first-child{
+    color: var(--yes3-information-em-color) !important;
+}
+
+div#yes3-fmapr-copyright {
+    color: var(--yes3-nonessential-information-color);
+    width: 100%;
+}
+
+

@@ -1,0 +1,2140 @@
+
+html {
+/*
+--yes3-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-contextmenu-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-input-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-alert-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-td-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-message-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-button-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+--yes3-title-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+*/
+
+/*
+   --yes3-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-contextmenu-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-input-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-alert-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-td-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-message-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-button-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-title-font-family: "Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
+   --yes3-light-font-family: "Segoe UI Light", Segoe, "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+   --yes3-semibold-font-family: "Segoe UI Semibold", Segoe, "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+   --yes3-bold-font-family: "Segoe UI Bold", Segoe, "DejaVu Sans", "Trebuchet MS", Verdana, sans-serif;
+*/
+   --yes3-font-family: "Open Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+
+   --yes3-font-size: 14px;
+   --yes3-input-font-size: 14px;
+   --yes3-contextmenu-font-size: 13px;
+   --yes3-panel-font-size: 14px;
+
+   --yes3-font-weight-light: 200;
+   --yes3-font-weight-normal: 400;
+   --yes3-font-weight-semibold: 600;
+   --yes3-font-weight-bold: 700;
+
+   --yes3-font-weight: var(--yes3-font-weight);
+   --yes3-td-font-weight: var(--yes3-font-weight);
+   --yes3-button-font-weight: var(--yes3-font-weight-semibold);
+   --yes3-input-font-weight: var(--yes3-font-weight-semibold);
+
+   --yes3-padding: 5px;
+   --yes3-margin: 10px;
+      
+   --yes3-block-height: 50px;
+
+   --yes3-item-description-width: 175px;
+   --yes3-item-gutter-width: 30px;
+}
+
+[data-theme="light"] {
+
+    color-scheme: light;
+
+    --yes3-color: darkslategray;
+    --yes3-subdued-color:lightslategrey;
+    --yes3-background-color: white;
+
+    --yes3-border-color: #000000;
+    --yes3-divider-color: cadetblue;
+
+    --yes3-input-color: black;
+    --yes3-input-background-color: #faf9f9;
+    --yes3-input-border-color: grey; 
+    --yes3-input-label-color: #484848;
+ 
+    --yes3-button-color: darkslategray;
+    --yes3-button-background-color: transparent;
+    --yes3-button-border-color: darkslategray;
+    --yes3-button-hover-color: black;
+    --yes3-button-hover-background-color: indianred;
+
+    --yes3-action-icon-color: rgb(32,32,32);
+
+    --yes3-action-icon-light-color: linen;
+
+    --yes3-hover-color: dodgerblue;
+
+    --yes3-color-balloon-input: rgb(32,32,32);
+    --yes3-project-title-color: black;
+ 
+    --yes3-dashboard-header-color: black;
+    --yes3-dashboard-header-background-color: ghostwhite;
+    --yes3-dashboard-row-selected-background-color: lightgrey;
+ 
+    --yes3-panel-color: black;
+    --yes3-panel-hover-color: black;
+    --yes3-panel-title-color: black;
+    --yes3-panel-subtitle-color: darkcyan;
+    --yes3-panel-message-color: darkslategray;
+    --yes3-panel-background-color: white;
+ 
+    --yes3-link-color-alert: indianred;
+    --yes3-link-color-warning: darkorange;
+    --yes3-link-color-passive: gray;
+    --yes3-link-color-clickme: seagreen;
+    --yes3-link-color-normal: darkslategray;
+    --yes3-link-color-nominal: mediumseagreen;
+    --yes3-dag-color: cadetblue;
+ 
+    --yes3-inspector-event-color: darkslategray;
+    --yes3-inspector-form-color: darkcyan;
+ 
+    --yes3-message-dcc-color: dodgerblue;
+    --yes3-message-staff-color: cadetblue;
+    --yes3-message-log-color: slategray;
+
+    --yes3-control-color: rgb(7, 55, 65);
+    --yes3-control-background-color: white;
+    --yes3-control-border-color: rgb(7, 55, 65);
+
+    --yes3-selected-background-color: rgba(7, 55, 65, 0.25);
+
+    --yes3-selected-color: dodgerblue;
+
+    --yes3-pre-color: black;
+    --yes3-pre-background-color: ghostwhite;
+    --yes3-pre-border-color: grey;
+
+    --yes3-hi-contrast-color: black;
+    --yes3-hi-contrast-background-color: white;
+
+    /* -------------------------------------------------------*/
+
+    --yes3-message-color: indianred;
+    --yes3-message-link-color: darkslategray;
+
+    --yes3-border: 2px solid gray;
+
+    --yes3-description-color: rgb(11, 40, 45);;
+    
+    --yes3-information-color: black;
+    
+    --yes3-information-em-color: black;
+   
+    --yes3-information-em-light-color: indianred;
+  
+    --yes3-nonessential-information-color: gray;
+
+    --yes3-select-color: steelblue;
+ 
+    --yes3-alert-color: darkred;
+ 
+    --yes3-okay-color: darkgreen;
+    --yes3-warning-color: orangered;    
+    --yes3-error-color: crimson;
+
+    --yes3-panel-header-highlight-color: white;
+    --yes3-panel-form-button-color: darkslategray;
+    --yes3-panel-form-button-background-color: white;
+    --yes3-panel-form-button-border-color: darkslategrey;
+    --yes3-panel-border-color: gray;
+ 
+    --yes3-table-border-color: lightgray;
+    --yes3-table-background-color: transparent;
+ 
+    --yes3-table-label-color: darkslategray;
+    --yes3-table-value-color: darkgreen;
+    --yes3-td-color: darkslategray;
+    --yes3-th-color: white;
+    --yes3-th-title-color: cornsilk;
+    --yes3-th-background-color: rgb(7, 55, 65);
+    --yes3-th-border-color: rgb(7, 55, 65);
+
+    --yes3-highlight-color: purple;
+ 
+    --yes3-title-color: rgb(7, 55, 65);
+    --yes3-subtitle-color: darkcyan;
+ 
+    --yes3-contextmenu-title-color: darkcyan;
+
+    --yes3-help-panel-background-color: linen;
+}
+
+[data-theme="dark"] {
+
+    color-scheme: dark;
+
+    --yes3-color: rgb(49, 148, 168);
+    --yes3-subdued-color:lightslategrey;
+    --yes3-background-color: rgb(24, 24, 24);
+
+    --yes3-border-color: silver;
+    --yes3-divider-color: silver;
+
+    --yes3-input-color: #d8d8d8;
+    --yes3-input-background-color: black;
+    --yes3-input-border-color: rgb(64, 64, 64);
+    --yes3-input-label-color: #a4a1a1;
+ 
+    --yes3-action-icon-color: rgb(49, 148, 168);
+
+    --yes3-action-icon-light-color: rgb(49, 148, 168);
+
+    --yes3-hover-color: dodgerblue;
+
+    --yes3-button-color: silver;
+    --yes3-button-background-color: transparent;
+    --yes3-button-border-color: silver;
+    --yes3-button-hover-color: white;
+    --yes3-button-hover-background-color: silver;
+    --yes3-color-balloon-input: silver;
+    --yes3-project-title-color: white;
+ 
+    --yes3-dashboard-header-color: linen;
+    --yes3-dashboard-header-background-color: black;
+    --yes3-dashboard-row-selected-background-color: #193435;
+ 
+    --yes3-panel-color: silver;
+    --yes3-panel-hover-color: white;
+    --yes3-panel-title-color: linen;
+    --yes3-panel-subtitle-color: darkgoldenrod;
+    --yes3-panel-message-color: antiquewhite;
+    --yes3-panel-background-color: rgba(8, 8, 8, 1.00);
+
+    --yes3-link-color-alert: indianred;
+    --yes3-link-color-warning: darkorange;
+    --yes3-link-color-passive: gray;
+    --yes3-link-color-clickme: lightseagreen;
+    --yes3-link-color-normal: powderblue;
+    --yes3-link-color-nominal: mediumseagreen;
+
+    --yes3-dag-color: darkturquoise;
+ 
+    --yes3-inspector-event-color: salmon;
+    --yes3-inspector-form-color: darkturquoise;
+ 
+    --yes3-message-dcc-color: darkturquoise;
+    --yes3-message-staff-color: lightsalmon;
+    --yes3-message-log-color: silver;
+
+    --yes3-control-color: gainsboro;
+    --yes3-control-background-color: rgb(24, 24, 24);
+    --yes3-control-border-color: rgb(64, 64, 64);
+
+    --yes3-selected-background-color: rgba(49, 148, 168, 0.25);
+
+    --yes3-selected-color: turquoise;
+
+    --yes3-pre-color: floralwhite;
+    --yes3-pre-background-color: rgb(24, 24, 24);
+    --yes3-pre-border-color: rgb(64, 64, 64);
+
+    --yes3-hi-contrast-color: white;
+    --yes3-hi-contrast-background-color: black;
+
+    /* -------------------------------------------------------*/
+
+    --yes3-message-color: lightsalmon;
+    --yes3-message-link-color: darkturquoise;
+
+    --yes3-border: 2px solid silver;
+
+    --yes3-description-color: rgb(49, 148, 168);
+
+    --yes3-information-color: silver;
+    
+    --yes3-information-em-color: linen;
+
+    --yes3-information-em-light-color: lightsalmon;
+ 
+    --yes3-nonessential-information-color: gray;
+ 
+    --yes3-select-color: skyblue;
+ 
+    --yes3-alert-color: indianred;
+ 
+    --yes3-okay-color: green;
+    --yes3-warning-color: darkorange;    
+    --yes3-error-color: crimson;
+
+    --yes3-panel-header-highlight-color: white;
+    --yes3-panel-form-button-color: silver;
+    --yes3-panel-form-button-background-color: black;
+    --yes3-panel-form-button-border-color: rgb(64, 64, 64);
+    --yes3-panel-border-color: silver;
+ 
+    --yes3-table-border-color: rgb(64, 64, 64);
+    --yes3-table-background-color: transparent;
+
+    --yes3-table-label-color: darksalmon;
+    --yes3-table-value-color: darkturquoise;
+    --yes3-td-color: #a4a1a1;
+    --yes3-th-color: linen;
+    --yes3-th-title-color: cornsilk;
+    --yes3-th-background-color: black;
+    --yes3-th-border-color: linen;
+
+    --yes3-highlight-color: darksalmon;
+ 
+    --yes3-title-color: rgb(49, 148, 168);
+    --yes3-subtitle-color: lightgray;
+ 
+    --yes3-contextmenu-title-color: darkcyan;
+
+    --yes3-help-panel-background-color: black;
+}
+
+pre {
+    background-color: var(--yes3-pre-background-color) !important;
+    border-color: var(--yes3-pre-border-color) !important;
+    color: var(--yes3-pre-color) !important;
+    font-size: 1em !important;
+}
+
+label:not(.yes3-override) {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+p {
+    font-size: 1em;
+}
+
+::placeholder {
+   opacity: 0.5 !important;
+   /*font-size: 1em;*/
+   color: var(--yes3-input-color) !important;
+   font-family: var(--yes3-font-family) !important;
+   font-weight: var(--yes3-font-weight-normal) !important;
+   font-style: italic !important;
+}
+
+/* === THEME === */
+
+/* Eyeball toggle */
+
+.yes3-theme-switch {
+    display: inline-block;
+    height: 1.5em;
+    position: relative;
+    width: 1.5em;
+    margin-left: 0.5em;
+    margin-bottom: 0 !important;
+}
+
+.yes3-theme-switch input {
+    display:none;
+}
+
+.yes3-theme-slider {
+    background-color: var(--yes3-color);
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    transition: .4s;
+    height: 1.5em;
+}
+
+.yes3-theme-slider:before {
+    background-color: #fff;
+    bottom: 0.375em;
+    content: "";
+    height: 0.75em;
+    width: 0.75em;
+    left: 1px;
+    position: absolute;
+    transition: .4s;
+}
+
+input:checked + .yes3-theme-slider {
+    background-color: var(--yes3-color);
+}
+
+input:checked + .yes3-theme-slider:before {
+    transform: translateX( calc( 0.75em - 2px ) );
+}
+
+.yes3-theme-slider.round {
+    border-radius: .75em;
+}
+
+.yes3-theme-slider.round:before {
+    border-radius: .375em;
+}
+
+/* === default font families and weights === */
+
+.yes3-panel, #yes3-container
+{
+  /*font-family: var(--yes3-font-family);*/
+   font-size: var(--yes3-font-size);
+   font-weight: var(--yes3-font-weight);
+}
+
+/* === ACTION ICON SUPPORT === */
+
+.yes3-dirty {
+    color: var(--yes3-alert-color) !important;
+    font-size: 2.5em !important;
+}
+
+i.yes3-action-icon:not(.yes3-action-icon-light) {
+    color: var(--yes3-action-icon-color);
+}
+
+i.yes3-action-icon.yes3-action-icon-light {
+    color: var(--yes3-action-icon-light-color);
+}
+
+i.yes3-action-icon:hover {
+    cursor: pointer;
+    color: var(--yes3-hover-color);
+}
+
+i.yes3-action-icon-controlpanel {
+    margin-top:0;
+    margin-bottom: 0;
+    margin-right: 0;
+    margin-left: 0.25em;
+}
+
+i.yes3-action-icon:not(.yes3-action-icon-inline):not(.yes3-dirty){
+    font-size: 1.5em !important;
+}
+
+i.yes3-action-icon-inline {
+   font-size: 1em !important;
+   line-height: 1em !important;
+   margin: 0 !important;
+}
+
+i.yes3-action-icon-inline-large {
+   font-size: 1.5rem !important;
+   line-height: 1.5rem !important;
+   margin-left: 5px !important;
+   margin-right: 0 !important;
+   margin-bottom: 0 !important;
+   margin-top: 0 !important;
+}
+
+.yes3-wrap {
+   white-space: break-spaces !important;
+}
+
+.yes3-nomargin {
+   margin: 0!important;
+}
+
+i.yes3-action-icon-gutter {
+    font-size: 1.5em;
+    line-height: 1.5em;
+    margin: 0 !important;
+}
+
+i.yes3-action-disabled {
+    opacity: 0.3 !important;
+}
+
+i.yes3-action-disabled:hover {
+    cursor: not-allowed;
+}
+
+/* === YES3 LOGO === */
+
+img.yes3-logo {
+    height: 40px;
+    margin-left: 20px;
+}
+
+img.yes3-logo:hover {
+    cursor: pointer;
+    animation: 5s infinite alternate yes3-logo-glow;
+}
+
+@keyframes yes3-logo-glow {
+    from {
+      transform:rotate(0deg);
+    }
+    to {
+      transform:rotate(360deg);
+      box-shadow: 0 0 25px 5px var(--yes3-color); /* #88c189; */
+    }
+  }
+
+/* === CONTAINER === */
+
+div#yes3-container {
+    min-width: 400px;
+    max-width: 1900px;
+    color: var(--yes3-color);
+    background-color: var(--yes3-background-color);
+    font-size: var(--yes3-font-size);   
+}
+
+div#yes3-container div,
+div#yes3-container p,
+div#yes3-container li,
+div#yes3-container td,
+div#yes3-container th {
+
+    font-size: var(--yes3-font-size);       
+}
+
+tr.yes3-row-selected, tr.yes3-row-selected input, tr.yes3-row-selected select {
+    background-color:var(--yes3-dashboard-row-selected-background-color) !important;
+}
+
+.yes3-row-focused {
+    background-color: rgba(65, 25, 7, 0.1) !important;
+}
+
+div#yes3-red-pointer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--yes3-alert-color);
+    font-size: 20px;
+    height: 24px;
+    line-height: 24px;
+    display: none;
+    padding: 0;
+    margin: 0;
+}
+
+.yes3-rowPointer {
+    border-bottom: 2px solid var(--yes3-alert-color) !important;
+}
+
+.vartester {
+    color: #483d8b;
+ }
+ 
+ /*
+  * when displayed, grays and blocks UI (for modal dialogs)
+  */
+ div#yes3-screen-cover {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 5000;
+    width: 100%;
+    height: 100%;
+    display: none;
+ }
+
+ .yes3-flex-container-evenly-distributed {
+   width: 100%;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: nowrap;
+   justify-content: space-between;
+   align-items: center;
+   align-content: space-between;  
+}
+
+.yes3-flex-container-left-aligned {
+   width: 100%;
+   display: flex;
+   flex-direction: row;
+   flex-wrap: wrap;
+   column-gap: 0.5rem;
+   row-gap: 0.25rem;
+   align-items: center; /* This centers children vertically */
+}
+
+.yes3-flex-container-right-aligned {
+   width: 100%;
+   display: flex;
+   flex-direction: row-reverse;
+   flex-wrap: nowrap;
+   row-gap: 0.25rem;
+   column-gap: 0.5rem;
+   align-items: center;
+}
+
+.yes3-flex-container {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;      /* vertical center */
+    /*
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start; 
+    */
+}
+
+/** 
+ * the recommended flex architecture for headers and footers.
+ * .yes3-ellipsis can be coupled with .yes3-flex-hleft for single-line containers
+ */
+
+.yes3-flex-container-vbaseline {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: baseline; 
+}
+
+.yes3-flex-container-vcenter {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center; 
+}
+
+/* for elements inside containers */
+
+.yes3-flex-hleft {
+    display: inline-block;
+}
+
+.yes3-flex-hright {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.yes3-flex-col-20 {
+   width: 20%;
+}
+
+.yes3-flex-col-33 {
+   width: 33.33%;
+}
+
+.yes3-flex-col-40 {
+   width: 40%;
+}
+
+.yes3-flex-col-50 {
+   width: 50%;
+}
+
+.yes3-flex-col-67 {
+   width: 66.67%;
+}
+
+
+/* end of flex architecture for headers and footers */
+
+.yes3-flex-left {
+    /*
+   padding-top: var(--yes3-padding); 
+   padding-bottom: var(--yes3-padding); 
+   */
+   padding-left: 0;
+   padding-right: 2em;
+   border: 0;
+}
+ .yes3-flex-item {
+    border: 1px solid lightgrey;
+    padding: var(--yes3-padding);
+    margin: var(--yes3-margin);
+ }
+
+.yes3-flex-vcenter-hleft {
+    display: inline-block;
+    /*
+    justify-content: flex-start;
+    align-self: center;  
+    */
+}
+
+.yes3-flex-vcenter-hright {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    align-self: center; 
+}
+
+.yes3-flex-vcenter-hcenter {
+    display: flex;
+    justify-content: center;
+    align-self: center; 
+}
+
+.yes3-flex-vbottom-hleft {
+    display: inline-block;
+    /*
+    display: flex;
+    justify-self: flex-start;
+    align-items: flex-end;  
+    */
+}
+
+.yes3-flex-vbottom-hright {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;  
+}
+
+.yes3-flex-vbottom-hcenter {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;  
+}
+
+ .yes3-highlight {
+    color: var(--yes3-highlight-color) !important;
+ }
+
+/* === PLUGIN CONTROL PANEL/ROW === */
+
+.yes3-controls select {
+
+    font-size: 1em;
+
+    color: var(--yes3-control-color);
+    background-color: var(--yes3-control-background-color);
+
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+
+    border: 1px solid var(--yes3-control-border-color);
+    border-radius: 4px;
+
+    width: 100%;
+}
+
+.yes3-controls input[type=date] {
+
+    font-size: 1em;
+
+    color: var(--yes3-control-color);
+    background-color: var(--yes3-control-background-color);
+
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+
+    border: 1px solid var(--yes3-control-border-color);
+    border-radius: 4px;
+}
+
+/* === CONFIG PANEL === DEPRECATED === */
+
+ .yes3-config-panel {
+    min-width: 400px;
+ }
+ 
+ .yes3-config-panel-small {
+    max-width: 500px;
+ }
+ 
+ .yes3-config-panel-row {
+    float: left;
+    width: 100%;
+    height: var(--yes3-block-height);
+    line-height: var(--yes3-block-height);
+ }
+ 
+ .yes3-config-panel-row-left {
+    float: left;
+    margin-right: var(--yes3-margin);
+    height: var(--yes3-block-height);
+    line-height: var(--yes3-block-height);
+ }
+ 
+ .yes3-config-panel-row-right {
+    float: right;
+    margin-left: var(--yes3-margin);
+    height: var(--yes3-block-height);
+    line-height: var(--yes3-block-height);
+ }
+ 
+ .yes3-config-panel-title {
+    width: 100%;
+    font-size: 1.2em;
+    font-weight: var(--yes3-font-weight-semibold);
+ }
+ 
+ .yes3-config-panel-description {
+    width: 100%;
+    color: var(--yes3-description-color);
+    font-style: italic;
+    margin-top: var(--yes3-margin);
+ }
+
+ .yes3-description {
+    color: var(--yes3-description-color) !important;
+    font-weight: var(--yes3-font-weight) !important;
+ }
+ 
+ table.yes3-config-table {
+    width: 100%;
+    border: var(--yes3-border);
+    border-spacing: 0;
+    border-collapse: collapse;
+    margin-top: var(--yes3-margin);
+ }
+ 
+.yes3-look-out-below {
+   margin-bottom: calc(2 * var(--yes3-margin)) !important;
+}
+
+.yes3-duck {
+   margin-top: calc(2 * var(--yes3-margin)) !important;
+}
+
+ table.yes3-config-table tr:first-child td {
+    padding: var(--yes3-padding);
+ }
+ 
+ table.yes3-config-table tr:not(:first-child) td {
+    padding-top: 0;
+    padding-bottom: var(--yes3-padding);
+    padding-left: var(--yes3-padding);
+    padding-right: var(--yes3-padding);
+ }
+ 
+ table.yes3-config-table td.yes3-gutter-left {
+    width: var(--yes3-item-gutter-width);
+    text-align: left;
+    vertical-align: top;
+ }
+ 
+ table.yes3-config-table td.yes3-gutter-right {
+    width: var(--yes3-item-gutter-width);
+    text-align: right;
+    vertical-align: top;
+ }
+ 
+ table.yes3-config-table td.yes3-config-table-item-description {
+    width: var(--yes3-item-description-width);
+    vertical-align: center;
+ }
+ 
+ td.yes3-divider {
+    padding-top: var(--yes3-padding);
+    padding-bottom: 0 !important;
+ }
+ 
+ hr.yes3-divider {
+    border-top: 2px solid lightgrey;
+    height: 2px;
+    margin: 0;
+ }
+ 
+ div.yes3-vertical-option {
+    width: 100%;
+ }
+ 
+ div.yes3-halfwidth {
+    width: 50%;
+ }
+ 
+ td.yes3-config-table-item-value input[type=text] {
+    display: inline-block;
+ }
+ 
+ td.yes3-config-table-item-value span {
+    display: inline-block;
+    font-style: italic;
+ }
+ 
+ .yes3-config-table-item-value input[type=radio], .yes3-config-table-item-value input[type=checkbox] {
+    width: 13px;
+    height: 13px;
+    padding: 0;
+    margin: 0;
+    vertical-align: bottom;
+    position: relative;
+    top: -2px;
+    margin-right: 2px;
+    /* *overflow: hidden;*/
+ }
+ 
+ .yes3-config-table-item-value label {
+    margin-bottom: 0;
+ }
+ 
+ td.yes3-config-table-third {
+    width: calc(0.5 * (100% - var(--yes3-item-description-width) - var(--yes3-item-gutter-width)));
+ }
+ 
+ td.yes3-config-table-third:not(.yes3-bottom-row) {
+    padding-bottom: 0 !important;
+ }
+ 
+ .yes3-config-panel input[type=text], .yes3-config-panel select {
+    padding: var(--yes3-padding);
+    border: 1px solid var(--yes3-input-border-color);
+    color: var(--yes3-input-color);
+    /*font-family: var(--yes3-input-font-family); */
+    font-weight: var(--yes3-input-font-weight);
+    border-radius: 4px;
+ }
+ 
+ .yes3-config-table-item-value input.yes3-input-large, tbody#yes3-trk-table-body input[type=text] {
+    width: 100%;
+ }
+ 
+ .yes3-config-table-item-value-text-readonly {
+    padding: var(--yes3-padding);
+    border: 1px solid transparent;
+    color: var(--yes3-input-color);
+    /*font-family: var(--yes3-input-font-family); */
+    font-weight: var(--yes3-input-font-weight);
+    width: 100%;
+ }
+ 
+ .yes3-config-table-item-value input.yes3-input-small {
+    width: 50px;
+    margin-right: var(--yes3-margin);
+ }
+ 
+ .yes3-config-table-item-value input.yes3-input-medium {
+    width: 100px;
+    margin-right: var(--yes3-margin);
+ }
+ 
+ .yes3-config-panel select {
+    width: 100%;
+ }
+ 
+ .yes3-sortable .yes3-config-table-item-description:hover {
+    cursor: move;
+ }
+ 
+ .yes3-config-table-collapse {
+    float: left;
+    vertical-align: top;
+    margin-right: calc(2 * var(--yes3-margin));
+ }
+ 
+ .yes3-config-table-remove {
+    float: right;
+    vertical-align: top;
+ }
+ 
+ .yes3-config-table-add {
+    float: left;
+    padding: var(--yes3-padding);
+    border: 1px solid transparent;
+ }
+ 
+ table.yes3-config-table i, div.yes3-config-table-add i {
+    opacity: 0.4;
+ }
+ 
+ table.yes3-config-table, div.yes3-config-table-add i:hover {
+    opacity: 1.0;
+ }
+
+/* === END OF DEPRECATED CONFIG PANEL CSS === */
+ 
+ a:focus, i:focus, a:hover, i:hover {
+    outline: none !important;
+ }
+
+ .yes3-block {
+     height: var(--yes3-block-height);
+     line-height: var(--yes3-block-height);
+ }
+
+ .yes3-single-spaced-vcenter {
+     height: 1em !important;
+     line-height: 1em !important;
+ }
+
+ input[type=text].yes3-input-integer {
+     width: 10em !important;
+ }
+ 
+ input[type=button].yes3-large-button {
+    float: left;
+    margin: 0;
+    color: var(--yes3-button-color);
+    
+    /*font-family: var(--yes3-input-font-family); */
+    font-weight: var(--yes3-button-font-weight);
+    background-color: var(--yes3-button-background-color);
+    padding-left: calc(6 * var(--yes3-padding));
+    padding-right: calc(6 * var(--yes3-padding));
+    padding-top: 0;
+    padding-bottom: 0;
+    height: var(--yes3-block-height);
+    border: 2px solid var(--yes3-border-color);
+    border-radius: calc(0.5 * var(--yes3-block-height));
+    width: 100%;
+ }
+ 
+ input[type=button].yes3-small-button {
+    float: left;
+    color: var(--yes3-button-color);
+    background-color: var(--yes3-button-background-color);
+    /*
+    padding-left: calc(3 * var(--yes3-padding));
+    padding-right: calc(3 * var(--yes3-padding));
+     */
+    padding-top: 0;
+    padding-bottom: 0;
+    height: calc(0.9 * var(--yes3-block-height));
+    margin-top: calc(0.05 * var(--yes3-block-height));
+    margin-bottom: calc(0.05 * var(--yes3-block-height));
+    /*line-height: calc(0.9 * var(--yes3-block-height));*/
+    border: 1px solid var(--yes3-border-color);
+    border-radius: calc(0.4 * var(--yes3-block-height));
+    /*width: 100%;*/
+    max-width: 240px;
+    min-width: 120px;
+    white-space: nowrap;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+ }
+ 
+ input[type=button].yes3-large-button:hover,
+ input[type=button].yes3-small-button:hover {
+    color: var(--yes3-button-hover-color);
+    background-color: var(--yes3-button-hover-background-color);
+    border-color: var(--yes3-button-hover-background-color);
+    cursor: pointer;
+ }
+
+ select.yes3-select {
+    font-size: 1em;
+    color: var(--yes3-input-color);
+    background-color: var(--yes3-input-background-color);
+    border: 1px solid var(--yes3-input-border-color);
+    padding-left: 1.25em;
+    padding-right: 1.25em;
+    padding-top: 0.75em;
+    padding-bottom: 0.75em;
+    border-radius: 4px;
+    width: 100%;
+    line-height: 0 !important;
+}
+
+ div.yes3-authenticated, div.yes3-not-authenticated {
+    display:none;
+ }
+ 
+ table#yes3-project-settings {
+    width: 100%;
+ }
+ 
+ table#yes3-project-settings td {
+    font-size: 0.8em;
+    height: 0.9em;
+    line-height: 0.9em;
+    vertical-align: top;
+ }
+ 
+ td.yes3-settings-label {
+    min-width: 150px;
+    max-width: 150px;
+    width: 150px;
+    color: var(--yes3-table-label-color);
+    white-space: nowrap;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+ }
+ 
+ td.yes3-settings-value {
+    color: var(--yes3-table-value-color);
+ }
+ 
+ div#yes3-config-save-message {
+ }
+ 
+div.yes3-information {
+    width: 100%;
+    color: var(--yes3-information-color);
+   /*font-family: var(--yes3-font-family);*/
+    font-size: var(--yes3-font-size);
+    font-weight: var(--yes3-font-weight);
+    margin-top: calc( 2*var(--yes3-margin));
+}
+
+div.yes3-information h1 {
+    color: var(--yes3-information-color);
+   /*font-family: var(--yes3-font-family);*/
+    font-weight: var(--yes3-font-weight-bold);
+    font-size: 1.1em;
+}
+
+div.yes3-information p {
+    color: var(--yes3-information-color);
+   /*font-family: var(--yes3-font-family);*/
+   /* font-weight: var(--yes3-font-weight); ; */
+    font-size: var(--yes3-font-size);
+}
+
+.yes3-information-em {
+    /*color: var(--yes3-information-em-color) !important;*/
+    font-weight: var(--yes3-font-weight) !important;
+    font-style: italic !important;
+}
+
+.yes3-information-em-light {
+    color: var(--yes3-information-em-color) !important;
+    font-weight: var(--yes3-font-weight)!important;
+}
+
+.yes3-information a {
+    color: var(--yes3-information-em-color);
+   /*font-family: var(--yes3-font-family);*/
+    font-style: italic;
+    text-decoration: none;
+}
+
+.yes3-information a:hover {
+    color: var(--yes3-alert-color);
+   /*font-family: var(--yes3-font-family);*/
+    font-style: italic;
+    text-decoration: underline;
+}
+
+div#yes3-message {
+    display: none;
+    color: var(--yes3-message-color);
+    font-size: 1em;
+    width: 100%;
+ }
+ 
+ div#yes3-message a {
+    text-decoration: underline;
+    color: var(--yes3-message-color);
+ }
+ 
+ span.yes3-required {
+    color: var(--yes3-alert-color);
+ }
+ 
+ .yes3-alert {
+    color: var(--yes3-alert-color) !important;
+}
+
+.icon::before {
+    display: inline-block;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+.yes3-command-disabled {
+    opacity: 0.5;
+}
+
+.yes3-color {
+
+   color: var(--yes3-color) !important;
+   font-weight: 600 !important;
+}
+
+.yes3-warning {
+   color: var(--yes3-warning-color) !important;
+   font-weight: 600 !important;
+   /*background-color: transparent !important;*/
+   /*font-weight: 600 !important;*/
+}
+
+.yes3-error {
+   color: var(--yes3-error-color) !important;
+   font-weight: 600 !important;
+   /*background-color: transparent !important;*/
+   /*font-weight: 600 !important;*/
+}
+
+.yes3-nonessential {
+   color: var(--yes3-nonessential-information-color) !important;
+   /*background-color: transparent !important;*/
+   /*font-weight: 600 !important;*/
+}
+
+/* frowny face for spotlighting errors */
+td:nth-child(1).yes3-error::before {
+    content: "\2639"; /* frowny face */
+    font-size: calc( 2 * var(--yes3-input-font-size) - 4px );
+    margin-right: 4px;
+    font-weight: var(--yes3-font-weight)!important;
+    vertical-align: middle;
+}
+
+input.yes3-error, select.yes3-error {
+    border-color: var(--yes3-error-color) !important;
+}
+
+table:not(.yes3-removed) .yes3-if-removed {
+    display: none;
+}
+
+table.yes3-removed .yes3-if-removed {
+    display: block;
+    color: var(--yes3-error-color) !important;
+    font-weight: var(--yes3-font-weight-semibold)!important;    
+}
+
+ .yes3-config-italicized-subdued {
+    font-style: italic;
+    opacity: 0.75;
+ }
+ 
+.yes3-bold {
+   font-weight: 800;
+}
+
+.yes3-bold-highlighted {
+   font-weight: 600 !important;
+   color: var(--yes3-hi-contrast-color) !important;
+}
+
+.yes3-hi-contrast {
+   color: var(--yes3-hi-contrast-color) !important;
+}
+
+.yes3-semibold {
+   font-weight: var(--yes3-font-weight-semibold);
+}
+
+.yes3-subdued {
+   color: var(--yes3-subdued-color);
+   font-weight: 600;
+}
+
+ .yes3-multisite-only {
+    display: none;
+ }
+ 
+ /* --- PANELS --- */
+
+i.yes3-selected {
+    color: var(--yes3-selected-color);
+}
+
+.yes3-row-selected, tr.yes3-selected {
+    background-color: var(--yes3-selected-background-color);
+}
+
+.yes3-drag-handle:hover {
+    cursor: move;
+}
+
+ div#yes3-contextmenu-panel {
+    display: none;
+    color: var(--yes3-panel-color);
+    background-color: var(--yes3-panel-background-color);
+    padding-left: calc(4*var(--yes3-padding));
+    padding-right: calc(4*var(--yes3-padding));
+    padding-top: calc(2*var(--yes3-padding));
+    padding-bottom: calc(2*var(--yes3-padding));
+    position: relative;
+    max-width: 400px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: 0 0 8px 1px rgb(175, 175, 175);
+ }
+
+ div#yes3-contextmenu-panel-title {
+    color: var(--yes3-contextmenu-title-color);
+ }
+
+ div.yes3-contextmenu-panel-row {
+    font-size: var(--yes3-contextmenu-font-size) !important;
+    float: left;
+    clear: both;
+    width: 100%;
+ }
+
+ div#yes3-contextmenu-content > div.yes3-contextmenu-panel-row > table > tbody > tr > td:first-child {
+     padding-right: 20px;
+ }
+ 
+ .yes3-panel {
+    display: none;
+    color: var(--yes3-panel-color);
+    background-color: var(--yes3-panel-background-color);
+    padding-top: calc( 4 * var(--yes3-padding) );
+    padding-bottom: calc( 2 * var(--yes3-padding) );
+    padding-left: calc( 4 * var(--yes3-padding) );
+    padding-right: calc( 4 * var(--yes3-padding) );
+    font-size: var(--yes3-panel-font-size);
+    /*border: 1px solid black;*/
+    width: 90%;
+    min-height: 100px;
+    /*min-width: 360px;*/
+    max-width: 800px;
+    position: relative;
+    border-radius: 0;
+    box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+    -webkit-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+    -moz-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+ }
+
+.yes3-panel-small {
+
+   max-width: 600px !important;
+}
+
+.yes3-panel-medium {
+
+   max-width: 800px !important;
+}
+
+.yes3-panel-large {
+
+   max-width: 1600px !important;
+}
+
+div#yes3-help-panel, div.yes3-help-panel {
+   width: auto !important;
+   max-width: 900px !important;
+   background-color: var(--yes3-help-panel-background-color) !important;
+}
+ 
+.yes3-panel p:not(.yes3-headroom) {
+   margin-top: 0;
+   margin-bottom: 0.75em;
+}
+
+table.yes3-panel-vertical-options {
+
+   margin-top: 0;
+   margin-left: 0;
+   margin-right: 0;
+   margin-bottom: 0;
+
+   border: 0;
+}
+
+table.yes3-panel-vertical-options td:first-child {
+
+   padding: 0 !important;
+}
+
+table.yes3-panel-vertical-options td:not(:first-child) {
+
+   padding: 0 !important;
+}
+
+div.yes3-max-headroom {
+   margin-top: 2em !important;
+}
+
+.yes3-headroom {
+   margin-top: 0.75em !important;
+}
+
+.yes3-legroom {
+   margin-bottom: 0.75em !important;
+}
+
+ .yes3-panel a {
+    color: var(--yes3-panel-color) !important;
+ }
+
+ .yes3-panel ol li:not(:first-child) {
+
+   margin-top: 8px;
+ }
+ 
+ .yes3-panel a:hover {
+    outline: none !important;
+    color: var(--yes3-panel-hover-color) !important;
+ }
+ 
+ .yes3-panel-header-row {
+   /*font-family: var(--yes3-font-family);*/
+    font-size: 2em;
+    color: var(--yes3-panel-title-color);
+    font-weight: var(--yes3-font-weight-light);
+    float: left;
+    clear: both;
+    width: 100%;
+    margin-top: calc( -2 * var(--yes3-padding) ); /* defeat the panel padding */
+    margin-bottom: var(--yes3-margin);
+    cursor: move;
+ }
+ 
+ .yes3-panel-header-highlight {
+    color: var(--yes3-panel-header-highlight-color);
+    font-weight: var(--yes3-font-weight-light);
+ }
+ 
+ .yes3-panel-title {
+    font-size: 2em;
+    color: var(--yes3-panel-title-color);
+    font-weight: var(--yes3-font-weight-light);
+    font-style: normal;
+ }
+ 
+ .yes3-panel-subtitle {
+    font-size: 1.2em;
+    color: var(--yes3-panel-subtitle-color);
+    font-weight: var(--yes3-font-weight-semibold);
+    font-style: normal;
+ }
+ 
+ .yes3-panel-footer {
+    float: left;
+    clear: both;
+    width: 100%;
+    cursor: move;
+ }
+ 
+ .yes3-panel-close-link-block {
+    display: inline-block;
+    vertical-align: top;
+ }
+ 
+ .yes3-panel-content {
+   /*font-family: var(--yes3-font-family);*/
+    color: inherit;
+    font-size: inherit;
+   /* font-weight: var(--yes3-font-weight); ; */
+    float: left;
+    clear: both;
+    width: 100%;
+    /* margin-top: 1em; */
+    margin-bottom: 12px;
+    /*overflow-y: scroll;*/
+ }
+ 
+.yes3-panel-row,
+.yes3-panel-top-row,
+.yes3-panel-bottom-row,
+.yes3-panel-message {
+   /*
+   /*font-family: var(--yes3-font-family);*/
+   color: inherit;
+   font-size: 1em;
+   font-weight: var(--yes3-font-weight);
+   float: left;
+   clear: both;
+   width: 100%;
+}
+ 
+ .yes3-panel-row {
+    margin-top: var(--yes3-margin);
+    margin-bottom: var(--yes3-margin);
+ }
+ 
+ .yes3-panel-top-row {
+    margin-top: 0;
+    margin-bottom: var(--yes3-margin);
+ }
+ 
+ .yes3-panel-bottom-row {
+    margin-top: var(--yes3-margin);
+    margin-bottom: 0;
+ }
+
+ .yes3-panel-row-border-top {
+     border-top: 1px solid var(--yes3-border-color);
+ }
+ 
+ .yes3-panel-message {
+    color: var(--yes3-panel-message-color);
+    margin-top: var(--yes3-margin);
+    margin-bottom: 0;
+    padding-bottom: 0;
+    overflow-wrap: anywhere;
+ }
+ 
+ div.yes3-panel-row-left {
+    float: left;
+    margin-right: var(--yes3-margin);
+    height: 100%;
+ }
+ 
+ div.yes3-panel-row-left + div.yes3-panel-row-left {
+    margin-left: 24px;
+    margin-left: var(--yes3-margin);
+    vertical-align: middle;
+ }
+ 
+ .yes3-panel-row-right {
+    float: right;
+    height: 100%;
+    vertical-align: middle;
+    margin-left: var(--yes3-margin);
+ }
+ 
+ .yes3-panel-row-middle {
+    text-align: center;
+ }
+ 
+ .yes3-panel-row a {
+   /*font-family: var(--yes3-font-family);*/
+    color: inherit;
+    font-size: inherit;
+    text-decoration: underline;
+ }
+
+ .yes3-panel-row a:hover {
+     color: var(--yes3-alert-color);
+ }
+ 
+ .yes3-panel label:not(.yes3-checkmarkContainer) {
+    font-weight: var(--yes3-font-weight-semibold);
+    color: var(--yes3-input-label-color);
+ }
+ 
+ div.yes3-panel ul ul {
+    font-weight: var(--yes3-font-weight-semibold);
+    opacity: 85%;
+ }
+ 
+ .yes3-panel form input[type=text], .yes3-panel form input[type=password] {
+    border: 1px solid var(--yes3-input-border-color);
+    color: var(--yes3-input-color);
+    padding: 6px;
+    border-radius: 4px;
+    width: 300px;
+ }
+ 
+ input[type=text].yes3-number {
+    color: var(--yes3-input-color);
+    padding: 6px;
+    border: 1px solid var(--yes3-input-border-color);
+    border-radius: 4px;
+    width: 50px;
+ }
+ 
+ .yes3-panel form button, .yes3-panel input[type=button], button[type=submit].yes3 {
+    height: calc(0.8* var(--yes3-block-height));
+    min-width: 120px;
+    padding-left: calc(2*var(--yes3-padding));
+    padding-right: calc(2*var(--yes3-padding));
+    color: var(--yes3-panel-form-button-color);
+    background-color: var(--yes3-panel-form-button-background-color);
+    border: 1px solid var(--yes3-panel-form-button-border-color);
+    border-radius: 4px;
+    outline: none;
+ }
+ 
+ .yes3-panel form button:hover, .yes3-panel input[type=button]:hover, button[type=submit].yes3:hover {
+    background-color: var(--yes3-panel-form-button-color);
+    color: var(--yes3-panel-form-button-background-color);
+    border: 1px solid var(--yes3-panel-form-button-color);
+    cursor: pointer;
+ }
+ 
+ input[type=button].yes3-button {
+    float: left;
+    margin-right: 10px;
+    border-radius: 20px;
+    height: 40px;
+    width: auto !important;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: var(--yes3-button-color);
+    background-color: var(--yes3-button-background-color);
+    border-color: var(--yes3-button-border-color);
+ }
+ 
+ input[type=button].yes3-button:hover {
+    color: var(--yes3-button-hover-color);
+    background-color: var(--yes3-button-hover-background-color);
+    border-color: var(--yes3-button-hover-background-color);
+    cursor: pointer;
+ }
+
+/*
+* for divs used as progress bars twixt 'okay' and 'cancel' buttons
+*/
+.yes3-panel-between-the-buttons {
+    width: calc(100% - 300px);
+    border: 1px solid var(--yes3-input-border-color);
+    background-color: transparent;
+    visibility: hidden;
+}
+
+.yes3-panel-between-the-buttons div {
+    width: 0;
+    height: 1.5em;
+    border: 0;
+    color: var(--yes3-panel-form-button-background-color);
+    background-color: var(--yes3-panel-form-button-color);
+}
+
+ .yes3-panel td, .yes3-panel th {
+    vertical-align: middle;
+    padding: 2px;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+ }
+
+ .yes3-panel td {
+   color: var(--yes3-td-color);
+   background-color: transparent;
+}
+
+.yes3-panel table.yes3-table-borders td {
+   border-color: var(--yes3-table-border-color) !important;
+   padding-left: 5px !important;
+   padding-right: 5px !important;
+}
+
+ .yes3-panel th {
+    color: var(--yes3-th-color);
+    background-color: transparent;
+ }
+ 
+ .yes3-alert-message {
+    color: var(--yes3-alert-color);
+ }
+
+ .yes3-no-padding-left {
+    padding-left: 0 !important;
+ }
+
+ .yes3-no-padding-right {
+    padding-right: 0 !important;
+ }
+
+
+/* CHECKBOXES */
+
+/* Customize the label (the container) */
+.yes3-checkmarkContainer {
+    display: block;
+    position: relative;
+    padding-left: 20px;
+    margin-left: 0;
+    cursor: pointer;
+    /*
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    */
+   /*font-family: var(--yes3-font-family);*/
+    color: var(--yes3-input-label-color);
+    /*font-size: 0.9rem;*/
+ 
+ }
+ 
+ /* Hide the browser's default checkbox */
+ .yes3-checkmarkContainer input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+ }
+ 
+ /* Create a custom checkbox, same dimensions and color as balloon radios */
+ .yes3-checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 15px;
+    width: 15px;
+    background-color: transparent;
+    border: 2px solid var( --yes3-input-label-color );
+ }
+ 
+ /* Checkmark/indicator: rotated rectangle with 2 sides visible */
+ .yes3-checkmarkContainer .yes3-checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+
+    left: 3px;
+    top: 0;
+    width: 5px;
+    height: 9px;
+    border: solid;
+    border-color: var(---yes3-input-label-color);
+    border-width: 0 2px 2px 0;
+    -webkit-transform: rotate(35deg);
+    -ms-transform: rotate(35deg);
+    transform: rotate(35deg);
+ }
+ 
+ /* Show the checkmark when checked */
+ .yes3-checkmarkContainer input:checked ~ .yes3-checkmark::after {
+    display: block;
+ }
+ 
+ /* RADIO BALLOONS  */
+ 
+ input[type=radio].balloon, input[type=checkbox].balloon {
+    /* Hide original inputs */
+    visibility: hidden;
+    position: absolute;
+ }
+ 
+ input[type=radio].balloon + label:before, input[type=checkbox].balloon + label:before {
+    height: 14px;
+    width: 14px;
+    margin-right: 3px;
+    content: " ";
+    display: inline-block;
+    vertical-align: middle;
+    border: 1px solid var(--yes3-input-label-color);
+ }
+ 
+ input[type=radio].balloon + label + input[type=radio].balloon + label:before, input[type=checkbox].balloon + label + input[type=checkbox].balloon + label:before {
+    margin-left: 6px;
+ }
+ 
+ input[type=radio].balloon:checked + label:before, input[type=checkbox].balloon:checked + label:before {
+    background: var(--yes3-input-label-color);
+    border-color: var(--yes3-input-label-color);
+ }
+ 
+ input[type=radio].balloon:hover + label:before, input[type=checkbox].balloon:hover + label:before {
+    border: 2px solid var(--yes3-input-label-color);
+    cursor: pointer;
+ }
+
+input[type=radio].balloon + label:before {
+   border-radius: 50%;
+   margin-bottom: 3px;
+}
+
+input[type=checkbox].balloon + label:before {
+   border-radius: 50%;
+   margin-bottom: 3px;
+}
+
+div.yes3-dashboard-head input[type=radio].balloon + label:before, input[type=checkbox].balloon + label:before {
+   border: 1px solid var(--yes3-th-color) !important;
+}
+
+div.yes3-dashboard-head input[type=radio].balloon:checked + label:before, input[type=checkbox].balloon:checked + label:before {
+   background: var(--yes3-th-color) !important;
+   border-color: var(--yes3-th-color) !important;
+}
+
+div.yes3-dashboard-head input[type=radio].balloon:hover + label:before, input[type=checkbox].balloon:hover + label:before {
+   border: 2px solid var(--yes3-th-color) !important;
+   cursor: pointer;
+}
+
+/**
+* Dashboard Head
+* This is a one-row header for a dashboard table.
+*/
+
+div.yes3-dashboard-head {
+   background-color: transparent;
+   border-top: 0;
+   border-bottom:2px solid var(--yes3-color);
+   padding-top: 0.5em;
+   padding-bottom: 0.5em;
+   padding-left: 0;
+   padding-right: 0;
+   color: var(--yes3-color);
+   width: 100%;
+}
+
+div.yes3-dashboard-head div.yes3-dashboard-title{
+   color: var(--yes3-th-title-color);
+}
+
+div.yes3-dashboard-head div.yes3-dashboard-options{
+   color: var(--yes3-th-color);
+}
+
+div.yes3-dashboard-head input[type=radio].balloon + label:before, input[type=checkbox].balloon + label:before {
+   border: 1px solid var(--yes3-color) !important;
+}
+
+div.yes3-dashboard-head input[type=radio].balloon:checked + label:before, input[type=checkbox].balloon:checked + label:before {
+   background: var(--yes3-color) !important;
+   border-color: var(--yes3-color) !important;
+}
+
+div.yes3-dashboard-head input[type=radio].balloon:hover + label:before, input[type=checkbox].balloon:hover + label:before {
+   border: 2px solid var(--yes3-color) !important;
+   cursor: pointer;
+}
+
+div.yes3-dashboard-head > *:not(.yes3-bold):not(.yes3-warning) {
+   color: var(--yes3-color) !important;
+   font-weight: var(--yes3-font-weight-semibold) !important;
+}
+
+
+/**
+* Dashboard Tail
+* This is a floating panel after the last row of a dashboard table.
+*/
+
+div.yes3-dashboard-tail {
+    display: flex;
+    flex-direction: row;
+   width: 100%;
+   padding-top: 0.5em;
+   padding-bottom: 0.5em;
+   padding-left: 0;
+   padding-right: 0;
+   background-color: var(--yes3-background-color);
+   color: var(--yes3-color);
+}
+
+div.yes3-dashboard-tail input[type=radio].balloon + label:before, input[type=checkbox].balloon + label:before {
+   border: 1px solid var(--yes3-color) !important;
+}
+
+div.yes3-dashboard-tail input[type=radio].balloon:checked + label:before, input[type=checkbox].balloon:checked + label:before {
+   background: var(--yes3-color) !important;
+   border-color: var(--yes3-color) !important;
+}
+
+div.yes3-dashboard-tail input[type=radio].balloon:hover + label:before, input[type=checkbox].balloon:hover + label:before {
+   border: 2px solid var(--yes3-color) !important;
+   cursor: pointer;
+}
+
+div.yes3-dashboard-tail > *:not(.yes3-semibold) {
+   color: var(--yes3-color) !important;
+   font-weight: var(--yes3-font-weight-normal) !important;
+}
+
+.yes3-title {
+   font-size: 2em;
+   font-weight: var(--yes3-font-weight-bold);
+   color: var(--yes3-title-color);
+}
+
+.yes3-subtitle {
+   font-size: 2em;
+   font-weight: var(--yes3-font-weight-light);
+   letter-spacing: -1px;
+   word-spacing: -2px;
+   color: var(--yes3-title-color);
+}
+
+.yes3-inline-parent {
+   display: block;
+   width: 100%;
+   margin-bottom: calc(2 * var(--yes3-margin));
+}
+
+.yes3-inline-element {
+   vertical-align: middle;
+   display: inline-block;
+}
+
+.yes3-inline-element-right {
+   vertical-align: middle;
+   text-align: right;
+   display: inline-block;
+}
+
+div#niayes3-study-info {
+   max-width: 500px;
+   white-space: nowrap;
+   -ms-text-overflow: ellipsis;
+   text-overflow: ellipsis;
+   overflow: hidden;
+}
+
+.yes3-ellipsis {
+   white-space: nowrap;
+   -ms-text-overflow: ellipsis;
+   text-overflow: ellipsis;
+   overflow: hidden;
+}
+
+.yes3-hidden {
+   display: none !important;
+}
+
+.yes3-shown-flex {
+   display: flex !important;
+}
+
+.yes3-float-row {
+   display:block;
+   width: 100%;
+}
+
+.yes3-float-left {
+   float: left !important;
+   width: auto !important;
+   margin-right: var(--yes3-margin);
+}
+
+.yes3-float-right {
+   float: right !important;
+   width: auto !important;
+   margin-left: var(--yes3-margin);
+}
+
+.yes3-full-width {
+   width: 100% !important;
+}
+
+.yes3-margin-right {
+   margin-right: var(--yes3-margin);
+}
+
+.yes3-margin-left {
+   margin-left: var(--yes3-margin);
+}
+
+.yes3-margin-bottom {
+   margin-bottom: var(--yes3-margin);
+}
+
+.yes3-margin-top {
+   margin-top: var(--yes3-margin);
+}
+ 
+ 
+ th label {
+    opacity: 0.75 !important;
+ }
+
+ /* === DASHBOARD TABLE === */
+
+
+  
+ table.yes3-dashboard {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    /*margin-top: var(--yes3-margin);*/
+ }
+  
+ table.yes3-scrollable {
+    table-layout: fixed;
+ }
+ 
+ table.yes3-dashboard thead {
+   background-color: var(--yes3-th-background-color);
+   border-top: 1px solid var(--yes3-th-border-color);
+   border-bottom: 1px solid var(--yes3-th-border-color);
+   border-left: 0;
+   border-right: 0;
+   width: 100%;
+}
+/*
+div.yes3-dashboard-head {
+   
+   background-color: var(--yes3-th-background-color);
+   border-top: 1px solid var(--yes3-th-border-color);
+   border-bottom: 1px solid var(--yes3-th-border-color);
+   border-left: 0;
+   border-right: 0;
+   padding-top: 0.5em;
+   padding-bottom: 0.5em;
+   margin-left: -15px;
+   margin-right: -15px;
+   margin-top: 15px;
+   margin-bottom: 0;
+}
+*/
+
+th.yes3-halign-left, td.yes3-halign-left {
+   text-align: left;
+   vertical-align: middle;
+}
+
+th.yes3-halign-right, td.yes3-halign-right {
+   text-align: right;
+   vertical-align: middle;
+}
+
+th.yes3-halign-center, td.yes3-halign-center {
+   text-align: center;
+   vertical-align: middle;
+}
+
+ table.yes3-scrollable thead tr {
+    display: block;
+ }
+ 
+ table.yes3-dashboard tbody {
+    width: 100%;
+    background-color: var(--yes3-table-background-color);
+ }
+
+ table.yes3-scrollable tbody {
+    display: block;
+    overflow: auto;
+    height: auto;
+ }
+ 
+ table.yes3-dashboard th, table.yes3-dashboard td {
+    padding: var(--yes3-padding);
+    white-space: nowrap;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+ }
+ 
+ table.yes3-dashboard th {
+    font-weight:  var(--yes3-font-weight) !important;
+    font-size: 1em;
+    height: 3em;
+    background-color: transparent;
+ }
+
+table.yes3-dashboard th.yes3-th-title {
+   color: var(--yes3-th-title-color);
+}
+
+table.yes3-dashboard th:not(.yes3-th-title) {
+   color: var(--yes3-th-color);
+}
+
+ table.yes3-dashboard td, .yes3-dashboard-td {
+    color: var(--yes3-td-color);
+    background-color: var(--yes3-table-background-color);
+    font-size: var(--yes3-font-size);
+    font-weight:  var(--yes3-font-weight) !important;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    /*height: calc( 2 * var(--yes3-input-font-size) + 2 * var(--yes3-padding) );*/
+ }
+
+ table.yes3-dashboard tr:not(:last-child) td {
+ 
+    border-bottom: 2px solid var(--yes3-table-border-color);
+ }
+
+ table.yes3-dashboard td input[type=text], 
+ table.yes3-settings td input[type=text] 
+ {
+     /*font-family: var(--yes3-input-font-family); */
+     font-size: var(--yes3-input-font-size);
+     font-weight: var(--yes3-input-font-weight);
+     color: var(--yes3-input-color);
+     background-color: var(--yes3-input-background-color);
+     border: 1px solid var(--yes3-input-border-color);
+     border-radius: 0;
+     padding-left: var(--yes3-input-font-size);
+     padding-right: var(--yes3-input-font-size);
+     padding-top: var(--yes3-padding);
+     padding-bottom: var(--yes3-padding);
+     width: 100%;
+ }
+
+ table.yes3-dashboard td select,  
+ table.yes3-settings td select 
+ {
+     /*font-family: var(--yes3-input-font-family); */
+     font-size: var(--yes3-input-font-size);
+     font-weight: var(--yes3-input-font-weight);
+     color: var(--yes3-input-color);
+     background-color: var(--yes3-input-background-color);
+     border: 1px solid var(--yes3-input-border-color);
+     border-radius: 0;
+     padding-left: calc(var(--yes3-input-font-size) - 4px); 
+     padding-right: var(--yes3-input-font-size);
+     padding-top: var(--yes3-padding);
+     padding-bottom: var(--yes3-padding);
+     width: 100%;
+ }
+  
+.yes3-when-loaded {
+    display: none;
+}
+
+.yes3-invisible {
+    visibility: hidden;
+}
+.yes3-visible {
+    visibility: visible;
+}
+
+/* JQUERY-UI SHENANIGANS */
+
+/* 
+   a list width of 1/2 viewport seems to work well for YES3 Exporter
+   the padding compresses the list.
+   all trial and error, folks
+*/
+
+.ui-menu {
+    z-index: 99999;
+    max-height: 300px;
+    overflow-y: auto;
+    position: absolute;
+    max-width: min(600px, 90vw);
+    width: max(200px, 40vw);
+}
+
+.ui-menu.ui-widget {
+    background-color: var(--yes3-background-color);
+}
+
+.ui-menu .ui-menu-item {
+    padding-top: 0;
+    padding-right: 1em;
+    padding-bottom: 0;
+    padding-left: 0.4em;
+    color: var(--yes3-color);
+    font-size: var(--yes3-font-size);
+    font-weight: var(--yes3-font-weight-normal);
+}
+
+.ui-menu-item-wrapper {
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;    /* Required to make overflow apply properly */
+}
+
+.ui-menu, .ui-menu-item, .ui-menu-item-wrapper {
+    box-sizing: border-box;
+}
+
+
+.yes3-busy {
+   cursor: wait;
+   color: var(--yes3-alert-color);
+   font-size: 2rem;
+   font-weight: 800;
+   z-index: 10000;
+   padding-top: 2rem;
+   padding-bottom: 2rem;
+   padding-left: 2.25rem;
+   padding-right: 2.25rem;
+   background-color: var(--yes3-panel-background-color);
+   border-radius: 4px;
+   box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+   -webkit-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+   -moz-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+}
+
+.yes3-1rem {
+   font-size: 1rem !important;
+}
+
+.yes3-1pt5rem {
+   font-size: 1.5rem !important;
+}
+
+.yes3-2rem {
+   font-size: 2rem !important;
+}
+
+.yes3-close-x {
+   font-size: 32px !important;
+   font-weight: 900 !important;
+   cursor: pointer;
+}
