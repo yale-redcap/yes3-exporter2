@@ -4771,14 +4771,35 @@ WHERE project_id=? AND log_entry_type=?
 
     public function redcap_module_link_check_display( $project_id, $link )
     {  
-        if ( $this->yes3UserRights()['exporter'] ){
+        $user_rights = $this->yes3UserRights();
 
-            if ( $this->isLongitudinal() || $link['name'] !== "YES3 Exporter Event Prefixes" ){ 
+        $projectSettings = $this->getProjectSettings();
 
-                return $link;
-            }
+        if ( !$user_rights['exporter'] ){
+
+            return false;
         }
 
-        return false;
+        // event prefixes are applicable only to longitudinal projects
+        if ( !$this->isLongitudinal() && $link['name'] !== "YES3 Exporter Event Prefixes" ){ 
+
+            return false;
+        }
+
+        if ( $projectSettings['enable-validator'] !== "Y" && $link['name'] === "YES3 Exporter Import/Validator" ){
+
+            return false;
+        }
+
+        if ( !$user_rights['isDesigner'] && 
+            (   $link['name'] === "YES3 Exporter Manager"  ||
+                $link['name'] === "YES3 Exporter Event Prefixes" ||
+                $link['name'] === "YES3 Export Workshop"
+            )){
+
+            return false;
+        }
+
+        return $link;
     }
 }

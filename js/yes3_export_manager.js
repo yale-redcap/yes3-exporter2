@@ -183,6 +183,7 @@ FMAPR.exportTableRowHtml = function( data ){
         if ( !repeater ) {
             if ( FMAPR.project.user_data_downloads_disabled==0 ) cellHtml += `&nbsp;<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>&nbsp;`;
             if ( FMAPR.project.host_filesystem_exports_enabled==1 ) cellHtml += `&nbsp;<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>&nbsp;`;
+            //if ( YES3.EMSettings['enable-validator'] === 'Y' ) cellHtml += `&nbsp;<i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i>&nbsp;`;
         }
         rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column">${cellHtml}</i></td>`;
     }
@@ -201,6 +202,11 @@ FMAPR.exportTableRowHtml = function( data ){
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_layout" title="${layout_tooltip}">${FMAPR.layoutLabel(data.export_layout)}</td>`;
     if ( FMAPR.enableHostFilesystemExports ) rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="column_count" >${data.column_count}</td>`;
+
+    // if ( YES3.EMSettings['enable-validator'] === 'Y' ) {
+    //     rowHtml += `<td class="yes3-col-sm yes3-halign-center"><i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i></td>`;
+    // }
+
 
     if ( YES3.userRights.isDesigner ) {
         

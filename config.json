@@ -22,41 +22,23 @@
 
     "versions": [
         {
+            "version": "2.0.1",
+            "date": "2025-08-01",
+            "description": "Initial work on the validator/importer",
+            "comments": "config.json, manager ui"
+        },
+        {
             "version": "2.0.0",
             "date": "2025-07-30",
             "description": "The first Exporter II beta release",
             "comments": "Mainly UI/UX stuff"
-        },        
-        {
-            "version": "1.1.8",
-            "date": "2025-06-18",
-            "description": "performance improvements",
-            "comments": "Trying to improve specification loading. Also minor bug fixes"
-        },        
-        {
-            "version": "1.1.5",
-            "date": "2025-06-17",
-            "description": "sascoder embedded in module",
-            "comments": "SAS code generation is now embedded in the module, rather than being a separate module. This allows for more flexibility in the future, and simplifies the installation process."
-        },
-        {
-            "version": "1.1.3",
-            "date": "2025-03-16",
-            "description": "repeating forms bug fixed",
-            "comments": "repeating forms were not selectable in export designer"
-        },
-        {
-            "version": "1.1.2",
-            "date": "2024-10-08",
-            "description": "cron bug fixed",
-            "comments": "project_id was not being passed to cron job"
         }
     ],
 
     "links": {
         "project": [
             {
-                "name": "YES3 Export Manager",
+                "name": "YES3 Exporter Manager",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_manager.php"
             },
@@ -69,6 +51,11 @@
                 "name": "YES3 Exporter Logs",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_logs.php"
+            },
+            {
+                "name": "YES3 Exporter Import/Validator",
+                "icon": "fab fa-connectdevelop",
+                "url":  "plugins/yes3_export_validator.php"
             },
             {
                 "name": "YES3 Exporter Mount Test",
@@ -297,7 +284,6 @@
             "key": "cron-user",
             "name": "Cron user",
             "required": true,
-            "super-users-only": true,
             "type": "user-list",
             "branchingLogic": {
                 "type": "or",
@@ -312,6 +298,26 @@
                     }
                 ]
             }
+        },
+        {
+            "key": "enable-validator-header",
+            "type" : "descriptive",
+            "name": "<h5>VALIDATOR / IMPORTER</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p><p>Originally designed as an in-house tool for testing the YES3 Exporter, we are now making it available as a standard feature that you may integrate with your data quality control workflows.</p><p>In addition, this feature supports the import of an external spreadsheet into REDCap, if its layout exactly matches that of a YES3 Export specification. This is useful for importing data from external sources, such as a data warehouse. NOTE: The import feature supports only non-repeating forms and events.</p>"
+        },
+        {
+            "key": "enable-validator",
+            "name": "Enable the validator/importer",
+            "type": "radio",
+            "choices":[
+                {
+                    "value":"N",
+                    "name":"No"
+                },
+                {
+                    "value":"Y",
+                    "name":"Yes"
+                }
+            ]
         },
         {
             "key":   "project-cron-header",

@@ -273,6 +273,8 @@ trait Yes3Trait {
 
         $js .= "\nYES3.moduleProperties = " . $this->objectProperties() . ";\n";
 
+        $js .= "\nYES3.EMSettings = " . json_encode($this->getProjectSettings()) . ";\n";
+
         $css .= file_get_contents( $this->getModulePath()."css/yes3.css" );
         $css .= file_get_contents( $this->getModulePath()."css/common.css" );
         $css .= file_get_contents( $this->getModulePath()."css/{$libname}.css" );
