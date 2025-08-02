@@ -79,7 +79,7 @@ $module->getCodeFor("yes3_export_manager", true);
 
     <!-- CONTROL BAR -->
 
-    <div class="yes3-flex-container-vbaseline yes3-fmapr-controls">
+    <div class="yes3-flex-container-vbaseline yes3-fmapr-controls  yes3-look-out-below">
 
         <div class="yes3-flex-col-33 yes3-flex-hleft yes3-ellipsis">
             <span class="yes3-title">YES3</span> <span class="yes3-subtitle">Exporter II <span class="yes3-semibold">Manager</span></span>
@@ -122,6 +122,7 @@ $module->getCodeFor("yes3_export_manager", true);
                         <th class="yes3-col-sm yes3-header yes3-halign-center" title="export layout">Layout</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-filesystem-exports" title="export included in daily batch (cron) job">Batch</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center" title="column count">Columns</th>
+                        <!--th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="validate this export, or import from an external datasheet">Val/Imp</th-->
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only" title="remove the export (can be restored later)">Remove</th>
                     </tr>
                 </thead>
@@ -138,6 +139,7 @@ $module->getCodeFor("yes3_export_manager", true);
                         <td class="yes3-col-sm yes3-halign-left"></td>
                         <td class="yes3-col-sm yes3-halign-left yes3-fmapr-filesystem-exports"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
+                        <!--<th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="who you lookin at?"></th>-->
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column" id="yes3-fmapr-visibility-control" title="click to show removed exports, which can then be restored">
                             show xx<br>removed
                         </td>
