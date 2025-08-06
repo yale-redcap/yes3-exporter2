@@ -602,6 +602,20 @@ div#yes3-red-pointer {
     align-items: center; 
 }
 
+.yes3-flex-container-vtop {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: flex-start; 
+}
+
+.yes3-flex-container-vbottom {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: flex-end; 
+}
+
 /* for elements inside containers */
 
 .yes3-flex-hleft {
@@ -1534,16 +1548,16 @@ div.yes3-max-headroom {
  }
  
  input[type=button].yes3-button {
-    float: left;
-    margin-right: 10px;
-    border-radius: 20px;
-    height: 40px;
+    border-radius: 15px;
+    height: 30px;
     width: auto !important;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 15px;
+    padding-right: 15px;
     color: var(--yes3-button-color);
     background-color: var(--yes3-button-background-color);
     border-color: var(--yes3-button-border-color);
+    border-style: outset;
+    border-width: 2px;
  }
  
  input[type=button].yes3-button:hover {

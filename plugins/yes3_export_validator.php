@@ -56,14 +56,8 @@ $module->getCodeFor("yes3_export_validator", true);
 
     <div class="yes3-flex-container-vbaseline yes3-fmapr-controls  yes3-look-out-below">
 
-        <div class="yes3-flex-col-33 yes3-flex-hleft yes3-ellipsis">
-            <span class="yes3-title">YES3</span> <span class="yes3-subtitle">Exporter II <span class="yes3-semibold">Importer / Validator</span></span>
-        </div>
-
-        <div class="yes3-flex-col-33 yes3-flex-hleft yes3-ellipsis">
-
-            <div id="yes3-fmapr-header-center"></div>
-
+        <div class="yes3-flex-col-67 yes3-flex-hleft yes3-ellipsis">
+            <span class="yes3-title">YES3</span> <span class="yes3-subtitle">Exporter II <span class="yes3-semibold">Validator</span></span>
         </div>
 
         <div class="yes3-flex-col-33 yes3-flex-vcenter-hright">
@@ -81,21 +75,32 @@ $module->getCodeFor("yes3_export_validator", true);
 
     </div>
 
-    <!-- DATA TABLE -->
+    <!-- IMPORT SELECTOR -->
 
-    <div class="yes3-container">
+    <div class="yes3-flex-container-left-aligned">
+
+        <div class="yes3-flex-hleft" id="yes3-fmapr-export-selection">
+            <ul>
+                <li><span class="name">my big fat export</span><span class="label"> don't leave home without it</span></li>
+                <li><span class="name">the hot skinny</span><span class="label"> everything you need to know</span></li>
+            </ul>
+        </div>
+
+        <input type="button" class="yes3-flex-hleft yes3-button" id="yes3-fmapr-export-button" value="upload datasheet">
 
     </div>
 
+    <!-- FOOTER -->
+
     <div class="yes3-flex-container" id="yes3-fmapr-footer">
 
-        <div class="yes3-flex-col-33 yes3-flex-vcenter-hleft">
+        <div class="yes3-flex-col-50 yes3-flex-vcenter-hleft">
 
             <div id='yes3-fmapr-copyright'></div>
 
         </div>
 
-        <div class="yes3-flex-col-67 yes3-flex-vcenter-hleft">
+        <div class="yes3-flex-col-50 yes3-flex-vcenter-hleft">
 
             <div id="yes3-message"></div>
 
