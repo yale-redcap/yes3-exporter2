@@ -4786,7 +4786,7 @@ WHERE project_id=? AND log_entry_type=?
             return false;
         }
 
-        if ( $projectSettings['enable-validator'] !== "Y" && $link['name'] === "YES3 Exporter Import/Validator" ){
+        if ( $projectSettings['enable-validator'] !== "Y" && $link['name'] === "YES3 Exporter Validator" ){
 
             return false;
         }

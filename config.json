@@ -53,7 +53,7 @@
                 "url":  "plugins/yes3_export_logs.php"
             },
             {
-                "name": "YES3 Exporter Import/Validator",
+                "name": "YES3 Exporter Validator",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_validator.php"
             },
@@ -302,11 +302,13 @@
         {
             "key": "enable-validator-header",
             "type" : "descriptive",
-            "name": "<h5>VALIDATOR / IMPORTER</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p><p>Originally designed as an in-house tool for testing the YES3 Exporter, we are now making it available as a standard feature that you may integrate with your data quality control workflows.</p><p>In addition, this feature supports the import of an external spreadsheet into REDCap, if its layout exactly matches that of a YES3 Export specification. This is useful for importing data from external sources, such as a data warehouse. NOTE: The import feature supports only non-repeating forms and events.</p>"
+            "super-users-only": true,
+            "name": "<h5>VALIDATOR</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p>"
         },
         {
             "key": "enable-validator",
             "name": "Enable the validator/importer",
+            "super-users-only": true,
             "type": "radio",
             "choices":[
                 {
