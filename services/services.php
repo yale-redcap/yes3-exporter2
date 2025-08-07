@@ -4,6 +4,8 @@ namespace Yale\Yes3Exporter;
 
 use Exception;
 
+use Yale\Yes3Exporter\Yes3ExportValidator;
+
 /*
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -93,7 +95,9 @@ function execRequest( $request ){
         , 'saveeventsettings'
         , 'saveexportspecification'
         , 'remove_or_restore_export'
-        , 'update_export_table_settings'    ];
+        , 'update_export_table_settings'
+        , 'validateexportfile'
+    ];
 
     $fnIndex = array_search( strtolower($request), $function_registry );
 
@@ -103,6 +107,52 @@ function execRequest( $request ){
     }
 
     exit( call_user_func( __NAMESPACE__ . "\\". $function_registry[ $fnIndex ] ) );
+}
+
+function validateExportFile(){
+    global $module;
+
+    $export_uuid = $_POST['export_uuid'] ?? null;
+
+    $project_id = $module->getProjectId();
+
+    $file = $_FILES['datasheetToValidate'] ?? null;
+
+    if ( !$file ){
+
+        return $module->stdReturnObj(
+            Yes3K::STD_RETURN_OBJECT_FAIL,
+            "Uploaded file not detected on server.",
+            print_r($_FILES, true)
+        );
+    }
+
+    // Get the temporary directory path
+    $tempDir = sys_get_temp_dir();
+
+    $uploadedFilePath = $file['tmp_name'];
+
+    $destPath = $tempDir . DIRECTORY_SEPARATOR . basename($file['name']);
+
+    if (is_uploaded_file($uploadedFilePath)) {
+
+        move_uploaded_file($uploadedFilePath, $destPath);
+    } else {
+
+        // Handle the error
+        throw new Exception("File upload error: Unable to move the uploaded file {$uploadedFilePath}.");
+    }
+
+    $size_destPath = filesize($destPath) ?? 0;
+
+    $ddPackage = $module->buildExportDataDictionary($export_uuid);
+
+    $XValidator = new Yes3ExportValidator();
+    $XValidator->initialize($project_id, $export_uuid, $destPath, $ddPackage['export_data_dictionary']);
+
+    $ValResults = $XValidator->validate();
+
+    return json_encode($ValResults);
 }
 
 function update_export_table_settings()
