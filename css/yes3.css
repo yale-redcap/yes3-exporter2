@@ -34,7 +34,7 @@ html {
    --yes3-font-weight-light: 200;
    --yes3-font-weight-normal: 400;
    --yes3-font-weight-semibold: 600;
-   --yes3-font-weight-bold: 700;
+   --yes3-font-weight-bold: 800;
 
    --yes3-font-weight: var(--yes3-font-weight);
    --yes3-td-font-weight: var(--yes3-font-weight);
@@ -618,6 +618,11 @@ div#yes3-red-pointer {
 
 /* for elements inside containers */
 
+.yes3-hleft {
+    display: inline-block;
+}
+
+/* deprecated as brain damaged */
 .yes3-flex-hleft {
     display: inline-block;
 }

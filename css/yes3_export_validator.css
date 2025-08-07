@@ -1,21 +1,35 @@
-#yes3-fmapr-export-selection {
+.yes3-fmapr-validator-inbox, .yes3-fmapr-validator-inbox-noborders {
     padding: 1em;
-    background-color: var(--yes3-hi-contrast-background-color);
-    border: 1px solid var(--yes3-border-color);
 }
 
-#yes3-fmapr-export-selection span.export_name {
+.yes3-fmapr-validator-inbox {
+    background-color: var(--yes3-hi-contrast-background-color);
+    border: 1px solid var(--yes3-border-color);
+    border-radius: 4px;
+}
+
+.yes3-fmapr-validator-inbox-noborders {
+    border: none;
+    background-color: transparent;
+}
+
+span.export_name {
     font-weight: var(--yes3-font-weight-semibold);
     color: var(--yes3-hi-contrast-color);
     margin-right: 1em;
 }
 
-#yes3-fmapr-export-selection span.export_label {
+span.export_label {
     font-weight: normal;
     color: var(--yes3-color);
 }
 
-#yes3-fmapr-export-selection span.export_name:hover {
+span.export_file_name {
+    font-weight: var(--yes3-font-weight-normal);
+    color: var(--yes3-hi-contrast-color);
+}
+
+span.export_name:hover {
     cursor: pointer;
 }
 /*
@@ -24,7 +38,8 @@
 }
 */
 #yes3-fmapr-export-selection div.selected::before {
-    content: "✓ ";
+    content: "\2714";
+    margin-right: 0.5em;
     color: var(--yes3-okay-color);
     font-weight: var(--yes3-font-weight-bold);
 }
@@ -32,3 +47,34 @@
 input#yes3-fmapr-export-button {
     display: none
 }
+
+div#yes3-fmapr-export-upload, div#yes3-fmapr-export-validate {
+    display: none;
+}
+
+#yes3-container input[type=button], 
+#yes3-container input::file-selector-button {
+    border-radius: 1.5em;
+    height: 3em;
+    width: auto !important;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    color: var(--yes3-button-color);
+    background-color: var(--yes3-background-color);
+    border-color: var(--yes3-button-border-color);
+    border-style: solid;
+    border-width: 1px;
+}
+
+#yes3-container input[type=button]:hover, 
+#yes3-container button[type=submit]:hover, 
+#yes3-container input::file-selector-button:hover {
+    background-color:var(--yes3-button-color);
+    border-color: var(--yes3-button-color);
+    color:var(--yes3-background-color);
+}
+
+button#yes3-fmapr-export-upload-button{
+    display: none
+}
+

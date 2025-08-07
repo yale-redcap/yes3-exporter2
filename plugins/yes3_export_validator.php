@@ -56,7 +56,7 @@ $module->getCodeFor("yes3_export_validator", true);
 
     <div class="yes3-flex-container-vbaseline yes3-fmapr-controls  yes3-look-out-below">
 
-        <div class="yes3-flex-col-67 yes3-flex-hleft yes3-ellipsis">
+        <div class="yes3-flex-col-67 yes3-hleft yes3-ellipsis">
             <span class="yes3-title">YES3</span> <span class="yes3-subtitle">Exporter II <span class="yes3-semibold">Validator</span></span>
         </div>
 
@@ -75,20 +75,32 @@ $module->getCodeFor("yes3_export_validator", true);
 
     </div>
 
-    <!-- IMPORT SELECTOR -->
+    <!-- EXPORT SELECTOR -->
 
     <div class="yes3-flex-container-left-aligned">
 
-        <div class="yes3-flex-hleft" id="yes3-fmapr-export-selection">
+        <div class="yes3-hleft yes3-fmapr-validator-inbox" id="yes3-fmapr-export-selection">
             <ul>
                 <li><span class="name">my big fat export</span><span class="label"> don't leave home without it</span></li>
                 <li><span class="name">the hot skinny</span><span class="label"> everything you need to know</span></li>
             </ul>
         </div>
 
-        <input type="button" class="yes3-flex-hleft yes3-button" id="yes3-fmapr-export-button" value="upload datasheet">
+        <div class="yes3-hleft yes3-fmapr-validator-inbox-noborders" id="yes3-fmapr-export-upload">
+            <form id="yes3-fmapr-export-upload-form" enctype="multipart/form-data">
+                <input type="file" id="yes3-fmapr-export-upload-file" name="yes3-fmapr-export-upload-file" accept=".csv,.tsv" />
+            </form>
+        </div>
+
+        <div class="yes3-hleft yes3-fmapr-validator-inbox-noborders" id="yes3-fmapr-export-validate">
+            <form id="yes3-fmapr-export-upload-form" enctype="multipart/form-data">
+                <input type="button" id="yes3-fmapr-export-validate-button" value="validate">
+            </form>
+        </div>
 
     </div>
+
+    <!-- EXPORT VALIDATOR -->
 
     <!-- FOOTER -->
 
