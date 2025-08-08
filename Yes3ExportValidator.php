@@ -106,6 +106,26 @@ class Yes3ExportValidator {
         fclose($handle);
     }
 
+    private function isRedCapVar($var_name) {
+
+        $redcap_vars = [
+            'redcap_event_id',
+            'redcap_event_name',
+            'redcap_data_access_group_id',
+            'redcap_data_access_group',
+            'redcap_event_id',
+            'redcap_event_name',
+            'redcap_repeat_instance'
+        ];
+
+        return in_array($var_name, $redcap_vars);
+    }
+
+    private function isCheckbox( $ddItem ){
+
+        return (( isset($ddItem['redcap_source_option']) && $ddItem['redcap_source_option'] ));
+    }
+
     public function validate() {
 
         $rowCount = 0;
@@ -144,7 +164,7 @@ class Yes3ExportValidator {
 
             $rowCount++;
 
-            if ($rowCount > 100 ) {
+            if ($rowCount > 10000 ) {
                 break; // for testing, limit to first 10 data rows
             }
         }
@@ -160,21 +180,29 @@ class Yes3ExportValidator {
         );
     }
 
-    private function isRedCapVar($var_name) {
+    private function validateHeader($header) {
 
-        $redcap_vars = [
-            'redcap_event_id',
-            'redcap_event_name',
-            'redcap_data_access_group_id',
-            'redcap_data_access_group',
-            'redcap_event_id',
-            'redcap_event_name',
-            'redcap_repeat_instance'
-        ];
+        $ddFields = array_column($this->dd, 'var_name') ?? [];
 
-        return in_array($var_name, $redcap_vars);
+        if ( count($header) !== count($ddFields) ) {
+
+            return Yes3Fn::failObject("Header validation failed: The number of fields in the header does not match the data dictionary.");
+        }
+
+        for ($i = 0; $i < count($header); $i++) {
+
+            $export_col_name = $this->cleanString($header[$i]);
+            $dd_col_name = $this->cleanString($ddFields[$i]);
+
+            if ($export_col_name !== $dd_col_name) {
+
+                return Yes3Fn::failObject("Header validation failed: Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}'.");
+            }
+        }
+
+        return Yes3Fn::successObject("Header validation passed.");
     }
-
+    
     private function validateRow($row) {
 
         $record = $row[0] ?? null;
@@ -214,7 +242,7 @@ class Yes3ExportValidator {
 
                 continue; // skip validation for redcap fields
             }
-
+            
             $redcap_field_name = $this->dd[$i]['redcap_field_name'];
 
             // for horiz layout, the event_id comes from the dd
@@ -223,30 +251,73 @@ class Yes3ExportValidator {
                 $redcap_event_id = (int) $this->dd[$i]['redcap_event_id'];
             }
 
-            // goddam multiselects: a "1" indicates that the associated option is selected,
-            // so we need to check if the value is a "1" and if so, set the value to the option value
-            if ( isset($this->dd[$i]['redcap_source_option']) && $this->dd[$i]['redcap_source_option']  ) {
+            if ( $this->isCheckbox($this->dd[$i]) ) {
 
-                if ( $value == "1" ) {
-                    $value = $this->dd[$i]['redcap_source_option'];
-                }
-                else $value = ""; // TEMPORARY: if not "1", then it is not selected, so set to "0"
+                $validationResult = $this->validateCheckbox($record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $value, $this->dd[$i]);
+            }
+            else {
 
-                continue; // skip validation for goddam multiselects for now
+                $validationResult = $this->validateValue($record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $value); // a success or fail std return object
             }
 
-            // validate the value
-            $valueValidation = $this->validateValue($record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $value); // a success or fail std return object
-
-            if ($valueValidation['result'] !== Yes3K::STD_RETURN_OBJECT_SUCCESS) {
-
-                return $valueValidation;
+            // bail on failed validation
+            if ($validationResult['result'] !== Yes3K::STD_RETURN_OBJECT_SUCCESS) {
+                return $validationResult;
             }
         }
+
         // Placeholder for row validation logic
         return Yes3Fn::successObject("Row validation passed.");
     }
-    
+
+    /**
+     * validates checkboxes, including multiselects
+     * 
+     * @param mixed $record 
+     * @param mixed $redcap_event_id 
+     * @param mixed $redcap_field_name 
+     * @param mixed $redcap_repeat_instance 
+     * @param mixed $value 
+     * @param mixed $ddItem 
+     * @return void 
+     */
+    private function validateCheckbox( $record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $value, $ddItem ){
+
+        /**
+         * To validate, we retrieve the associated option value from the data dictionary, which is the value stored in the redcap data table.
+         */
+        $option_value = $ddItem['redcap_source_option'] ?? null;
+
+        if ( !$option_value ) {
+
+            return Yes3Fn::failObject("Checkbox validation failed: No associated option value found in data dictionary."); // truly enfargled
+        }
+
+        // we start by determining whether a 'checked state' is present in the redcap database
+        $sql = "SELECT COUNT(*) FROM {$this->redcap_data_table} WHERE project_id = ? AND record = ? AND field_name = ? AND event_id = ? AND ifnull(instance, 1) = ? AND value = ? LIMIT 1";
+        $params = [
+            $this->project_id,
+            $record,    
+            $redcap_field_name,
+            $redcap_event_id,
+            $redcap_repeat_instance,
+            $option_value
+        ];
+        $stored_checked_state = Yes3Fn::fetchValue( $sql, $params ) ? 1 : 0;
+
+        // in the export, a "1" indicates that the associated option is selected
+        $exported_checked_state = ( $value == "1" ) ? 1 : 0;
+
+        //$exported_checked_state = 1 - $exported_checked_state; // testing, should immediately fail
+
+        if ( $stored_checked_state === $exported_checked_state ) {
+
+            return Yes3Fn::successObject("Checkbox validation passed.");
+        }
+
+        return Yes3Fn::failObject("Checkbox validation failed for record '{$record}', event_id '{$redcap_event_id}', instance '{$redcap_repeat_instance}', field '{$redcap_field_name}', option '{$option_value}': the exported ({$exported_checked_state}) and stored ({$stored_checked_state}) checked states do not match.");
+    }
+
     private function validateValue($record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $exported_value) {
 
         $sql = "SELECT value FROM {$this->redcap_data_table} WHERE project_id = ? AND record = ? AND field_name = ? AND event_id = ? AND ifnull(instance, 1) = ? LIMIT 1";
@@ -260,37 +331,13 @@ class Yes3ExportValidator {
 
         $stored_value = Yes3Fn::fetchValue( $sql, $params ) ?? "";
 
-        if ( trim($stored_value) !== trim($exported_value) ) {
+        if ( trim($stored_value) === trim($exported_value) ) {
 
-            return Yes3Fn::failObject("Value validation failed: For record '{$record}', event_id '{$redcap_event_id}', field '{$redcap_field_name}', instance '{$redcap_repeat_instance}', the exported value '{$exported_value}' does not match the stored value '{$stored_value}'.");
+            return Yes3Fn::successObject("The exported and stored values match.");
         }
 
-        // Placeholder for value validation logic
-        return Yes3Fn::successObject("Value validation passed.");
-    }
-
-    private function validateHeader($header) {
-
-        $ddFields = array_column($this->dd, 'var_name') ?? [];
-
-        if ( count($header) !== count($ddFields) ) {
-
-            return Yes3Fn::failObject("Header validation failed: The number of fields in the header does not match the data dictionary.");
-        }
-
-        for ($i = 0; $i < count($header); $i++) {
-
-            $export_col_name = $this->cleanString($header[$i]);
-            $dd_col_name = $this->cleanString($ddFields[$i]);
-
-            if ($export_col_name !== $dd_col_name) {
-
-                return Yes3Fn::failObject("Header validation failed: Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}'.");
-            }
-        }
-
-        return Yes3Fn::successObject("Header validation passed.");
-    }
+        return Yes3Fn::failObject("Value validation failed: For record '{$record}', event_id '{$redcap_event_id}', instance '{$redcap_repeat_instance}', field '{$redcap_field_name}': the exported value '{$exported_value}' does not match the stored value '{$stored_value}'.");
+   }
 
     private function cleanString($str) {
         // Remove UTF-8 BOM if present
