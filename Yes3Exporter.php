@@ -129,7 +129,8 @@ class Yes3Exporter extends \ExternalModules\AbstractExternalModule
     }
 
     /**
-     * Hash and Date shifting code from Record class, REDCap 11.3.4
+     * Hash and Date shifting code from Record class
+     * verified as of REDCap 14.5.29
      * Copied here to remove dependency on class def
      */
 
@@ -2275,7 +2276,8 @@ WHERE project_id=? AND log_entry_type=?
                         $y[ $dd[ $field_index]['var_name'] ] .= ",";
                     }
 
-                    $y[ $dd[ $field_index]['var_name'] ] .= Yes3Fn::normalized_string( $REDCapValue );
+                    //$y[ $dd[ $field_index]['var_name'] ] .= Yes3Fn::normalized_string( $REDCapValue );
+                    $y[ $dd[ $field_index]['var_name'] ] .= $REDCapValue;
                 }
                 elseif ( $is_multiselect ) {
 

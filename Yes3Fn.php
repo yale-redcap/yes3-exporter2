@@ -5,7 +5,7 @@ namespace Yale\Yes3Exporter;
 use ExternalModules\ExternalModules;
 
 use Exception;
-
+use Generator;
 use Project;
 
 use REDCap;
@@ -75,7 +75,7 @@ class Yes3Fn {
       return ExternalModules::query($sql, $parameters);
    }
 
-   public static function yieldRecords($sql, $parameters = [])
+   public static function recordGenerator($sql, $parameters = [])
    {
       $resultSet = self::query($sql, $parameters);
       if ( $resultSet->num_rows > 0 ) {
@@ -752,18 +752,183 @@ class Yes3Fn {
     }
 
     /**
+     * Convert UTF-8 text to ASCII.
+     * - Applies a UTF-8 => ASCII symbol map (quotes, dashes, math, currency, etc.)
+     * - Transliterates remaining characters to ASCII (diacritics/non-Latin scripts)
+     * - Optionally enforces ASCII-only (replace or drop any leftover non-ASCII)
+     *
+     * NOTE: This function assumes you've already handled control chars, tabs, CR/LF.
+     *
+     * @param string $input
+     * @param bool $enforce enforce ASCII-only output
+     * @param string $repl replacement for non-ASCII characters
+     * @return string
+     * 
+     * Wrought by chatGPT 5
+     */
+    
+    public static function utf8_to_ascii(string $input, $repl='', $enforce=true): string
+    {
+        // basic UTF-8 => ASCII symbol map
+        $baseMap = [
+            // Quotation marks 
+            "\u{2018}" => "'", "\u{2019}" => "'", "\u{201A}" => "'", "\u{201B}" => "'",
+            "\u{201C}" => "'", "\u{201D}" => "'", "\u{201E}" => "'", "\u{201F}" => "'",
+            "\u{00AB}" => '"', "\u{00BB}" => '"', "\u{02BA}" => '"', "\u{02B9}" => "'",
+            "\u{275B}" => "'", "\u{275C}" => "'", "\u{275D}" => '"', "\u{275E}" => '"',
+
+            // Dashes / hyphens
+            "\u{2013}" => "-", "\u{2014}" => "-", "\u{2010}" => "-", "\u{2011}" => "-", "\u{2212}" => "-",
+
+            // Spaces (NB: control/invisible filtering is assumed handled elsewhere;
+            // these map exotic spaces to a normal space)
+            "\u{00A0}" => " ", "\u{2000}" => " ", "\u{2001}" => " ", "\u{2002}" => " ", "\u{2003}" => " ",
+            "\u{2004}" => " ", "\u{2005}" => " ", "\u{2006}" => " ", "\u{2007}" => " ", "\u{2008}" => " ",
+            "\u{2009}" => " ", "\u{200A}" => " ", "\u{202F}" => " ", "\u{205F}" => " ", "\u{3000}" => " ",
+            "\u{FEFF}" => "",
+
+            // Math symbols
+            "\u{2264}" => "<=", "\u{2265}" => ">=", "\u{00D7}" => "x", "\u{00F7}" => "/", "\u{2215}" => "/",
+            "\u{2217}" => "*", "\u{2248}" => "~", "\u{2260}" => "!=", "\u{2206}" => "delta",
+            "\u{2202}" => "d", "\u{2211}" => "sum",
+
+            // Arrows
+            "\u{2190}" => "<-", "\u{2192}" => "->", "\u{2191}" => "^", "\u{2193}" => "v", "\u{21D2}" => "=>",
+
+            // Fractions
+            "\u{00BC}" => "1/4", "\u{00BD}" => "1/2", "\u{00BE}" => "3/4",
+            "\u{2153}" => "1/3", "\u{2154}" => "2/3", "\u{2155}" => "1/5", "\u{2156}" => "2/5",
+            "\u{2157}" => "3/5", "\u{2158}" => "4/5", "\u{2159}" => "1/6", "\u{215A}" => "5/6",
+            "\u{215B}" => "1/8", "\u{215C}" => "3/8", "\u{215D}" => "5/8", "\u{215E}" => "7/8",
+
+            // Currency
+            "\u{00A3}" => "GBP", "\u{00A5}" => "YEN", "\u{20AC}" => "EUR", "\u{0024}" => "$",
+
+            // Misc
+            "\u{2032}" => "'", "\u{2033}" => "'", "\u{2034}" => "'", "\u{2026}" => "...", "\u{2022}" => "*",
+            "\u{00A9}" => "(c)", "\u{00AE}" => "(r)", "\u{2122}" => "TM", "\u{00B0}" => "deg",
+            "\u{2020}" => "+", "\u{2021}" => "++", "\u{203D}" => "!?",
+            "\u{2117}" => "(P)", "\u{2118}" => "(Q)", "\u{2119}" => "(R)",
+        ];
+
+        $extraMap = [
+            // More quotes / primes / guillemets
+            "\u{2039}" => "'", "\u{203A}" => "'", "\u{02BC}" => "'", "\u{301D}" => '"',
+            "\u{301E}" => '"', "\u{301F}" => '"',
+
+            // Dashes / hyphens
+            "\u{2012}" => "-", "\u{2015}" => "-", "\u{00AD}" => "",
+
+            // Invisible format chars)
+            "\u{200B}" => "", "\u{200C}" => "", "\u{200D}" => "", "\u{2060}" => "",
+
+            // Bullets / middots
+            "\u{00B7}" => "*", "\u{2219}" => "*", "\u{25E6}" => "*", "\u{2981}" => "*",
+
+            // Inverted punctuation
+            "\u{00A1}" => "!", "\u{00BF}" => "?",
+
+            // Superscripts/subscripts (ASCII-ish approximations)
+            "\u{00B9}" => "^1", "\u{00B2}" => "^2", "\u{00B3}" => "^3",
+            "\u{2070}" => "^0", "\u{2074}" => "^4", "\u{2075}" => "^5", "\u{2076}" => "^6",
+            "\u{2077}" => "^7", "\u{2078}" => "^8", "\u{2079}" => "^9", "\u{207A}" => "^+",
+            "\u{207B}" => "^-",
+            "\u{2081}\u{2080}" => "_10",
+            "\u{2080}" => "_0", "\u{2081}" => "_1", "\u{2082}" => "_2", "\u{2083}" => "_3",
+            "\u{2084}" => "_4", "\u{2085}" => "_5", "\u{2086}" => "_6", "\u{2087}" => "_7",
+            "\u{2088}" => "_8", "\u{2089}" => "_9", "\u{208A}" => "_+", "\u{208B}" => "_-",
+
+            // More fractions
+            "\u{2150}" => "1/7", "\u{2151}" => "1/9", "\u{2152}" => "1/10", "\u{215F}" => "1/",
+
+            // Math / logic
+            "\u{00B1}" => "+/-", "\u{2213}" => "-/+", "\u{221E}" => "inf", "\u{00AC}" => "NOT",
+            "\u{2227}" => "AND", "\u{2228}" => "OR", "\u{2200}" => "forall", "\u{2203}" => "exists",
+            "\u{2229}" => "INTERSECT", "\u{222A}" => "UNION", "\u{2286}" => "subseteq",
+            "\u{2282}" => "subset", "\u{2261}" => "===", "\u{2243}" => "~=", "\u{226A}" => "<<",
+            "\u{226B}" => ">>", "\u{22C5}" => "*",
+
+            // More arrows
+            "\u{21D0}" => "<=", "\u{21D4}" => "<=>", "\u{21A6}" => "->", "\u{2194}" => "<->",
+
+            // Currency (extra)
+            "\u{00A2}" => "cent", "\u{20B9}" => "INR", "\u{20BD}" => "RUB", "\u{20A9}" => "KRW",
+            "\u{20B1}" => "PHP", "\u{20AA}" => "ILS", "\u{20BA}" => "TRY", "\u{20B4}" => "UAH",
+            "\u{20A8}" => "Rs", "\u{20BF}" => "BTC",
+
+            // Units / Greek
+            "\u{03A9}" => "ohm", "\u{2126}" => "ohm", "\u{00B5}" => "u", "\u{03BC}" => "u",
+            "\u{03C0}" => "pi", "\u{00F0}" => "d", "\u{2207}" => "del", "\u{03B1}" => "alpha",
+            "\u{03B2}" => "beta", "\u{03B3}" => "gamma", "\u{03B4}" => "delta",
+            "\u{03B5}" => "epsilon", "\u{03B6}" => "zeta", "\u{03B7}" => "eta", "\u{03B8}" => "theta",
+            "\u{0394}" => "Delta",
+
+            // Legal / paragraph
+            "\u{00A7}" => "Section", "\u{00B6}" => "Para",
+
+            // Misc punctuation
+            "\u{2030}" => "per mille", "\u{2031}" => "per 10k", "\u{2016}" => "||",
+            "\u{00A8}" => '"',
+
+            // emojis
+            "\u{1F336}" => "pepper", "\u{2615}" => "coffee",
+            "\u{1F37A}" => "beer", "\u{1F37B}" => "wine",
+            "\u{1F4C4}" => "page", "\u{1F4C5}" => "page with curl",
+            "\u{2764}" => "heart", "\u{1F96A}" => "sandwich", "\u{1F3AF}" => "dart",
+        ];
+
+        $charMap = array_replace($baseMap, $extraMap);
+        $out = strtr($input, $charMap);
+
+        // --- 2) Transliterate to ASCII (diacritics + non-Latin scripts) ---
+        // Prefer ICU Transliterator (ext/intl). Fallback to iconv.
+        
+        
+        if (class_exists('Transliterator')) {
+            $t = \Transliterator::create('Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC');
+            if ($t) {
+                $out = $t->transliterate($out);
+            }
+        } else {
+            $converted = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $out);
+            if ($converted !== false) {
+                $out = $converted;
+            }
+        }
+
+        // --- 3) Optionally enforce ASCII-only (strip/replace any leftovers) ---
+        if ($enforce) {
+            if ($repl === '') {
+                // Drop anything not in ASCII printable range + common whitespace you already vetted
+                $out = preg_replace('/[^\x20-\x7E]/', '', $out);
+            } else {
+                $out = preg_replace('/[^\x20-\x7E]/', $repl, $out);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
      * Sanitizes a string for text output, removing or replacing special characters.
+     * This is the one sanitizer to rule them all.
      * 
      * The following transformations are always applied:
      * - leading and trailing whitespace are trimmed
-     * - non-printable control characters except for newline, carriage return, and tab are removed
+     * - valid UTF-8 is enforced
+     * - embedded \r (CR) characters are removed.
+     *
+     * A note about newlines: export .csv and .tsv files are terminated by \n\r (CRLF). 
+     * This allows for \n to be preserved in the exported cells.
      *
      * @param string $input The input string to sanitize.
-     * @param int $maxLen Optional maximum length of the output string. Default is 0 (no limit).
+     * @param int  $maxLen Optional maximum length of the output string. Default is 0 (no limit).
      * @param bool $notags If true, removes HTML tags. Default is true.
      * @param bool $ascii If true, converts non-ASCII characters to their ASCII equivalents. Default is false.
-     * @param bool $notabs If true, replaces tab characters with spaces. Default is true.
-     * @param bool $nodquotes If true, replaces double quotes with single quotes. Suitable for labels. Default is true.
+     * @param bool $noUnprintableCharacters (aka inoffensiveText) If true, removes unprintable characters except for newline, carriage return, and tab. Default is false.
+     * @param bool $noNewlines If true, removes newline characters. Default is false.
+     * @param bool $notabs If true, replaces tab characters with spaces. Default is TRUE (since exports are tsv by default).
+     * @param bool $nodquotes If true, replaces double quotes with single quotes. Suitable for labels. Default is false.
      * @return string The sanitized string.
      */
     public static function sanitizeForText( $input, 
@@ -772,113 +937,10 @@ class Yes3Fn {
         $ascii=false, 
         $noUnprintableCharacters=false,
         $noNewlines=false,
-        $noTabs=false,
+        $noTabs=true,
         $noDQuotes=false
         ):string
     {
-        $charMap = [
-
-            // Quotation marks (straight double quotes are handled separately)
-            "\u{2018}" => "'",   // left single quotation mark
-            "\u{2019}" => "'",   // right single quotation mark
-            "\u{201A}" => "'",   // single low-9 quotation mark
-            "\u{201B}" => "'",   // single high-reversed-9 quotation mark
-            "\u{201C}" => "'",   // left double quotation mark
-            "\u{201D}" => "'",   // right double quotation mark
-            "\u{201E}" => "'",   // double low-9 quotation mark
-            "\u{201F}" => "'",   // double high-reversed-9 quotation mark
-            "\u{00AB}" => '"',   // « left-pointing double angle quotation mark
-            "\u{00BB}" => '"',   // » right-pointing double angle quotation mark
-            "\u{02BA}" => '"',   // modifier letter double prime
-            "\u{02B9}" => "'",   // modifier letter prime
-            "\u{275B}" => "'",   // heavy single turned comma quotation mark ornament
-            "\u{275C}" => "'",   // heavy single comma quotation mark ornament
-            "\u{275D}" => '"',   // heavy double turned comma quotation mark ornament
-            "\u{275E}" => '"',   // heavy double comma quotation mark ornament
-
-            // Dashes and hyphens
-            "\u{2013}" => "-",   // en dash
-            "\u{2014}" => "-",   // em dash
-            "\u{2010}" => "-",   // hyphen
-            "\u{2011}" => "-",   // non-breaking hyphen
-            "\u{2212}" => "-",   // minus sign
-
-            // Spaces and invisible characters
-            "\u{00A0}" => " ",   // non-breaking space
-            "\u{2000}" => " ",   // en quad
-            "\u{2001}" => " ",   // em quad
-            "\u{2002}" => " ",   // en space
-            "\u{2003}" => " ",   // em space
-            "\u{2004}" => " ",   // three-per-em space
-            "\u{2005}" => " ",   // four-per-em space
-            "\u{2006}" => " ",   // six-per-em space
-            "\u{2007}" => " ",   // figure space
-            "\u{2008}" => " ",   // punctuation space
-            "\u{2009}" => " ",   // thin space
-            "\u{200A}" => " ",   // hair space
-            "\u{202F}" => " ",   // narrow no-break space
-            "\u{205F}" => " ",   // medium mathematical space
-            "\u{3000}" => " ",   // ideographic space
-            "\u{FEFF}" => "",    // zero width no-break space (BOM)
-
-            // Math symbols
-            "\u{2264}" => "<=",  // less-than or equal to
-            "\u{2265}" => ">=",  // greater-than or equal to
-            "\u{00D7}" => "x",   // multiplication sign
-            "\u{00F7}" => "/",   // division sign
-            "\u{2215}" => "/",   // division slash
-            "\u{2217}" => "*",   // asterisk operator
-            "\u{2248}" => "~",   // almost equal to
-            "\u{2260}" => "!=",  // not equal to
-            "\u{2206}" => "delta", // increment / delta
-            "\u{2202}" => "d",   // partial differential
-            "\u{2211}" => "sum",  // summation
-
-            // Arrows
-            "\u{2190}" => "<-",  // left arrow
-            "\u{2192}" => "->",  // right arrow
-            "\u{2191}" => "^",   // up arrow
-            "\u{2193}" => "v",   // down arrow
-            "\u{21D2}" => "=>",  // implies
-
-            // Fractions
-            "\u{00BC}" => "1/4", // ¼
-            "\u{00BD}" => "1/2", // ½
-            "\u{00BE}" => "3/4", // ¾
-            "\u{2153}" => "1/3", // ⅓
-            "\u{2154}" => "2/3", // ⅔
-            "\u{2155}" => "1/5", // ⅕
-            "\u{2156}" => "2/5", // ⅖
-            "\u{2157}" => "3/5", // ⅗
-            "\u{2158}" => "4/5", // ⅘
-            "\u{2159}" => "1/6", // ⅙
-            "\u{215A}" => "5/6", // ⅚
-            "\u{215B}" => "1/8", // ⅛
-            "\u{215C}" => "3/8", // ⅜
-            "\u{215D}" => "5/8", // ⅝
-            "\u{215E}" => "7/8", // ⅞
-
-            // Currency
-            "\u{00A3}" => "GBP",  // £
-            "\u{00A5}" => "YEN",  // ¥
-            "\u{20AC}" => "EUR",  // €
-            "\u{0024}" => "$",    // Dollar (for completeness)
-
-            // Misc
-            "\u{2032}" => "'",    // prime
-            "\u{2033}" => "'",    // double prime
-            "\u{2034}" => "'",    // triple prime
-            "\u{2026}" => "...",  // ellipsis
-            "\u{2022}" => "*",    // bullet
-            "\u{00A9}" => "(c)",  // copyright
-            "\u{00AE}" => "(r)",  // registered trademark
-            "\u{2122}" => "TM",   // trademark
-            "\u{00B0}" => "deg",  // degree symbol
-            "\u{2020}" => "+",    // dagger
-            "\u{2021}" => "++",   // double dagger
-            "\u{203D}" => "!?",   // interrobang
-        ];
-
         if ( !is_string($input) ) return "";
 
         // always remove leading and trailing whitespace
@@ -890,23 +952,39 @@ class Yes3Fn {
         // always remove CR, to prevent embedded CRLF which is the CSV/TSV row terminator
         $input = str_replace("\r", '', $input);
 
-        // remove control characters except for newline, carriage return, and tab
-        if ( $noUnprintableCharacters ) {
+        // remove control characters except for newline and tab
+        //if ( $noUnprintableCharacters ) {
 
-            // remove all control characters except for newline and tab
-            $input = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $input);
+        //    $input = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $input);
+        //}
+
+        // Clean up input by removing:
+        //   1. All Unicode control characters (\p{Cc}), except:
+        //      - Horizontal tab (U+0009, \x09)
+        //      - Line feed (U+000A, \x0A)
+        //   2. All Unicode line/paragraph separators (\p{Zl}, \p{Zp})
+        //   3. All invisible or zero-width space characters, including:
+        //      - No-break space (U+00A0)
+        //      - Zero-width space, joiners, and directional marks (U+200B–U+200F)
+        //      - Line/paragraph separators and narrow no-break space (U+2028–U+202F)
+        //      - Word joiner and other invisible format controls (U+2060–U+206F)
+        //      - Byte Order Mark (U+FEFF)
+        // This ensures that only meaningful printable characters, tabs, and line feeds remain.
+        // Works safely for both ASCII and UTF-8 encoded input.
+        // ref: GPT 5
+        if ($noUnprintableCharacters) {
+
+            $input = preg_replace(
+                '/[\p{Cc}\p{Zl}\p{Zp}\x{00A0}\x{200B}-\x{200F}\x{2028}-\x{202F}\x{2060}-\x{206F}\x{FEFF}&&[^\x09\x0A]]/u',
+                '',
+                $input
+            );
         }
 
         // replace newline and carriage return with a single space
         if ( $noNewlines) {
 
-            $input = str_replace(["\r\n","\n", "\r"], ' ', $input);
-        }
-
-        // convert double quotes to single quotes if requested (appropriate for labels)
-        if ( $noDQuotes ) {
-            
-            $input = str_replace('"', "'", $input);
+            $input = str_replace("\n", ' ', $input);
         }
         
         if ( $notags ) {
@@ -921,13 +999,16 @@ class Yes3Fn {
             $input = str_replace("\t", ' ', $input);
         }
 
+        // convert to ASCII if requested
         if ( $ascii ) {
 
-            // Normalize common unicode symbols to ASCII equivalents
-            $input = strtr($input, $charMap);
+            $input = self::utf8_to_ascii($input); // enforce ASCII-only output
+        }
 
-            // Remove all non-ASCII characters (keep only 0x20–0x7E)
-            $input = preg_replace('/[^\x20-\x7E]/u', '.', $input);
+        // convert double quotes to single quotes if requested (appropriate for labels)
+        if ( $noDQuotes ) {
+            
+            $input = str_replace('"', "'", $input);
         }
 
         // Truncate to the specified length if maxLen is greater than 0
@@ -1376,5 +1457,23 @@ class Yes3Fn {
 
     public static function sanitize_utf8($str) {
         return mb_convert_encoding($str, 'UTF-8', 'UTF-8');
+    }
+
+    /**
+     * formula from Records::getData
+     * verified as of REDCap v14
+     * 
+     * function: hash_record
+     * 
+     * @param string $record
+     * @param string $project_salt
+     * 
+     * @return string
+     */
+    public static function hash_record(string $record, string $project_salt): string
+    {
+        global $salt; // global REDCap salt, determined at installation
+
+        return md5($salt . $record . $project_salt);
     }
 }
