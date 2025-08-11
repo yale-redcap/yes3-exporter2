@@ -148,7 +148,7 @@ function validateExportFile(){
     $ddPackage = $module->buildExportDataDictionary($export_uuid);
 
     $XValidator = new Yes3ExportValidator();
-    $XValidator->initialize($project_id, $export_uuid, $destPath, $ddPackage['export_data_dictionary']);
+    $XValidator->initialize($project_id, $destPath, $ddPackage);
 
     $ValResults = $XValidator->validate();
 
