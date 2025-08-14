@@ -38,7 +38,8 @@ span.export_name:hover {
 }
 */
 #yes3-fmapr-export-selection div.selected::before {
-    content: "\2714";
+    /*content: "\2714\FE0E"; /* Check mark forced as text not emoji */
+    content: "\2714"; /* Check mark emoji */
     margin-right: 0.5em;
     color: var(--yes3-okay-color);
     font-weight: var(--yes3-font-weight-bold);
