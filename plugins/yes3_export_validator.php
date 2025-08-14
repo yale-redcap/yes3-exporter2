@@ -2,11 +2,9 @@
 
 namespace Yale\Yes3Exporter;
 
-
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
 
 $module = new Yes3Exporter();
 
@@ -96,6 +94,9 @@ $module->getCodeFor("yes3_export_validator", true);
             <form id="yes3-fmapr-export-upload-form" enctype="multipart/form-data">
                 <input type="button" id="yes3-fmapr-export-validate-button" value="validate">
             </form>
+        </div>
+
+        <div class="yes3-hleft yes3-fmapr-validator-inbox-noborders" id="yes3-fmapr-export-validate-message">
         </div>
 
     </div>

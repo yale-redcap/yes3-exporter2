@@ -8,6 +8,7 @@ FMAPR.renderUI = function( data ){
 }
 
 FMAPR.formData = {};
+FMAPR.fileToValidate = null;
 
 FMAPR.loadSpecifications = function( get_removed )
 {
@@ -73,16 +74,16 @@ FMAPR.hideUploadOptionsContainer = function()
     $uploadOptionsContainer.hide();
 }
 
-FMAPR.showValidateOptionsContainer = function( uploadedFileName )
+FMAPR.showValidateOptionsContainer = function()
 {
-    if ( !uploadedFileName ) {
+    if ( !FMAPR.fileToValidate ) {
         return false;
     }
     
     const $validateOptionsContainer = $( '#yes3-fmapr-export-validate' );
     const $validateButton = $( '#yes3-fmapr-export-validate-button' );
 
-    $validateButton.val( `validate: ${uploadedFileName}` );
+    $validateButton.val( `validate: ${FMAPR.fileToValidate}` );
 
     $validateOptionsContainer.show();
 }
@@ -100,13 +101,26 @@ FMAPR.setValidatorListeners = function()
 
         const $uploadOptionsContainer = $( '#yes3-fmapr-export-upload' );
         const $uploadButton = $( '#yes3-fmapr-export-upload-button' );
+        const $parentDiv = $( this ).closest( 'div' );
+        let $selectedExport = $( '#yes3-fmapr-export-selection div.selected' );
 
-        $( '#yes3-fmapr-export-selection div.selected' ).removeClass( 'selected' );
-        $( this ).closest( 'div' ).addClass( 'selected' );
+        if ( $parentDiv.hasClass( 'selected' ) ) {
+            $parentDiv.removeClass( 'selected' );
+            FMAPR.hideUploadOptionsContainer();
+            FMAPR.hideValidateOptionsContainer();
+        } else {
+            $selectedExport.removeClass( 'selected' );
+            $parentDiv.addClass( 'selected' );
+            FMAPR.showUploadOptionsContainer();
+        }
+        
+        FMAPR.clearValidationMessage();
+        FMAPR.fileToValidate = null;
 
-        console.log( 'selected', $( this ).text() );
-
-        FMAPR.showUploadOptionsContainer();
+        if ( $selectedExport.length > 0 ) {
+        }
+        else {
+        }
     });
 
     // file select button
@@ -129,8 +143,9 @@ FMAPR.setValidatorListeners = function()
             }
             console.log('FMAPR.formData:', obj);
 
+            FMAPR.fileToValidate = file.name;
             FMAPR.hideUploadOptionsContainer();
-            FMAPR.showValidateOptionsContainer( file.name );
+            FMAPR.showValidateOptionsContainer();
         }
     });
 
@@ -157,6 +172,10 @@ FMAPR.setValidatorListeners = function()
         console.log('upload: FMAPR.formData:', obj);
         
         FMAPR.validator_ajax( "validateExportFile", FMAPR.formData, FMAPR.uploadCallback );
+
+        FMAPR.hideValidateOptionsContainer();
+
+        FMAPR.postValidationMessage( 'Validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
     });
 }
 
@@ -181,6 +200,9 @@ FMAPR.uploadCallback = function( response )
     }
 
     FMAPR.postMessage( msg );
+    
+    FMAPR.postValidationMessage( 'Finished validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
+
 }
 
 FMAPR.validator_ajax = function( request, data, callback ) {
@@ -215,6 +237,16 @@ FMAPR.validator_ajax = function( request, data, callback ) {
 
         alert('AJAX error (check console for more info): ' + errorThrown);
     });
+}
+
+FMAPR.postValidationMessage = function( msg ){
+
+    $('#yes3-fmapr-export-validate-message').html( msg );
+}
+
+FMAPR.clearValidationMessage = function(){
+
+    $('#yes3-fmapr-export-validate-message').html( '' );
 }
 
 $( function(){
