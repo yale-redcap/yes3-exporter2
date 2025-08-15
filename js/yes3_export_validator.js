@@ -95,6 +95,20 @@ FMAPR.hideValidateOptionsContainer = function()
     $validateOptionsContainer.hide();
 }
 
+FMAPR.showValidationResultsTable = function()
+{
+    const $resultsTable = $( '#yes3-fmapr-export-validate-results-container' );
+
+    $resultsTable.show();
+}   
+
+FMAPR.hideValidationResultsTable = function()
+{
+    const $resultsTable = $( '#yes3-fmapr-export-validate-results-container' );
+
+    $resultsTable.hide();
+}
+
 FMAPR.setValidatorListeners = function()
 {
     $( '#yes3-fmapr-export-selection span.export_name' ).off('click').on('click', function(){
@@ -108,6 +122,7 @@ FMAPR.setValidatorListeners = function()
             $parentDiv.removeClass( 'selected' );
             FMAPR.hideUploadOptionsContainer();
             FMAPR.hideValidateOptionsContainer();
+            FMAPR.hideValidationResultsTable();
         } else {
             $selectedExport.removeClass( 'selected' );
             $parentDiv.addClass( 'selected' );
@@ -116,6 +131,7 @@ FMAPR.setValidatorListeners = function()
         
         FMAPR.clearValidationMessage();
         FMAPR.fileToValidate = null;
+        FMAPR.clearFileSelectionForm();
 
         if ( $selectedExport.length > 0 ) {
         }
@@ -175,13 +191,22 @@ FMAPR.setValidatorListeners = function()
 
         FMAPR.hideValidateOptionsContainer();
 
+        FMAPR.hideValidationResultsTable();
+
         FMAPR.postValidationMessage( 'Validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
     });
+}
+
+FMAPR.clearFileSelectionForm = function() {
+
+    $('#yes3-fmapr-export-upload-form')[0].reset();
 }
 
 FMAPR.uploadCallback = function( response )
 {
     console.log('FMAPR.uploadCallback', response);
+
+    FMAPR.clearFileSelectionForm();
 
     YES3.notBusy();
 
@@ -193,16 +218,41 @@ FMAPR.uploadCallback = function( response )
 
     const timeToUpload = (performance.getEntriesByName('FMAPR.upload')[0].duration/1000).toFixed(4);
 
-    let msg = `File uploaded successfully in ${timeToUpload} seconds.`;
+    const errorcount = response.data.counts.errors || 0;
+
+    let msg = `Export file uploaded and processed in ${timeToUpload} seconds. ${errorcount} discrepancies found.`;
 
     if ( response && response.message ) {
-        msg += ` Message: ${response.message}`;
+        msg += ` ${response.message}`;
     }
 
     FMAPR.postMessage( msg );
     
     FMAPR.postValidationMessage( 'Finished validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
 
+    FMAPR.buildValidationResultsTable( response.data.error_report );
+
+}
+
+FMAPR.buildValidationResultsTable = function( validationResults )
+{
+    const $resultsTableBody = $( '#yes3-fmapr-export-validate-results-body' );
+    $resultsTableBody.empty();
+
+    if ( validationResults && validationResults.length > 0 ) {
+        validationResults.forEach( function( result ) {
+            const $row = $( '<tr>' );
+            $row.append( $( '<td>' ).text( result.row ) );
+            $row.append( $( '<td>' ).text( result.record ) );
+            $row.append( $( '<td>' ).text( result.event_name ) );
+            $row.append( $( '<td>' ).text( result.instance ) );
+            $row.append( $( '<td>' ).text( result.field ) );
+            $row.append( $( '<td>' ).text( result.error_type ) );
+            $row.append( $( '<td>' ).text( result.message ) );
+            $resultsTableBody.append( $row );
+        });
+        FMAPR.showValidationResultsTable();
+    }
 }
 
 FMAPR.validator_ajax = function( request, data, callback ) {

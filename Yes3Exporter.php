@@ -911,6 +911,21 @@ class Yes3Exporter extends \ExternalModules\AbstractExternalModule
         return $etf;
     }
 
+    public function determineExportFileType()
+    {
+        $filetypeCsv = $this->getProjectSetting("export-filetype-csv");
+
+        if ( $filetypeCsv ){
+
+            $this->EXPORT_DATA_DELIMITER = ",";
+            $this->EXPORT_DATA_EXTENSION = "csv";
+        }
+        else {
+            $this->EXPORT_DATA_DELIMITER = "\t";
+            $this->EXPORT_DATA_EXTENSION = "tsv";
+        }
+    }
+
     /**
      * writeExportFiles
      * 
@@ -971,6 +986,8 @@ class Yes3Exporter extends \ExternalModules\AbstractExternalModule
         $export_no_tabs = false;
         $export_no_newlines = false;
         $export_no_dquotes = false;
+
+        $this->determineExportFileType(); // sets delimiter and file extension
 
         if ( $this->EXPORT_DATA_DELIMITER === "\t" ) {
 
@@ -2458,6 +2475,8 @@ WHERE project_id=? AND log_entry_type=?
 
         $response = "";
 
+        $this->determineExportFileType();
+
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
         if ($cron) {
@@ -2634,6 +2653,8 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadDataDictionary($export_uuid)
     {
+        $this->determineExportFileType();
+
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
         $export_name = $ddPackage['export_name'];
@@ -2697,6 +2718,8 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadData($export_uuid)
     {
+        $this->determineExportFileType();
+        
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
         $export_name = $ddPackage['export_name'];
@@ -2774,6 +2797,8 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadZip($export_uuid, $support_package=false)
     {
+        $this->determineExportFileType();
+
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
         $bytesWritten = 0;
@@ -2942,11 +2967,13 @@ WHERE project_id=? AND log_entry_type=?
 
     public function exportDataFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
     {
+        $this->determineExportFileType();
         return $this->exportFilename($export_name, "data", $this->EXPORT_DATA_EXTENSION, $target, $timestamp);
     }
 
     public function exportDataDictionaryFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
     {
+        $this->determineExportFileType();
         return $this->exportFilename($export_name, "dd", $this->EXPORT_DATA_EXTENSION, $target, $timestamp);
     }
 
@@ -4459,6 +4486,8 @@ WHERE project_id=? AND log_entry_type=?
     {
         $project_id = $this->getProjectId();
 
+        $this->determineExportFileType();
+
         $time = time();
 
         $bxLog = "\nBatch export started for project #{$project_id} at " . strftime("%F %T");
@@ -4789,7 +4818,7 @@ WHERE project_id=? AND log_entry_type=?
             return false;
         }
 
-        if ( $projectSettings['enable-validator'] !== "Y" && $link['name'] === "YES3 Exporter Validator" ){
+        if ( isset($projectSettings['enable-validator']) && $projectSettings['enable-validator'] != "1" && $link['name'] === "YES3 Exporter Validator" ){
 
             return false;
         }

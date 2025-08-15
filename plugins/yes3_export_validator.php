@@ -101,7 +101,25 @@ $module->getCodeFor("yes3_export_validator", true);
 
     </div>
 
-    <!-- EXPORT VALIDATOR -->
+    <!-- EXPORT VALIDATION RESULTS -->
+
+    <div id="yes3-fmapr-export-validate-results-container">
+        <table id="yes3-fmapr-export-validate-results-table" class="yes3-fampr-scrolling-table">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Record</th>
+                    <th>Event</th>
+                    <th>Instance</th>
+                    <th>Field</th>
+                    <th>Error</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="yes3-fmapr-export-validate-results-body">
+            </tbody>
+        </table>
+    </div>
 
     <!-- FOOTER -->
 

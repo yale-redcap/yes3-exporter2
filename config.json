@@ -7,7 +7,7 @@
 
     "documentation": "https://yale-redcap.github.io/yes3-exporter-1.0-docs/",
 
-    "prefix": "yes3_exporter",
+    "prefix": "yes3_exporter2",
 
     "institution": "Yale University",
 
@@ -300,28 +300,6 @@
             }
         },
         {
-            "key": "enable-validator-header",
-            "type" : "descriptive",
-            "super-users-only": true,
-            "name": "<h5>VALIDATOR</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p>"
-        },
-        {
-            "key": "enable-validator",
-            "name": "Enable the validator/importer",
-            "super-users-only": true,
-            "type": "radio",
-            "choices":[
-                {
-                    "value":"N",
-                    "name":"No"
-                },
-                {
-                    "value":"Y",
-                    "name":"Yes"
-                }
-            ]
-        },
-        {
             "key":   "project-cron-header",
             "type" : "descriptive",
             "name":  "<h5>CRON LOG</h5><p>The YES3 Exporter perfoms a number daily tasks for each project. Below is the most recent daily cron log for this project.</p>"
@@ -331,6 +309,48 @@
             "name": "Cron log for this project",
             "type": "textarea",
             "required": false
+        },
+        {
+            "key":   "filetype-header",
+            "type" : "descriptive",
+            "name":  "<h5>EXPORT FILE TYPE</h5><p>By default, the export file type is tab-separated-values (TSV). If you like, you can change the export file type to comma-separated-values (CSV) instead. Note that TSV is generally more 'bullet proof' when it comes to handling special characters and line breaks.</p>"
+        },
+        {
+            "key": "export-filetype-csv",
+            "name": "Export files in CSV format",
+            "type": "checkbox",
+            "required": false
+        },
+        {
+            "key":   "sascode-header",
+            "type" : "descriptive",
+            "name":  "<h5>SAS CODE GENERATION</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These defaults may be overriden for any given export specification.</p><p>Note for Windows users: You must escape backslashes in file paths, i.e. (Z:\\\\mypath\\\\sascode) instead of (Z:\\mypath\\sascode).</p>"
+        },
+        {
+            "key": "sascode-libref",
+            "name": "SAS libref (1-8 character library name; typically a shortened version of your project name)",
+            "required": false,
+            "super-users-only": false,
+            "type": "text"
+        },
+        {
+            "key": "sascode-libref-path",
+            "name": "SAS library path (full path to the directory where the SAS datasets will be written)",
+            "required": false,
+            "super-users-only": false,
+            "type": "textarea"
+        },
+        {
+            "key": "enable-validator-header",
+            "type" : "descriptive",
+            "super-users-only": false,
+            "name": "<h5>VALIDATOR</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p>"
+        },
+        {
+            "key": "enable-validator",
+            "name": "Enable the validator",
+            "super-users-only": false,
+            "type": "checkbox"
         },
         {
             "key":   "backup-retention-header",
@@ -350,49 +370,6 @@
                 {"name":"retain all backups",  "value":"all"}
             ],
             "required": false
-        },
-        {
-            "key":   "sascode-header",
-            "type" : "descriptive",
-            "name":  "<h5>SAS CODE GENERATION</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These defaults may be overriden for any given export specification.</p>"
-        },
-        {
-            "key": "sascode-support",
-            "name": "Include support for SAS code?",
-            "type": "radio",
-            "choices":[
-                {
-                    "value":"N",
-                    "name":"No"
-                },
-                {
-                    "value":"Y",
-                    "name":"Yes"
-                }
-            ],
-            "required": false
-        },
-        {
-            "key": "sascode-libref",
-            "name": "SAS libref (1-8 character library name; typically a shortened version of your project name)",
-            "required": false,
-            "super-users-only": false,
-            "type": "text",
-            "branchingLogic": {
-                "field": "sascode-support",
-                "value": "Y"
-            }
-        },
-        {
-            "key": "sascode-libref-path",
-            "name": "SAS library path (full path to the directory where the SAS datasets will be written)",
-            "required": false,
-            "super-users-only": false,
-            "type": "textarea",
-            "branchingLogic": {
-                "field": "sascode-support",
-                "value": "Y"
-            }
         }
     ],
 

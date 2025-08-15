@@ -16,12 +16,28 @@ $HtmlPage = new HtmlPage();
 $HtmlPage->ProjectHeader();
 
 
-testTheSanitizer();
+//testTheSanitizer();
+
+testTheFileType();
 
 
 //phpinfo();
 
 exit();
+
+function testTheFileType(){
+    global $module;
+
+    $filetypeCsv = $module->getProjectSetting("export-filetype-csv");
+
+    $module->determineExportFileType();
+
+    $fileType = $module->EXPORT_DATA_EXTENSION;
+
+    echo "File type setting: $filetypeCsv<br>";
+
+    echo "Determined export file type: $fileType";
+}
 
 function testTheSanitizer() {
 

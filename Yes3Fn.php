@@ -680,6 +680,17 @@ class Yes3Fn {
         return $s;
     }
 
+    public static function sanitizeForFiletype( 
+        $input,
+        $maxLen=0,
+        $ascii=false,
+        $fileType='csv'    
+        ): string {
+
+        if ($fileType === 'tsv') return self::sanitizeForTSV($input, $maxLen, $ascii);
+        else return self::sanitizeForCSV($input, $maxLen, $ascii);
+    }
+
     public static function sanitizeForTSV(
         $input,
         $maxLen=0,
@@ -918,7 +929,7 @@ class Yes3Fn {
      * - valid UTF-8 is enforced
      * - embedded \r (CR) characters are removed.
      *
-     * A note about newlines: export .csv and .tsv files are terminated by \n\r (CRLF). 
+     * A note about newlines: export .csv and .tsv files are terminated by \r\n (CRLF). 
      * This allows for \n to be preserved in the exported cells.
      *
      * @param string $input The input string to sanitize.
@@ -1139,6 +1150,21 @@ class Yes3Fn {
 
         return $safe_html;
     }
+
+    public static function safe_debug_output($data): string {
+        return json_encode(
+            $data,
+            JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES
+            | JSON_HEX_TAG     // <
+            | JSON_HEX_AMP     // &
+            | JSON_HEX_APOS    // '
+            | JSON_HEX_QUOT    // "
+            | JSON_PRETTY_PRINT // for readability
+            | JSON_PARTIAL_OUTPUT_ON_ERROR // for broken encoding
+        );
+    }
+
         
     /**
      * A plug-compatible version of fputcsv that supports the eol parameter for PHP < 8.1.

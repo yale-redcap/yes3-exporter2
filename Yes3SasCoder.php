@@ -201,7 +201,7 @@ class Yes3SasCoder {
         }
         else {
 
-            $datastep .= "\n   INFILE '{$infile}' DELIMITER=',' MISSOVER DSD LRECL={$this->lrecl} TERMSTR=CRLF FIRSTOBS=2;\n"; // use hex for tab
+            $datastep .= "\n   INFILE '{$infile}' DELIMITER=',' MISSOVER DSD LRECL={$this->lrecl} TERMSTR=CRLF FIRSTOBS=2;\n"; 
         }
 
         $attrib = "\n   ATTRIB\n";
