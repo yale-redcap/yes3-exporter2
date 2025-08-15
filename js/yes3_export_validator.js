@@ -57,6 +57,8 @@ FMAPR.populateExportSelection = function( exports )
         container.append( `<div id='${exp.export_uuid}'><span class="export_name" title="click to select this export">${exp.export_name}</span><span class="export_label">${exp.export_label}</span></div>` );
     });
 
+    FMAPR.resize();
+
     FMAPR.setValidatorListeners();
 }
 
@@ -99,14 +101,14 @@ FMAPR.showValidationResultsTable = function()
 {
     const $resultsTable = $( '#yes3-fmapr-export-validate-results-container' );
 
-    $resultsTable.show();
+    $resultsTable.css('display', 'block');
 }   
 
 FMAPR.hideValidationResultsTable = function()
 {
     const $resultsTable = $( '#yes3-fmapr-export-validate-results-container' );
 
-    $resultsTable.hide();
+    $resultsTable.css('display', 'none');
 }
 
 FMAPR.setValidatorListeners = function()
@@ -242,16 +244,17 @@ FMAPR.buildValidationResultsTable = function( validationResults )
     if ( validationResults && validationResults.length > 0 ) {
         validationResults.forEach( function( result ) {
             const $row = $( '<tr>' );
-            $row.append( $( '<td>' ).text( result.row ) );
-            $row.append( $( '<td>' ).text( result.record ) );
-            $row.append( $( '<td>' ).text( result.event_name ) );
-            $row.append( $( '<td>' ).text( result.instance ) );
-            $row.append( $( '<td>' ).text( result.field ) );
-            $row.append( $( '<td>' ).text( result.error_type ) );
-            $row.append( $( '<td>' ).text( result.message ) );
+            $row.append( $( '<td>' ).addClass('yes3-text-center').text( result.row ) );
+            $row.append( $( '<td>' ).addClass('breakwrap').text( result.error_type ) );
+            $row.append( $( '<td>' ).addClass('breakwrap').text( result.record ) );
+            $row.append( $( '<td>' ).addClass('breakwrap').text( result.event_name ) );
+            $row.append( $( '<td>' ).addClass('yes3-text-center').text( result.instance ) );
+            $row.append( $( '<td>' ).addClass('breakwrap').text( result.field ) );
+            $row.append( $( '<td>' ).addClass('breakwrap').text( result.message ) );
             $resultsTableBody.append( $row );
         });
         FMAPR.showValidationResultsTable();
+        FMAPR.resize();
     }
 }
 
@@ -298,6 +301,61 @@ FMAPR.clearValidationMessage = function(){
 
     $('#yes3-fmapr-export-validate-message').html( '' );
 }
+
+FMAPR.resize = function() {
+
+    const $resultsSection = $('#yes3-fmapr-export-validate-results-section');
+    const $resultsContainer = $('#yes3-fmapr-export-validate-results-container');
+    const $table = $('table#yes3-fmapr-export-validate-results-table');
+    const $footer = $('#yes3-fmapr-validate-footer');
+    const newHeight = $(window).innerHeight() - $resultsSection.offset().top - $footer.outerHeight() - 20;
+    let newWidth = Math.max($(window).innerWidth() - $resultsSection.offset().left - 30, 800);
+    //const newTableWidth = newWidth - 60; // Adjust table width
+    $resultsSection.css({'height': newHeight+'px', 'width': newWidth+'px'});
+    $resultsContainer.css({'height': newHeight+'px', 'max-height': newHeight+'px'});
+    //$table.width(newTableWidth);
+
+    const tW = newWidth - 20;
+
+    const colRowWidth = 50;
+    const colInstanceWidth = 75;
+    let colMessageWidth = tW / 3; // a first offer
+    let remainder = tW - (colRowWidth + colInstanceWidth + colMessageWidth);
+
+    let colErrorWidth   = Math.max(remainder * 2 / 12, 100);
+    let colRecordWidth  = Math.max(remainder * 2 / 12, 100);
+    let colEventWidth   = Math.max(remainder * 4 / 12, 100);
+    let colFieldWidth   = Math.max(remainder * 4 / 12, 100);
+
+    colMessageWidth = tW - (colRowWidth + colInstanceWidth + colErrorWidth + colRecordWidth + colEventWidth + colFieldWidth);
+
+    $table.find('colgroup .col-row').css('width', colRowWidth + 'px');
+    $table.find('colgroup .col-instance').css('width', colInstanceWidth + 'px');
+    $table.find('colgroup .col-error').css('width', colErrorWidth + 'px');
+    $table.find('colgroup .col-record').css('width', colRecordWidth + 'px');
+    $table.find('colgroup .col-event').css('width', colEventWidth + 'px');
+    $table.find('colgroup .col-field').css('width', colFieldWidth + 'px');
+    $table.find('colgroup .col-message').css('width', colMessageWidth + 'px');
+    /*
+    console.log('FMAPR.resize', {
+        tW,
+        newWidth,
+        colRowWidth,
+        colInstanceWidth,
+        colErrorWidth,
+        colRecordWidth,
+        colEventWidth,
+        colFieldWidth,
+        colMessageWidth
+    });
+    */
+
+}
+
+$(window).on('resize', YES3.deBounce(function() {
+
+    FMAPR.resize();
+}));
 
 $( function(){
 

@@ -897,9 +897,9 @@ class Yes3Exporter extends \ExternalModules\AbstractExternalModule
 
     public function get_export_target_folder()
     {
-        $enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports");
+        $enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports") ? 1 : 0;
 
-        if ( $enable_host_filesystem_exports !== "Y" ){
+        if ( !$enable_host_filesystem_exports ){
 
             return "";
         }
@@ -4379,14 +4379,14 @@ WHERE project_id=? AND log_entry_type=?
 
             // BATCH EXPORT
 
-            if ( $this->getProjectSetting("enable-cron-batch-exports")==="Y" ){
+            if ( $this->getProjectSetting("enable-cron-batch-exports") ){
 
                 $projCronLog .= "\n" . $this->cronJob( "exportBatch" );
             }
 
             // DAILY EMAIL
 
-            if ( $this->getProjectSetting("notification-email-enable")==="Y" ){
+            if ( $this->getProjectSetting("notification-email-enable") ){
 
                 $projCronLog .= "\n" . $this->cronJob( "emailDailyLog" );
             }

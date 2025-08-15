@@ -16,9 +16,9 @@ use HtmlPage;
 $HtmlPage = new HtmlPage();
 $HtmlPage->ProjectHeader();
 
-$exports_enabled = $module->getProjectSetting('enable-host-filesystem-exports') ?? "";
+$exports_enabled = $module->getProjectSetting('enable-host-filesystem-exports') ? 1 : 0;
 
-if ($exports_enabled !== "Y") {
+if ($exports_enabled !== 1) {
     echo "<h4>Exports to file system are not enabled</h4>";
     exit();
 }

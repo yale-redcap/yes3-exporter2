@@ -60,6 +60,7 @@ html {
 
     --yes3-border-color: #000000;
     --yes3-divider-color: cadetblue;
+    --y3-separator-color: rgba(0, 0, 0, 0.4);
 
     --yes3-input-color: black;
     --yes3-input-background-color: #faf9f9;
@@ -183,7 +184,9 @@ html {
     --yes3-background-color: rgb(24, 24, 24);
 
     --yes3-border-color: silver;
-    --yes3-divider-color: silver;
+    --yes3-divider-color: silver;     
+    --y3-separator-color: rgba(255, 255, 255, .28);
+
 
     --yes3-input-color: #d8d8d8;
     --yes3-input-background-color: black;
@@ -963,7 +966,11 @@ div#yes3-red-pointer {
  }
 
 /* === END OF DEPRECATED CONFIG PANEL CSS === */
- 
+
+th.yes3-text-center, td.yes3-text-center {
+    text-align: center;
+}
+
  a:focus, i:focus, a:hover, i:hover {
     outline: none !important;
  }
@@ -2156,4 +2163,32 @@ table.yes3-dashboard th:not(.yes3-th-title) {
    font-size: 32px !important;
    font-weight: 900 !important;
    cursor: pointer;
+}
+
+.yes3-scrolling-container {
+
+    scrollbar-color: var(--y3-separator-color);
+    scrollbar-width: 10px;
+    /*height: 500px;*/
+    overflow-y: auto;
+}
+
+.yes3-scrolling-container::-webkit-scrollbar-track
+{
+    /*box-shadow: inset 0 0 5px rgba(0,0,0,0.3);*/
+    /*border-radius: 2px;*/
+    background-color: transparent;
+}
+
+.yes3-scrolling-container::-webkit-scrollbar
+{
+    width: 10px;
+    background-color: transparent;
+}
+
+.yes3-scrolling-container::-webkit-scrollbar-thumb
+{
+    /*border-radius: 2px;*/
+    /*box-shadow: inset 0 0 5px rgba(0,0,0,.3);*/
+    background-color: var(--y3-separator-color);
 }

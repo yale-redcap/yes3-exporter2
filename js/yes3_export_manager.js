@@ -3,6 +3,11 @@ YES3.Functions.Page_refresh = function() {
     FMAPR.loadSpecifications( 1 );
 }
 
+YES3.Functions.Open_validator = function() {
+
+    FMAPR.openValidator();
+}
+
 FMAPR.useYes3Functions = true; // override FMAPR function if function of same name exists in YES3 namespace
 
 FMAPR.exportSpecification = {};
@@ -181,8 +186,8 @@ FMAPR.exportTableRowHtml = function( data ){
     if ( data.permission_export ) {
         let cellHtml = "";
         if ( !repeater ) {
-            if ( FMAPR.project.user_data_downloads_disabled==0 ) cellHtml += `&nbsp;<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>&nbsp;`;
-            if ( FMAPR.project.host_filesystem_exports_enabled==1 ) cellHtml += `&nbsp;<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>&nbsp;`;
+            if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ) cellHtml += `&nbsp;<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>&nbsp;`;
+            if ( YES3.EMSettings['enable-host-filesystem-exports'] ) cellHtml += `&nbsp;<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>&nbsp;`;
             //if ( YES3.EMSettings['enable-validator'] === 'Y' ) cellHtml += `&nbsp;<i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i>&nbsp;`;
         }
         rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column">${cellHtml}</i></td>`;
@@ -200,7 +205,7 @@ FMAPR.exportTableRowHtml = function( data ){
     rowHtml += `<td class="yes3-col-md yes3-halign-left yes3-required-column" data-name="export_name"  >${data.export_name}</td>`;
     rowHtml += `<td class="yes3-col-lg yes3-halign-left"                      data-name="export_label" >${data.export_label}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_layout" title="${layout_tooltip}">${FMAPR.layoutLabel(data.export_layout)}</td>`;
-    if ( FMAPR.enableHostFilesystemExports ) rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
+    if ( YES3.EMSettings['enable-cron-batch-exports'] ) rowHtml += `<td class="yes3-col-sm yes3-halign-center" data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="column_count" >${data.column_count}</td>`;
 
     // if ( YES3.EMSettings['enable-validator'] === 'Y' ) {
@@ -667,6 +672,39 @@ FMAPR.saveExportSpecificationCallback = function( response ){
     FMAPR.loadSpecifications( 1 ); // include removed exports
 }
 
+/*
+ * VALIDATOR
+ */
+
+FMAPR.openValidator = function()
+{
+
+    const _MAX_WIDTH_ = 1500;
+    const _MIN_WIDTH_ = 500;
+    const _MAX_HEIGHT_ = 1000;
+    const _MIN_HEIGHT_ = 450;
+    
+    let w = $(window).outerWidth() * 0.9; if ( w > _MAX_WIDTH_ ) w = _MAX_WIDTH_; else if ( w < _MIN_WIDTH_ ) w = _MIN_WIDTH_;  
+    let h = $(window).outerHeight() * 0.9; if ( h > _MAX_HEIGHT_ ) h = _MAX_HEIGHT_; else if ( h < _MIN_HEIGHT_ ) h = _MIN_HEIGHT_;
+
+    let url = YES3.moduleObject.getUrl("plugins/yes3_export_validator.php");
+
+    const windowName = "yes3-export-validator";
+
+    const handle = window.open( url, windowName, FMAPR.popupWindowFeatures(w, h) );
+
+    if ( !handle ){
+
+        console.error("oops: export editor wouldn't open");
+        return false;
+    }
+    else {
+        FMAPR.logOpenWindow(handle, windowName);
+        return true;
+    }
+
+}
+
 /**
  * EDIT EXPORT
  */
@@ -762,7 +800,13 @@ FMAPR.logOpenWindow = function(w, yes3WindowId){
     FMAPR.openWindows.push(w);
 }
 
-
+FMAPR.removeTheIrrelevantElements = function()
+{
+    // remove the batch export column if not enabled
+    if ( !YES3.EMSettings['enable-host-filesystem-exports'] || !YES3.EMSettings['enable-cron-batch-exports'] ){
+        $('.yes3-fmapr-batch-exports').remove();
+    }
+}
 
 
 /**
@@ -781,6 +825,8 @@ $(document).on('yes3-fmapr.settings', function(){
 $( function(){
 
     YES3.contentLoaded = false;
+
+    FMAPR.removeTheIrrelevantElements();
 
     //YES3.displayActionIcons();
 
