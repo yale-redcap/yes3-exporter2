@@ -163,7 +163,7 @@ function update_export_table_settings()
 
     if ( !is_array($updates) ){
 
-        return $module->stdReturnObj( "fail", print_r($_POST, true), [], true );;
+        return $module->stdReturnObj( "fail", Yes3Fn::safe_debug_output($updates), [], true );
     }
 
     $result = "success";
@@ -369,7 +369,7 @@ function saveExportSpecification()
 
     //$module->logDebugMessage($module->getProjectId(), print_r($qParams, true), 'saveExportSpecification' );
 
-    $debug = print_r($qParams, true);
+    $debug = Yes3Fn::safe_debug_output($qParams);
 
     if ( $log_id ){
 

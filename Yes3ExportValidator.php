@@ -81,6 +81,8 @@ class Yes3ExportValidator {
 
     private $delimiter = ","; // default delimiter for all exports
 
+    private $fileType = "csv"; // csv or tsv
+
     private $filePath = "";
 
     private $project_salt = "";
@@ -126,6 +128,7 @@ class Yes3ExportValidator {
         if (strtolower($extension) === 'tsv') {
 
             $this->delimiter = "\t";
+            $this->fileType = "tsv";
         }
 
         // items from the project object
@@ -142,7 +145,7 @@ class Yes3ExportValidator {
         ));
     }
 
-    public function readUploadedRecords(): Generator {
+    public function processUploadedRecords(): Generator {
 
         $handle = fopen($this->filePath, 'r');
 
@@ -193,7 +196,7 @@ class Yes3ExportValidator {
 
         $this->sysmsg = "";
 
-        foreach($this->readUploadedRecords() as $row) {
+        foreach($this->processUploadedRecords() as $row) {
 
             if ($rowCount === 0) {
 
@@ -312,6 +315,7 @@ class Yes3ExportValidator {
         $x = [
             'record' => $row[0] ?? null,
             'redcap_event_id' => 0,
+            'redcap_event_name' => "",
             'redcap_data_access_group_id' => 0,
             'redcap_repeat_instance' => 1,
             'redcap_field_name' => "",
@@ -329,9 +333,7 @@ class Yes3ExportValidator {
 
             if ( !$x['record'] ) {
 
-                $msg = "Record ID hash {$record_hash} not matched to any record.";
-
-                $this->reportValidationError([], 'ROW_HASH', $msg);
+                $this->reportValidationError([], 'ROW_HASH', "Record ID hash {$record_hash} not matched to any record.");
 
                 return false;
             }
@@ -361,6 +363,10 @@ class Yes3ExportValidator {
                         $x['redcap_event_id'] = (int) $value;
                         break;
 
+                    case 'redcap_event_name':
+                        $x['redcap_event_name'] = $value;
+                        break;
+
                     case 'redcap_data_access_group_id':
                         $x['redcap_data_access_group_id'] = (int) $value;
                         break;
@@ -383,6 +389,7 @@ class Yes3ExportValidator {
             if ( isset($this->dd[$i]['redcap_event_id']) && $this->dd[$i]['redcap_event_id'] ) {
 
                 $x['redcap_event_id'] = (int) $this->dd[$i]['redcap_event_id'];
+                $x['redcap_event_name'] = $this->dd[$i]['redcap_event_name'] ?? "";
             }
 
             $this->counts['cells']++;
@@ -412,18 +419,25 @@ class Yes3ExportValidator {
         return ( $this->counts['errors'] === $pre_error_count );
     }
 
-    private function reportValidationError($x=[], $err_type="", $message="") {
+    private function reportValidationError($x=[], $err_type="", $message=null) {
 
         $this->counts['errors']++;
         $this->counts['details'][$err_type] = ($this->counts['details'][$err_type] ?? 0) + 1;
 
-        if ( !empty($x) ) {
+        $report = [
+            'row' => $this->counts['rows'],
+            'error_type' => $err_type,
+            'message' => $message ?? self::ERROR_LABELS[$err_type] ?? "Unknown error type",
+            'record' => $x['record'] ?? null,
+            'event_id' => $x['redcap_event_id'] ?? null,
+            'event_name' => $x['redcap_event_name'] ?? null,
+            'field' => $x['redcap_field_name'] ?? null,
+            'instance' => $x['redcap_repeat_instance'] ?? null,
+            'exported_value' => $x['exported_value'] ?? null,
+            'stored_value' => $x['stored_value'] ?? null
+        ];
 
-            $this->error_report[] = "Row {$this->counts['rows']}: [{$err_type}] {$message} (record: {$x['record']}, event_id: {$x['redcap_event_id']}, field: {$x['redcap_field_name']}, instance: {$x['redcap_repeat_instance']})";
-        }
-        else {
-            $this->error_report[] = "Row {$this->counts['rows']}: [{$err_type}] {$message}";
-        }
+        $this->error_report[] = $report;
     }
 
     /**
@@ -548,11 +562,11 @@ class Yes3ExportValidator {
             $x['redcap_repeat_instance']
         ];
 
-        $stored_value = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "");
+        $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "");
 
-        $exported_value = trim($x['exported_value']);
+        //$x['exported_value'] = trim($x['value']);
 
-        if ( $stored_value === $exported_value ) {
+        if ( $x['stored_value'] === $x['exported_value'] ) {
 
             return true;
         }
@@ -562,49 +576,44 @@ class Yes3ExportValidator {
 
             $days_to_shift = Records::get_shift_days($x['record'], $this->date_shift_max, $this->project_salt);
 
-            $shifted_stored_value = Records::shift_date_format($stored_value, $days_to_shift);
+            $shifted_stored_value = Records::shift_date_format($x['stored_value'], $days_to_shift);
 
-            if ( $shifted_stored_value === $exported_value ) {
+            if ( $shifted_stored_value === $x['exported_value'] ) {
                 return true;
             }
             else {
-                $this->reportValidationError($x, "DATE_SHIFT", "Value validation failed (after date shifting): the exported value '{$exported_value}' does not match the shifted stored value '{$shifted_stored_value}'.");
+                $this->reportValidationError($x, "DATE_SHIFT", "the exported value '{$x['exported_value']}' does not match the shifted stored value '{$shifted_stored_value}'.");
                 return false;
             }
         }
 
-        // no match, but it could be a max length issue
-        if ( $this->export_max_text_length > 0 ) {
+        // no match, it could be a conditioning issue
 
-            if ( substr($exported_value, 0, $this->export_max_text_length) === substr($stored_value, 0, $this->export_max_text_length) ) {
-
-                return true;
-            }
-        }
-
-        // no match, it could be a sanitization issue
-        $exported_value = Yes3Fn::sanitizeForText(
-            $exported_value,
+        $x['sanitized_stored_value'] = Yes3Fn::sanitizeForFiletype(
+            $x['stored_value'],
             $this->export_max_text_length,
-            false, // notags is currently not an export option
             $this->export_ascii_text,
-            $this->export_inoffensive_text
+            $this->fileType
         );
 
-        $stored_value = Yes3Fn::sanitizeForText(
-            $stored_value,
-            $this->export_max_text_length,
-            false, // notags is currently not an export option
-            $this->export_ascii_text,
-            $this->export_inoffensive_text
-        );
-
-        if ( $stored_value === $exported_value ) {
+        if ( $x['exported_value'] === $x['sanitized_stored_value'] ) {
 
             return true;
         }
 
-        $this->reportValidationError($x, "VALUE", "Value validation failed: the exported value '{$exported_value}' does not match the stored value '{$stored_value}'.");
+        // okay, we surrender and report the discrepancy
+
+        if ( $x['sanitized_stored_value'] !== $x['stored_value'] ) {
+
+            $msg = "The exported value '{$x['exported_value']}' does not match the conditioned stored value '{$x['sanitized_stored_value']}'";
+        }
+        else {
+
+            $msg = "The exported value '{$x['exported_value']}' does not match the stored value '{$x['stored_value']}'";
+        }
+
+        $this->reportValidationError($x, "VALUE", $msg);
+
         return false;
     }
 
