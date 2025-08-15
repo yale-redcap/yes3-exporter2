@@ -37,6 +37,12 @@ span.export_name:hover {
     background-color: var(--yes3-dashboard-row-selected-background-color);
 }
 */
+
+#yes3-fmapr-export-selection {
+
+    max-height: 140px;
+}
+
 #yes3-fmapr-export-selection div.selected::before {
     /*content: "\2714\FE0E"; /* Check mark forced as text not emoji */
     content: "\2714"; /* Check mark emoji */
@@ -79,18 +85,28 @@ button#yes3-fmapr-export-upload-button{
     display: none
 }
 
+div#yes3-fmapr-export-validate-results-section {
+
+    display: block;
+    padding: 0;
+    margin-top: 20px;
+    border: 0;
+}
+
 div#yes3-fmapr-export-validate-results-container {
+    width: 100%;
     display: none;
-    max-height: 150px;
     overflow-y: auto;
     border: 1px solid var(--yes3-border-color);
-    margin-top: 20px;
-    width: 100%;
+    padding: 0;
+    margin: 0;
 }
 
 div#yes3-fmapr-export-validate-results-container table {
     border-collapse: collapse;
+    /*width: calc(100% - 20px);*/
     width: 100%;
+    table-layout: fixed;
 }
 
 div#yes3-fmapr-export-validate-results-container table thead th {
@@ -113,4 +129,32 @@ div#yes3-fmapr-export-validate-results-container table tbody td {
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+div#yes3-fmapr-validate-footer {
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 100%;
+}
+
+.yes3-fampr-scrolling-table .col-row      { width: 5%; }
+.yes3-fampr-scrolling-table .col-error    { width: 10%; }
+.yes3-fampr-scrolling-table .col-record   { width: 10%; }
+.yes3-fampr-scrolling-table .col-event    { width: 15%; }
+.yes3-fampr-scrolling-table .col-instance { width: 5%; }
+.yes3-fampr-scrolling-table .col-field    { width: 15%; }
+.yes3-fampr-scrolling-table .col-message  { width: 40%; }
+
+td.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+td.breakwrap {
+    white-space: normal;        /* allow wrapping */
+    overflow-wrap: anywhere;    /* break long tokens anywhere if needed */
+    word-break: break-word;     /* legacy-friendly */
+    min-width: 0;               /* ensure the cell is allowed to shrink */
 }

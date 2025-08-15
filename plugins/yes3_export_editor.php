@@ -19,7 +19,7 @@ $copy = $module->getCopyright();
 $default_sascode_libref = $module->getProjectSetting('sascode-libref');
 $default_sascode_libref_path = $module->getProjectSetting('sascode-libref-path');
 $default_sascode_dsname = $module->getProjectSetting('sascode-dsname') ?? "yes3_exporter";
-$enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesystem-exports') ?? "N";
+$enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesystem-exports') ? 1 : 0;
 
 //$HtmlPage = new HtmlPage();
 //$HtmlPage->ProjectHeader();
@@ -65,7 +65,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
         "export_sascode_libref_path": "<?= $default_sascode_libref_path ?>"
     };
 
-    FMAPR.enable_host_filesystem_exports = "<?= $enable_host_filesystem_exports ?>";
+    FMAPR.enable_host_filesystem_exports = <?= $enable_host_filesystem_exports ?>;
 
 </script>
 
@@ -648,7 +648,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
             <i class="far fa-save yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-save-control" id="yes3-fmapr-save-control" action="saveExportSpecification" title="Save the export specification."></i>
 
-            <i class="fas fa-download yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean" id="yes3-fmapr-download-control" action="download" title="Download."></i>
+            <i class="fas fa-download yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-download-options" id="yes3-fmapr-download-control" action="download" title="Download."></i>
 
                 <i class="fas fa-file-export yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-export-options" id="yes3-fmapr-export-control" action="export" title="Export to file system."></i>
                 
@@ -965,14 +965,14 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
             <div class="col-xl-4">
 
-                <div class="yes3-fmapr-settings-section yes3-fmapr-export-options">
+                <div class="yes3-fmapr-settings-section yes3-fmapr-batch-export-options">
                     BATCH EXPORT
                 </div>
 
-                <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block yes3-fmapr-export-options yes3-max-legroom">
-                    <label class="yes3-checkmarkContainer">
-                        <input type="checkbox" name="export_batch" data-setting="export_batch" value="1" />
-                        <span class="yes3-checkmark"></span>Include in automated (cron) batch exports
+                <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block yes3-fmapr-batch-export-options yes3-max-legroom">
+                    <label class="yes3-checkmarkContainer yes3-fmapr-batch-export-options">
+                        <input type="checkbox" name="export_batch" data-setting="export_batch" value="1" class="yes3-fmapr-batch-export-options" />
+                        <span class="yes3-checkmark yes3-fmapr-batch-export-options"></span>Include in automated (cron) batch exports
                     </label>
                 </div>
 

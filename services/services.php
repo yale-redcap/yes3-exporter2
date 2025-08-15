@@ -937,7 +937,7 @@ function checkDownloadPermission()
     $enable_host_filesystem_exports = $module->getProjectSetting("enable-host-filesystem-exports");
     $enable_user_data_downloads = $module->getProjectSetting("enable-user-data-downloads");
 
-    if ( $enable_host_filesystem_exports==="Y" && $enable_user_data_downloads !== "Y" ) {
+    if ( $enable_host_filesystem_exports && !$enable_user_data_downloads ) {
 
         throw new Exception("User data downloads are not enabled for this project.");
     }
@@ -949,7 +949,7 @@ function checkExportPermission()
 
     $enable_host_filesystem_exports = $module->getProjectSetting("enable-host-filesystem-exports");
 
-    if ( $enable_host_filesystem_exports!=="Y" ) {
+    if ( !$enable_host_filesystem_exports ) {
 
         throw new Exception("File system exports are not enabled for this project.");
     }
@@ -1395,8 +1395,8 @@ function get_project_settings():string
         'project_event_metadata' => get_project_event_metadata(),
         'default_event_id' => get_first_event_id(),
         'beta' => 0,
-        'user_data_downloads_disabled' => ( $module->getProjectSetting('enable-host-filesystem-exports')==="Y" && $module->getProjectSetting('enable-user-data-downloads')!=="Y" ) ? 1 : 0,
-        'host_filesystem_exports_enabled' => ( $module->getProjectSetting('enable-host-filesystem-exports')==="Y" ) ? 1 : 0,
+        'user_data_downloads_disabled' => ( $module->getProjectSetting('enable-host-filesystem-exports') && !$module->getProjectSetting('enable-user-data-downloads') ) ? 1 : 0,
+        'host_filesystem_exports_enabled' => ( $module->getProjectSetting('enable-host-filesystem-exports') ) ? 1 : 0,
         'host_filesystem_target' => $module->getProjectSetting('export-target-folder')
     ];
 
@@ -1422,8 +1422,8 @@ function get_reduced_project_settings() {
     $project_settings = [
         'project_id' => $module->getProjectId(),
         'is_longitudinal' => \REDCap::isLongitudinal(),
-        'user_data_downloads_disabled' => ( $module->getProjectSetting('enable-host-filesystem-exports')==="Y" && $module->getProjectSetting('enable-user-data-downloads')!=="Y" ) ? 1 : 0,
-        'host_filesystem_exports_enabled' => ( $module->getProjectSetting('enable-host-filesystem-exports')==="Y" ) ? 1 : 0,
+        'user_data_downloads_disabled' => ( $module->getProjectSetting('enable-host-filesystem-exports') && $module->getProjectSetting('enable-user-data-downloads') ) ? 1 : 0,
+        'host_filesystem_exports_enabled' => ( $module->getProjectSetting('enable-host-filesystem-exports') ) ? 1 : 0,
         'host_filesystem_target' => $module->getProjectSetting('export-target-folder'),
         'repeating_forms' => Yes3Fn::hasRepeatingInstruments()
     ];

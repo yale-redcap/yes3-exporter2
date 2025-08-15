@@ -12,8 +12,6 @@ $module = new Yes3Exporter();
 
 $copy = $module->getCopyright();
 
-$enable_host_filesystem_exports = ($module->getProjectSetting('enable-host-filesystem-exports') ?? "N") === 'Y';
-
 use Yale\Yes3\Yes3;
 use REDCap;
 use HtmlPage;
@@ -42,7 +40,6 @@ $module->getCodeFor("yes3_export_manager", true);
 
 <script type="text/javascript">
 
-    FMAPR.enableHostFilesystemExports = <?php echo $enable_host_filesystem_exports ? 'true' : 'false'; ?>;  
     FMAPR.copyright = "<?php echo $copy; ?>";
 
 </script>
@@ -94,7 +91,9 @@ $module->getCodeFor("yes3_export_manager", true);
         <div class="yes3-flex-col-33 yes3-flex-vcenter-hright">
 
             <!--i class="fas fa-refresh yes3-action-icon yes3-action-icon-controlpanel" action="Page_refresh" title="refresh this page"></i-->
-            
+
+            <i class="fas fa-check yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-validator-only" action="Open_validator" title="open the validator"></i>
+
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="get some help"></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
@@ -120,7 +119,7 @@ $module->getCodeFor("yes3_export_manager", true);
                         <th class="yes3-col-md yes3-header yes3-halign-left   yes3-required-column" title="export name">Name</th>
                         <th class="yes3-col-lg yes3-header yes3-halign-left  " title="export label">Label</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center" title="export layout">Layout</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-filesystem-exports" title="export included in daily batch (cron) job">Batch</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports" title="export included in daily batch (cron) job">Batch</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center" title="column count">Columns</th>
                         <!--th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="validate this export, or import from an external datasheet">Val/Imp</th-->
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only" title="remove the export (can be restored later)">Remove</th>
@@ -137,7 +136,7 @@ $module->getCodeFor("yes3_export_manager", true);
                         <td class="yes3-col-md yes3-halign-left   yes3-required-column"><em>new export</em></td>
                         <td class="yes3-col-lg yes3-halign-left"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
-                        <td class="yes3-col-sm yes3-halign-left yes3-fmapr-filesystem-exports"></td>
+                        <td class="yes3-col-sm yes3-halign-left yes3-fmapr-batch-exports"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
                         <!--<th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="who you lookin at?"></th>-->
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column" id="yes3-fmapr-visibility-control" title="click to show removed exports, which can then be restored">
@@ -287,10 +286,15 @@ $module->getCodeFor("yes3_export_manager", true);
 
     $(function(){
 
-        if ( !FMAPR.enableHostFilesystemExports ) {
+        if ( !YES3.EMSettings['enable-host-filesystem-exports'] ) {
 
             // remove items associated with filesystem exports
             $('.yes3-fmapr-filesystem-exports').remove();
+        }
+
+        if ( !YES3.EMSettings['enable-validator'] ) {
+
+            $('.yes3-fmapr-validator-only').remove();
         }
     })
 

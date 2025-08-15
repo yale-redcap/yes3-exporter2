@@ -26,10 +26,12 @@ use Records;
 use Yale\Yes3Exporter\Yes3Fn;
 
 /**
- * Yes3SasCoder class
+ * Yes3ExportValidator class
  *
- * This class is responsible for generating SAS code based on the data dictionary and info files.
- * It reads the data dictionary and info files, processes them, and generates SAS code for input.
+ * This class is responsible for validating the exported data against the stored data.
+ * It is the inverse function and system test for the Yes3Exporter, and is intended to ensure data integrity and consistency.
+ *
+ * @package Yale\Yes3Exporter
  */
 
 class Yes3ExportValidator {
@@ -39,13 +41,14 @@ class Yes3ExportValidator {
     public $sysmsg = '';
 
     private const ROW_LIMIT = 100;
-    private const ERROR_LIMIT = 1000;
+    private const ERROR_LIMIT = 6000;
     private const ERROR_LABELS = [
-        'HDR_FIELDCOUNT' => 'The column count does not match the field count in the data dictionary.',
-        'HDR_FIELDNAMES' => 'One or more column names do not match the field names in the data dictionary.',
+        'HDR_COUNT' => 'The column count does not match the field count in the data dictionary.',
+        'HDR_NAME' => 'One or more column names do not match the field names in the data dictionary.',
         'ROW_HASH' => 'The record id hash does not match the expected value.',
         'ROW_ID' => 'The record id is missing for the row.',
-        'CHKBX_OPTION' => 'The exported checkbox option state does not match the stored state.',
+        'CHKBX_OPTN' => 'The exported checkbox option state does not match the stored state.',
+        'CHKBX_LIST' => 'The exported checkbox list does not match the stored state.',
         'DATE_SHIFT' => 'The exported date value does not match the stored value (after date shifting).',
         'VALUE' => 'The exported value does not match the stored value.'
     ];
@@ -272,7 +275,7 @@ class Yes3ExportValidator {
 
         if ( $hdr_col_count !== $dd_count ) {
 
-            $this->reportValidationError([], "HDR_FIELDCOUNT", "The number of fields in the header ({$hdr_col_count}) does not match the data dictionary field count ({$dd_count}).");
+            $this->reportValidationError([], "HDR_COUNT", "The number of fields in the header ({$hdr_col_count}) does not match the data dictionary field count ({$dd_count}).");
             return false;
         }
 
@@ -287,7 +290,7 @@ class Yes3ExportValidator {
 
                 $hdrOk = false; // header validation failed
 
-                $this->reportValidationError([], "HDR_FIELDNAMES", "Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}' for column {$i}.");
+                $this->reportValidationError([], "HDR_NAME", "Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}' for column {$i}.");
             }
         }
 
@@ -485,7 +488,7 @@ class Yes3ExportValidator {
             return true;
         }
 
-        $this->reportValidationError($x, "CHKBX_OPTION", "option '{$option_value}': the exported ({$exported_checked_state}) and stored ({$stored_checked_state}) checked states do not match.");
+        $this->reportValidationError($x, "CHKBX_OPTN", "option '{$option_value}': the exported ({$exported_checked_state}) and stored ({$stored_checked_state}) checked states do not match.");
 
         return false;
     }
@@ -562,7 +565,7 @@ class Yes3ExportValidator {
             $x['redcap_repeat_instance']
         ];
 
-        $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "");
+        $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "")."-foo";
 
         //$x['exported_value'] = trim($x['value']);
 

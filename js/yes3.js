@@ -958,6 +958,17 @@ YES3.setJQueryStuff = function(){
 }
 
 
+YES3.deBounce = function(func, delay) {
+    delay = delay || 25;
+    let timer;
+    return function(...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
 /*
 * the approved alternative to $(document).ready()
 */

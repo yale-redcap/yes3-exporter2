@@ -5079,12 +5079,20 @@ FMAPR.exportSettingsTableSkipper = function ()
         $('.yes3-fmapr-if-sascode').hide();
     }
 
-    if ( FMAPR.enable_host_filesystem_exports==="Y"){
+    if ( YES3.EMSettings['enable-host-filesystem-exports'] ){
         $('.yes3-fmapr-export-options').show();
     }
     else {
         $('.yes3-fmapr-export-options').hide();
     }
+
+    if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ){
+        $('.yes3-fmapr-download-options').show();
+    }
+    else {
+        $('.yes3-fmapr-download-options').hide();
+    }
+
 }
 
 FMAPR.renumberRows = function()
@@ -5290,23 +5298,12 @@ FMAPR.highlightRemovedIfSelected = function(){
     }
 }
 
-FMAPR.deBounce = function(func, delay) {
-    let timer;
-    return function(...args) {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            func.apply(this, args);
-        }, delay);
-    };
-}
-
-
-$(window).on('resize', FMAPR.deBounce(function() {
+$(window).on('resize', YES3.deBounce(function() {
 
     FMAPR.resizeExportItemsTable();
     FMAPR.resizeExportSettingsContainer();
 
-}, 100));
+}));
 
 /**
  * things to do after the project settings are loaded
@@ -5450,6 +5447,20 @@ FMAPR.displayCopyright = function(){
     $('div#yes3-fmapr-copyright').html(YES3.copyright);
 }
 
+FMAPR.removeTheIrrelevantElements = function()
+{
+
+    // remove the batch export column if not enabled
+    if ( !YES3.EMSettings['enable-host-filesystem-exports'] || !YES3.EMSettings['enable-cron-batch-exports'] ){
+        $('.yes3-fmapr-batch-export-options').hide();
+    }
+}
+
+FMAPR.displayCopyright = function(){
+
+    $('div#yes3-fmapr-copyright').html(YES3.copyright);
+}
+
 /**
  * -------------------------------------------
  * STARTUP ACTIONS - yes3_export_editor plugin
@@ -5507,6 +5518,8 @@ FMAPR.displayCopyright = function(){
 $( function () {
 
     YES3.isBusy(); // will be cleared by the loadspecification callback
+
+    FMAPR.removeTheIrrelevantElements(); // remove irrelevant UI elements, depending on EM settings
 
     YES3.RegisterApplicationNameSpace('FMAPR');
 
