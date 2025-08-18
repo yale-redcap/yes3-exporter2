@@ -4829,18 +4829,33 @@ WHERE project_id=? AND log_entry_type=?
         ];
     }
 
-    private function transferLegacySettings() {
+    private function getLegacyProjectSettings() {
 
         $legacy_external_module_id = $this->getLegacyEMID();
 
-        $transfer_log = [];
+        if ( !$legacy_external_module_id ) {
+
+            return [];
+        }
 
         $sql = "select ems.*
         from redcap_external_modules em
         inner join redcap_external_module_settings ems on ems.external_module_id=em.external_module_id
         where em.external_module_id=? and ems.project_id=? and ifnull(ems.value, '') <> ''";
 
-        $legacyProjectSettings = Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id,$this->getProjectId() ]);
+        return Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id,$this->getProjectId() ]);
+    }
+
+    private function transferLegacySettings() {
+
+        $legacyProjectSettings = $this->getLegacyProjectSettings();
+
+        if ( !$legacyProjectSettings ) {
+
+            return [ 'No legacy project settings found.' ];
+        }
+
+        $transfer_log = [];
 
         $configProjectSettings =$this->getConfig()['project-settings'];
 
@@ -4965,6 +4980,29 @@ WHERE project_id=? AND log_entry_type=?
         return ( $result->num_rows > 0 );
     }
 
+    public function legacyEnvironmentExists()
+    {
+
+        $legacy_project_settings = $this->getLegacyProjectSettings();
+
+
+        return !empty($legacy_project_settings);
+    }
+
+    public function determineLegacyTransferStatus()
+    {
+        $legacy_transfer_status = $this->getProjectSetting("legacy-transfer-status") ?? "";
+
+        if ( !$legacy_transfer_status ) {
+
+            $legacy_environment_exists = $this->legacyEnvironmentExists();
+            $legacy_transfer_status = $legacy_environment_exists ? "pending" : "nolegacy";
+            $this->setProjectSetting("legacy-transfer-status", $legacy_transfer_status);
+        }
+
+        return $legacy_transfer_status;
+    }
+
     /* ==== HOOKS ==== */
 
     public function redcap_module_link_check_display( $project_id, $link )
@@ -5008,19 +5046,45 @@ WHERE project_id=? AND log_entry_type=?
             return; // only run on the EM manager page
         }
 
+        $xpII = new \Yale\Yes3Exporter2\Yes3Exporter2();
+
+        $legacy_transfer_status = $xpII->determineLegacyTransferStatus();
+
+        if ( $legacy_transfer_status !== "pending" ){
+
+            return; // no legacy transfer form to render
+        }
+
+        $xpII->initializeJavascriptModuleObject();
+
         ?>
 
         <script>
 
             $( function () {
 
-                const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
+                const module = <?php echo json_encode($xpII->getJavascriptModuleObject()); ?>;
 
-                const $description = $emSettingsContainer.find('div.external-modules-description');
+                const legacy_transfer_status = "<?php echo $legacy_transfer_status; ?>";
 
-                $description.append(`<div class="external-modules-description" style="color: #800000 ;">Hi Mom.</div>`);
+                if (legacy_transfer_status==='pending') {
 
-                // Add your settings HTML here
+                    renderLegacyTransferForm();
+                }
+
+                function renderLegacyTransferForm() {
+
+                    const $form = $('<form>').attr('id', 'legacy-transfer-form');
+                    const $submit = $('<button>').attr('type', 'submit').text('Transfer Legacy Environment');
+                    
+                    const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
+                    const $description = $emSettingsContainer.find('div.external-modules-description');
+                    
+                    $form.append($submit);
+
+                    $description.append($form);
+                }
+
             });
 
         </script>

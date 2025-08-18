@@ -1,5 +1,5 @@
 {
-    "name": "YES3 Exporter II II",
+    "name": "YES3 Exporter II",
 
     "namespace": "Yale\\Yes3Exporter2",
 
@@ -324,6 +324,12 @@
                 {"name":"100", "value":"100"},
                 {"name":"retain all backups",  "value":"all"}
             ],
+            "required": false
+        },
+        {
+            "key": "legacy-transfer-status",
+            "name": "Legacy YES3 Exporter transfer status (nolegacy/pending/transferred/declined)",
+            "type": "text",
             "required": false
         }
     ],
