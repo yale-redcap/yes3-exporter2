@@ -1,12 +1,12 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$module = new Yes3Exporter();
+$module = new Yes3Exporter2();
 
 $csrf_token = $module->getCSRFToken();
 

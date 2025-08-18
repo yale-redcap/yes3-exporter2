@@ -1,6 +1,6 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 use HtmlPage;
 
@@ -10,7 +10,7 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 */
 
-$module = new Yes3Exporter();
+$module = new Yes3Exporter2();
 
 $HtmlPage = new HtmlPage();
 $HtmlPage->ProjectHeader();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -17,13 +17,13 @@ use REDCap;
 
 use RuntimeException;
 
-use Yale\Yes3Exporter\Yes3K;
+use Yale\Yes3Exporter2\Yes3K;
 
 use Generator;
 
 use Records;
 
-use Yale\Yes3Exporter\Yes3Fn;
+use Yale\Yes3Exporter2\Yes3Fn;
 
 /**
  * Yes3ExportValidator class

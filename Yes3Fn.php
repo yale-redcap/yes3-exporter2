@@ -1,6 +1,6 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 use ExternalModules\ExternalModules;
 
@@ -1502,4 +1502,16 @@ class Yes3Fn {
 
         return md5($salt . $record . $project_salt);
     }
+
+    /**
+     * Get the external module ID by its directory prefix
+     *
+     * @param string $directoryPrefix
+     * @return int|null
+     */
+    public static function getEMIDbyPrefix($directoryPrefix) {
+        $sql = "select external_module_id from redcap_external_modules where directory_prefix=?";
+        return intval(self::fetchValue($sql, [ $directoryPrefix ]) ?? 0);
+    }
+
 }
