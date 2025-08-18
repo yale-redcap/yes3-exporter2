@@ -1,6 +1,6 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -15,7 +15,7 @@ use Project;
 
 use REDCap;
 
-use Yale\Yes3Exporter\Yes3Fn;
+use Yale\Yes3Exporter2\Yes3Fn;
 
 /**
  * Yes3SasCoder class

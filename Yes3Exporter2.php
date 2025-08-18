@@ -1,6 +1,6 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -25,10 +25,12 @@ use REDCap;
 use ZipArchive;
 use Project;
 
-class Yes3Exporter extends \ExternalModules\AbstractExternalModule
+class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 {
     public $sysmsg = "";
     public $errmsg = "";
+
+    public $EXTERNAL_MODULE_ID = 0;
 
     public $EXPORT_DATA_EXTENSION = "tsv"; 
     public $EXPORT_DATA_DELIMITER = "\t"; // default delimiter for export data files
@@ -77,6 +79,16 @@ class Yes3Exporter extends \ExternalModules\AbstractExternalModule
 
             $this->errmsg .= $msg;
         }
+    }
+
+    public function getModuleId(){
+
+        if ( !$this->EXTERNAL_MODULE_ID ) {
+            $sql = "select external_module_id from redcap_external_modules where directory_prefix=?";
+            $this->EXTERNAL_MODULE_ID = Yes3Fn::fetchValue($sql, [ $this->PREFIX ]);
+        }
+
+        return $this->EXTERNAL_MODULE_ID;
     }
 
     public function getFormExportPermissions(){
@@ -2535,7 +2547,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $msg = '<html><body style="font-family:arial,helvetica;">';
 
-        $msg .= '<p>You are receiving this email because you have enabled notifications from the REDCap YES3 Exporter.</p>';
+        $msg .= '<p>You are receiving this email because you have enabled notifications from the REDCap YES3 Exporter II.</p>';
 
         $msg .= '<p style="text-decoration:underline;">Summary of export</p>';
 
@@ -4564,7 +4576,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $msg .= '<style>td,th{padding-right: 10px;text-align:left;}</style>';
 
-        $msg .= '<p>You are receiving this email because you have enabled notifications from the REDCap YES3 Exporter.</p>';
+        $msg .= '<p>You are receiving this email because you have enabled notifications from the REDCap YES3 Exporter II.</p>';
 
         $msg .= '<table style="border-collapse:collapse;"><tbody>';
 
@@ -4753,10 +4765,10 @@ WHERE project_id=? AND log_entry_type=?
         SELECT DISTINCT p01.`value` AS `export_uuid`
         FROM redcap_external_modules_log x
         INNER JOIN redcap_external_modules_log_parameters p01 ON p01.log_id=x.log_id AND p01.name='export_uuid'
-        WHERE x.project_id=? and x.message=?
+        WHERE x.external_module_id=? and x.project_id=? and x.message=?
         ";
 
-        $UUIDs = $this->fetchRecords($sqlUUID, [$this->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
+        $UUIDs = $this->fetchRecords($sqlUUID, [$this->getModuleId(), $this->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
 
         $data = [];
 
@@ -4799,6 +4811,160 @@ WHERE project_id=? AND log_entry_type=?
         return (string) count( $elements );
     }
 
+    /* ==== IMPORT EXPORTER I SETTINGS ==== */
+
+    public function transferLegacyEnvironment() {
+
+        $errors = 0;
+
+        $log1 = $this->transferLegacySettings();
+
+        $log2 = $this->transferLegacyEMLogs( $errors );
+
+        $log = implode("\n", array_merge($log1, $log2));
+
+        return [
+            'log' => $log,
+            'errors' => $errors
+        ];
+    }
+
+    private function transferLegacySettings() {
+
+        $legacy_external_module_id = $this->getLegacyEMID();
+
+        $transfer_log = [];
+
+        $sql = "select ems.*
+        from redcap_external_modules em
+        inner join redcap_external_module_settings ems on ems.external_module_id=em.external_module_id
+        where em.external_module_id=? and ems.project_id=? and ifnull(ems.value, '') <> ''";
+
+        $legacyProjectSettings = Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id,$this->getProjectId() ]);
+
+        $configProjectSettings =$this->getConfig()['project-settings'];
+
+        $settingsTransferred = 0;
+
+        foreach ( $legacyProjectSettings as $setting ) {
+
+            // see if the legacy key is in the config
+            foreach ( $configProjectSettings as $configSetting ) {
+
+                if ( $setting['key'] == $configSetting['key'] ) {
+
+                    $value = $setting['value'];
+
+                    // most legacy booleean settings were set up as 'Y'/'N' radio buttons
+                    if ( $configSetting['type'] == 'checkbox' ) {
+
+                        if ( $value === 'Y' || $value === '1' ) {
+                            $value = "1";
+                        } else {
+                            $value = "0";
+                        }
+                    }
+
+                   $this->setProjectSetting($setting['key'], $value);
+                    $settingsTransferred++;
+
+                    continue 2;
+                }
+            }
+        }
+
+        $transfer_log[] = "Transferred $settingsTransferred legacy project settings.";
+
+        return $transfer_log;
+    }
+
+    private function transferLegacyEMLogs( &$errcount ) {
+
+        $legacy_external_module_id = $this->getLegacyEMID();
+
+        $this_external_module_id = $this->getModuleId();
+
+        $transfer_log = [];
+
+        $sql = "select eml.* from redcap_external_modules_log eml where eml.external_module_id=? and eml.project_id=?";
+
+        $legacy_logs = Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id, $this->getProjectId() ]);
+        $legacy_log_count = count($legacy_logs);
+        $transfer_log[] = "Processing $legacy_log_count legacy logs.";
+        $transfer_count = 0;
+        $transfer_errcount = 0;
+        foreach ( $legacy_logs as $legacy_log ) {
+
+            $legacy_log_id = $legacy_log['log_id'];
+
+            // skip if already transferred
+            if ( $this->logIsAlreadyTransferred($legacy_log_id) ) {
+                $transfer_log[] = "Legacy log $legacy_log_id has already been transferred.";
+                continue;
+            }
+
+            $legacy_log_message = $legacy_log['message'];
+
+            // gather ye parameters
+            $legacy_parameters = $this->getEMLogParameters($legacy_log_id);
+
+            $legacy_parameters['legacy_log_id'] = $legacy_log_id; // so we can prevent repeat transfers
+
+            $legacy_parameter_count = count($legacy_parameters);
+
+            // store the legacy log message and parameters
+            $new_log_id = $this->log($legacy_log_message, $legacy_parameters);
+
+            if ( $new_log_id ) {
+                $transfer_log[] = "Transferred legacy log $legacy_log_id to new log $new_log_id with $legacy_parameter_count parameters (message=$legacy_log_message).";
+                $transfer_count++;
+            }
+            else {
+                $transfer_log[] = "Failed to transfer legacy log $legacy_log_id (message=$legacy_log_message).";
+                $transfer_errcount++;
+            }
+        }
+
+        $transfer_log[] = "Transferred $transfer_count legacy log(s).";
+        $transfer_log[] = "$transfer_errcount error(s) reported.";
+
+        $errcount += $transfer_errcount;
+
+        return $transfer_log;
+    }
+    
+    private function getEMLogParameters( $log_id = null ) {
+
+        $sql = "select name, value from redcap_external_modules_log_parameters where log_id=?";
+        $rows = Yes3Fn::fetchRecords($sql, [ $log_id ]);
+
+        if ( empty($rows) ) {
+            return [];
+        }
+
+        $parameters = [];
+
+        foreach ( $rows as $row ) {
+            $parameters[$row['name']] = $row['value'];
+        }
+
+        return $parameters;
+    }
+
+    private function getLegacyEMID(){
+
+        return Yes3Fn::getEMIDbyPrefix("yes3_exporter");
+    }
+
+    private function logIsAlreadyTransferred( $legacy_log_id ){
+
+        $psuedoSql = "select log_id where legacy_log_id = ?";
+        $params = [$legacy_log_id];
+        $result = $this->queryLogs($psuedoSql, $params);
+
+        return ( $result->num_rows > 0 );
+    }
+
     /* ==== HOOKS ==== */
 
     public function redcap_module_link_check_display( $project_id, $link )
@@ -4833,5 +4999,40 @@ WHERE project_id=? AND log_entry_type=?
         }
 
         return $link;
+    }
+
+    function redcap_every_page_top($project_id)
+    {        
+        if ( PAGE !== 'manager/project.php') {
+
+            return; // only run on the EM manager page
+        }
+
+        ?>
+
+        <script>
+
+            $( function () {
+
+                const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
+
+                const $description = $emSettingsContainer.find('div.external-modules-description');
+
+                $description.append(`<div class="external-modules-description" style="color: #800000 ;">Hi Mom.</div>`);
+
+                // Add your settings HTML here
+            });
+
+        </script>
+
+        <?php
+
+
+    }
+
+    // causes a crash on the system settings dialog
+    public function redcap_module_configuration_settings_setaside($project_id, $settings){
+        // Implement your configuration settings logic here
+        return true;
     }
 }

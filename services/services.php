@@ -1,10 +1,10 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 use Exception;
 
-use Yale\Yes3Exporter\Yes3ExportValidator;
+use Yale\Yes3Exporter2\Yes3ExportValidator;
 
 /*
 ini_set('display_errors', '1');
@@ -497,10 +497,10 @@ function getExportSpecificationList():string
     SELECT DISTINCT p01.`value` AS `export_uuid`
     FROM redcap_external_modules_log x
     INNER JOIN redcap_external_modules_log_parameters p01 ON p01.log_id=x.log_id AND p01.name='export_uuid'
-    WHERE x.project_id=? and x.message=?
+    WHERE x.external_module_id=? and x.project_id=? and x.message=?
     ";
 
-    $params = [$module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION];
+    $params = [ $module->getModuleId(), $module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION];
 
     if ( $log_id ){
 
@@ -609,10 +609,10 @@ function getExportSpecificationList2( $get_removed=0 )
     SELECT DISTINCT p01.`value` AS `export_uuid`
     FROM redcap_external_modules_log x
     INNER JOIN redcap_external_modules_log_parameters p01 ON p01.log_id=x.log_id AND p01.name='export_uuid'
-    WHERE x.project_id=? and x.message=?
+    WHERE x.external_module_id=? AND x.project_id=? AND x.message=?
     ";
 
-    $UUIDs = $module->fetchRecords($sqlUUID, [$module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
+    $UUIDs = $module->fetchRecords($sqlUUID, [$module->getModuleId(), $module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
 
     $data = [];
 
@@ -709,7 +709,7 @@ function getExportLogRecordSQL( $log_id=0 )
     }
     else {
  
-        $sql .= " WHERE x.project_id=? AND p1.`value`=? AND p2.`value`=? ORDER BY timestamp ASC";
+        $sql .= " WHERE x.external_module_id=? AND x.project_id=? AND p1.`value`=? AND p2.`value`=? ORDER BY timestamp ASC";
     }
 
     return $sql;
@@ -749,7 +749,7 @@ function downloadExportLog()
 
     //exit("downloadExportLog: {$export_uuid}, {$export_name}, {$path}, {$bytes}, {$sql}");
 
-    foreach ( $module->recordGenerator($sql, [ $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
+    foreach ( $module->recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
 
         if ( !$bytes ) {
 
@@ -816,10 +816,10 @@ FROM redcap_external_modules_log x
   INNER JOIN redcap_external_modules_log_parameters p2 ON p2.log_id=x.log_id AND p2.name='export_uuid'
   INNER JOIN redcap_external_modules_log_parameters p3 ON p3.log_id=x.log_id AND p3.name='destination'
   LEFT  JOIN redcap_external_modules_log_parameters p4 ON p4.log_id=x.log_id AND p4.name='user_name'
-WHERE x.project_id=? AND p1.`value`=? AND p2.`value`=?
+WHERE x.external_module_id=? AND x.project_id=? AND p1.`value`=? AND p2.`value`=?
     ";
 
-    $params = [ $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ];
+    $params = [ $module->getModuleId(), $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ];
 
     if ( $username ){
 

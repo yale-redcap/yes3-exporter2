@@ -1,7 +1,7 @@
 {
-    "name": "YES3 Exporter",
+    "name": "YES3 Exporter II II",
 
-    "namespace": "Yale\\Yes3Exporter",
+    "namespace": "Yale\\Yes3Exporter2",
 
     "description": "Specialized data export module for datamart integrations. Key features include a 'horizontal' layout for longitudinal projects, having one column per event per field. Supports exports to the host file system, intended for bind mounts mapped to external fileshares. This release requires REDCap version 13.7.3 or above. See the change log at https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/changelog.html for important release notes.",
 
@@ -38,32 +38,27 @@
     "links": {
         "project": [
             {
-                "name": "YES3 Exporter Manager",
+                "name": "YES3 Exporter II Manager",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_manager.php"
             },
             {
-                "name": "YES3 Exporter Event Prefixes",
+                "name": "YES3 Exporter II Event Prefixes",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_prefixes.php"
             },
             {
-                "name": "YES3 Exporter Logs",
+                "name": "YES3 Exporter II Logs",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_logs.php"
             },
             {
-                "name": "YES3 Exporter Validator",
-                "icon": "fab fa-connectdevelop",
-                "url":  "plugins/yes3_export_validator.php"
-            },
-            {
-                "name": "YES3 Exporter Mount Test",
+                "name": "YES3 Exporter II Mount Test",
                 "icon": "fab fa-connectdevelop",
                 "url":  "plugins/yes3_export_mount_test.php"
             },
             {
-                "name": "YES3 Exporter Workshop",
+                "name": "YES3 Exporter II Workshop",
                 "icon": "fas fa-gear",
                 "url":  "plugins/workshop.php"
             }
@@ -74,7 +69,7 @@
         {
             "key":   "system-cron-header",
             "type" : "descriptive",
-            "name":  "<h5>YES3 EXPORTER CRON JOB</h5><p>The YES3 Exporter perfoms a number daily tasks for each project. By default all of the daily tasks are run at 11 minutes past midnight, but you may specify a different time to run these tasks.</p>"
+            "name":  "<h5>YES3 Exporter II CRON JOB</h5><p>The YES3 Exporter II perfoms a number daily tasks for each project. By default all of the daily tasks are run at 11 minutes past midnight, but you may specify a different time to run these tasks.</p>"
         },
         {
             "key": "cron-time",
@@ -126,7 +121,7 @@
         {
             "key": "email-notifications-header",
             "type" : "descriptive",
-            "name": "<h5>DAILY EMAIL NOTIFICATIONS</h5><p>You may elect to receive daily summaries of YES3 Exporter actions by email.</p>"
+            "name": "<h5>DAILY EMAIL NOTIFICATIONS</h5><p>You may elect to receive daily summaries of YES3 Exporter II actions by email.</p>"
         },
         {
             "key": "notification-email-enable",
@@ -166,7 +161,7 @@
         {
             "key": "toast-the-host",
             "type" : "descriptive",
-            "name": "<h5>HOST FILE SYSTEM EXPORTS</h5><p>YES3 Exporter can export to the host file system, n.b. to automounts pointing to secure institutional file shares. This will require services from your REDCap host system administrator, and the blessing of your Information Security Officer.</p>"
+            "name": "<h5>HOST FILE SYSTEM EXPORTS</h5><p>YES3 Exporter II can export to the host file system, n.b. to automounts pointing to secure institutional file shares. This will require services from your REDCap host system administrator, and the blessing of your Information Security Officer.</p>"
         },
         {
             "key": "enable-host-filesystem-exports",
@@ -262,7 +257,7 @@
         {
             "key":   "project-cron-header",
             "type" : "descriptive",
-            "name":  "<h5>CRON LOG</h5><p>The YES3 Exporter perfoms a number daily tasks for each project. Below is the most recent daily cron log for this project.</p>"
+            "name":  "<h5>CRON LOG</h5><p>The YES3 Exporter II perfoms a number daily tasks for each project. Below is the most recent daily cron log for this project.</p>"
         },
         {
             "key": "project-cron-log",
@@ -304,7 +299,7 @@
             "key": "enable-validator-header",
             "type" : "descriptive",
             "super-users-only": false,
-            "name": "<h5>VALIDATOR</h5><p>YES3 Exporter includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p>"
+            "name": "<h5>VALIDATOR</h5><p>YES3 Exporter II includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p>"
         },
         {
             "key": "enable-validator",
@@ -336,7 +331,7 @@
     "crons":[
         {
             "cron_name": "yes3_exporter_cron",
-            "cron_description": "YES3 Exporter cron manager",
+            "cron_description": "YES3 Exporter II cron manager",
             "method": "yes3_exporter_cron",
             "cron_frequency": "60",
             "cron_max_run_time": "60"

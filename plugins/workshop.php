@@ -1,12 +1,12 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-$module = new Yes3Exporter();
+$module = new Yes3Exporter2();
 
 use Yale\Yes3\Yes3;
 use REDCap;
@@ -15,15 +15,113 @@ use HtmlPage;
 $HtmlPage = new HtmlPage();
 $HtmlPage->ProjectHeader();
 
-
 //testTheSanitizer();
 
-testTheFileType();
-
+//testTheFileType();
 
 //phpinfo();
 
+testTheLegacyTransfer();
+
+//echo $module->getModuleId();
+
 exit();
+
+function testTheLegacyTransfer(){
+    global $module;
+
+    $result = $module->transferLegacyEnvironment();
+
+    echo "<pre>";
+
+    echo "Legacy environment transfer results:\n";
+    echo $result['log'];
+    echo "\n";
+
+    if ( $result['errors'] > 0 ) {
+        echo "Encountered {$result['errors']} errors during legacy environment transfer.";
+    }
+
+    echo "</pre>";
+
+}
+
+function getEMLogParameters( $log_id = null ) {
+
+    $sql = "select * from redcap_external_modules_log_parameters where log_id=?";
+    return Yes3Fn::fetchRecords($sql, [ $log_id ]);
+}
+
+function transferLegacyEMLogs( $legacy_external_module_id = null ) {
+    global $module;
+
+    $transfer_log = "";
+
+    $sql = "select eml.*
+from redcap_external_modules_log eml
+where eml.external_module_id=? and eml.project_id=?";
+
+    $legacy_logs = Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id, $module->getProjectId() ]);
+    $legacy_log_count = count($legacy_logs);
+    $transfer_log .= "\nTransferring $legacy_log_count legacy logs";
+    foreach ( $legacy_logs as $legacy_log ) {
+
+        $legacy_log_id = $legacy_log['log_id'];
+        // gather ye parameters
+        $legacy_parameters = getEMLogParameters($legacy_log_id);
+        $legacy_parameter_count = count($legacy_parameters);
+
+        $legacy_parameters['legacy_log_id'] = $legacy_log_id; // to prevent multiple transfers
+
+        $transfer_log .= "\nTransferring legacy log $legacy_log_id with $legacy_parameter_count parameters";
+    }
+
+    return $transfer_log;
+}
+
+function transferLegacySettings( $legacy_external_module_id = null ) {
+    global $module;
+
+    $sql = "select ems.*
+from redcap_external_modules em
+inner join redcap_external_module_settings ems on ems.external_module_id=em.external_module_id
+where em.external_module_id=? and ems.project_id=? and ifnull(ems.value, '') <> ''";
+
+    $legacyProjectSettings = Yes3Fn::fetchRecords($sql, [ $legacy_external_module_id, $module->getProjectId() ]);
+
+    $configProjectSettings = $module->getConfig()['project-settings'];
+
+    $settingsTransferred = 0;
+
+    foreach ( $legacyProjectSettings as $setting ) {
+
+        // see if the legacy key is in the config
+        foreach ( $configProjectSettings as $configSetting ) {
+
+            if ( $setting['key'] == $configSetting['key'] ) {
+
+                $value = $setting['value'];
+
+                // most legacy booleean settings were set up as 'Y'/'N' radio buttons
+                if ( $configSetting['type'] == 'checkbox' ) {
+
+                    if ( $value === 'Y' || $value === '1' ) {
+                        $value = "1";
+                    } else {
+                        $value = "0";
+                    }
+                }
+
+                $module->setProjectSetting($setting['key'], $value);
+                $settingsTransferred++;
+
+                continue 2;
+            }
+        }
+    }
+
+    return $settingsTransferred;
+}
 
 function testTheFileType(){
     global $module;

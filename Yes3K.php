@@ -1,5 +1,5 @@
 <?php
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
 class Yes3K
 {    

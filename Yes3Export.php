@@ -1,8 +1,8 @@
 <?php
 
-namespace Yale\Yes3Exporter;
+namespace Yale\Yes3Exporter2;
 
-use Yale\Yes3Exporter\Yes3Fn;
+use Yale\Yes3Exporter2\Yes3Fn;
 
 class Yes3Export {
 
