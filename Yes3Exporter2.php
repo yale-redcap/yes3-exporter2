@@ -41,6 +41,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
     const LOG_MESSAGE_DD_DOWNLOADED = "export data dictionary downloaded";
     const LOG_MESSAGE_DATA_DOWNLOADED = "export data downloaded";
     const LOG_MESSAGE_ZIP_DOWNLOADED = "export zip downloaded";
+    const LOG_MESSAGE_LEGACY_TRANSFERRED = "legacy exporter environment transferred";
 
     const DESTINATION_DOWNLOAD = "download";
     const DESTINATION_FILESYSTEM = "filesystem";
@@ -4815,17 +4816,36 @@ WHERE project_id=? AND log_entry_type=?
 
     public function transferLegacyEnvironment() {
 
-        $errors = 0;
+        $tx1 = $this->transferLegacySettings();
 
-        $log1 = $this->transferLegacySettings();
+        $tx2 = $this->transferLegacyEMLogs( true );
 
-        $log2 = $this->transferLegacyEMLogs( $errors );
+        $log = implode("\n", array_merge($tx1['log'], $tx2['log']));
 
-        $log = implode("\n", array_merge($log1, $log2));
+        $errors = $tx1['errors'] + $tx2['errors'];
+
+        $settings_transferred = $tx1['transferred'];
+
+        $logs_transferred = $tx2['transferred'];
+
+        $summary = "Transfers completed. $settings_transferred project settings transferred, $logs_transferred logs transferred.";
+
+        if ( $errors > 0 ){
+            
+            $summary .= "\nNOTE: $errors error(s) occurred during the transfer. See the console log (F12) for details.";
+        }
+        else {
+
+            $this->setProjectSetting('legacy-transfer-status', 'transferred');
+        }
+
+        // log this transfer
+        $this->log( self::LOG_MESSAGE_LEGACY_TRANSFERRED, [ 'summary' => $summary, 'log' => $log, 'errors' => $errors ]);
 
         return [
             'log' => $log,
-            'errors' => $errors
+            'errors' => $errors,
+            'summary' => $summary
         ];
     }
 
@@ -4861,39 +4881,66 @@ WHERE project_id=? AND log_entry_type=?
 
         $settingsTransferred = 0;
 
+        $errors = 0;
+
         foreach ( $legacyProjectSettings as $setting ) {
 
             // see if the legacy key is in the config
             foreach ( $configProjectSettings as $configSetting ) {
 
-                if ( $setting['key'] == $configSetting['key'] ) {
+                if ( $setting['key'] == $configSetting['key']) {
 
-                    $value = $setting['value'];
+                    if ( empty($this->getProjectSetting($setting['key']))) {
 
-                    // most legacy booleean settings were set up as 'Y'/'N' radio buttons
-                    if ( $configSetting['type'] == 'checkbox' ) {
+                        $value = $setting['value'];
 
-                        if ( $value === 'Y' || $value === '1' ) {
-                            $value = "1";
-                        } else {
-                            $value = "0";
+                        $blockBoolean = false; // no need to transfer a false boolean
+
+                        // most legacy booleean settings were set up as 'Y'/'N' radio buttons
+                        if ( $configSetting['type'] == 'checkbox' ) {
+
+                            if ( $value === 'Y' || $value === '1' ) {
+                                $value = "1";
+                            } else {
+                                $value = "0";
+                                $blockBoolean = true;
+                            }
                         }
+
+                        if ( !$blockBoolean ){
+                            $transfer_log[] = "Transferred legacy project setting {$setting['key']}.";
+
+                            $this->setProjectSetting($setting['key'], $value);
+                            $settingsTransferred++;
+                        }
+
+                        continue 2;
                     }
-
-                   $this->setProjectSetting($setting['key'], $value);
-                    $settingsTransferred++;
-
-                    continue 2;
                 }
             }
         }
 
         $transfer_log[] = "Transferred $settingsTransferred legacy project settings.";
 
-        return $transfer_log;
+        return [
+            'errors' => $errors,
+            'transferred' => $settingsTransferred,
+            'log' => $transfer_log
+        ];
     }
 
-    private function transferLegacyEMLogs( &$errcount ) {
+    private function setLogTimestamp( $log_id, $timestamp ) {
+
+        $sql = "update redcap_external_modules_log set timestamp=? where log_id=?";
+        $this->query($sql, [ $timestamp, $log_id ]);
+
+        // verify: this is fabulously important
+        $storedTimestamp = Yes3Fn::fetchValue("select timestamp from redcap_external_modules_log where log_id=?", [ $log_id ]);
+
+        return $storedTimestamp === $timestamp;
+    }
+
+    private function transferLegacyEMLogs( $force=false ) {
 
         $legacy_external_module_id = $this->getLegacyEMID();
 
@@ -4911,14 +4958,30 @@ WHERE project_id=? AND log_entry_type=?
         foreach ( $legacy_logs as $legacy_log ) {
 
             $legacy_log_id = $legacy_log['log_id'];
+            $new_log_id = null;
+            $restamped = false; // the log timestamp must be transferred or else versioning is kaput
 
-            // skip if already transferred
+            // skip or replace if already transferred
             if ( $this->logIsAlreadyTransferred($legacy_log_id) ) {
-                $transfer_log[] = "Legacy log $legacy_log_id has already been transferred.";
-                continue;
+
+                if ( !$force ) {
+                    $transfer_log[] = "Legacy log $legacy_log_id has already been transferred, and will be skipped.";
+                    continue;
+                }
+
+                $removed_log_count = $this->removeTransferredLegacyLog($legacy_log_id);
+
+                if ( !$removed_log_count ) {
+                    $transfer_log[] = "Failed to remove the transferred copy of legacy log $legacy_log_id.";
+                    $transfer_errcount++;
+                    continue;
+                }
+
+                $transfer_log[] = "Legacy log $legacy_log_id will be re-transferred.";
             }
 
             $legacy_log_message = $legacy_log['message'];
+            $legacy_log_timestamp = $legacy_log['timestamp'];
 
             // gather ye parameters
             $legacy_parameters = $this->getEMLogParameters($legacy_log_id);
@@ -4931,11 +4994,23 @@ WHERE project_id=? AND log_entry_type=?
             $new_log_id = $this->log($legacy_log_message, $legacy_parameters);
 
             if ( $new_log_id ) {
-                $transfer_log[] = "Transferred legacy log $legacy_log_id to new log $new_log_id with $legacy_parameter_count parameters (message=$legacy_log_message).";
+
+                // transfer the timestamp so versioning will work correctly
+                $restamped = $this->setLogTimestamp($new_log_id, $legacy_log_timestamp);
+
+                if ( !$restamped ) {
+                    $transfer_log[] = "Failed to transfer timestamp for legacy log $legacy_log_id to new log $new_log_id.";
+                    $transfer_errcount++;
+                }
+            }
+
+            if ( $new_log_id && $restamped ) {
+
+                $transfer_log[] = "Transferred legacy log $legacy_log_id ($legacy_log_message) to new log $new_log_id with $legacy_parameter_count parameters.";
                 $transfer_count++;
             }
             else {
-                $transfer_log[] = "Failed to transfer legacy log $legacy_log_id (message=$legacy_log_message).";
+                $transfer_log[] = "Failed to transfer legacy log $legacy_log_id ($legacy_log_message).";
                 $transfer_errcount++;
             }
         }
@@ -4943,9 +5018,12 @@ WHERE project_id=? AND log_entry_type=?
         $transfer_log[] = "Transferred $transfer_count legacy log(s).";
         $transfer_log[] = "$transfer_errcount error(s) reported.";
 
-        $errcount += $transfer_errcount;
-
-        return $transfer_log;
+        return [
+            'errors' => $transfer_errcount,
+            'transferred' => $transfer_count,
+            'log' => $transfer_log
+        ];
+;
     }
     
     private function getEMLogParameters( $log_id = null ) {
@@ -4978,6 +5056,11 @@ WHERE project_id=? AND log_entry_type=?
         $result = $this->queryLogs($psuedoSql, $params);
 
         return ( $result->num_rows > 0 );
+    }
+
+    private function removeTransferredLegacyLog( $legacy_log_id ){
+
+        return $this->removeLogs( 'legacy_log_id=?', $legacy_log_id );
     }
 
     public function legacyEnvironmentExists()
@@ -5055,18 +5138,49 @@ WHERE project_id=? AND log_entry_type=?
             return; // no legacy transfer form to render
         }
 
-        $xpII->initializeJavascriptModuleObject();
+        $module_json = "4";
 
         ?>
+
+        <style>
+
+            #legacy-transfer-form div {
+                width: 100%;
+                margin: 5px 0;
+                font-weight: 600;
+                color: black;
+                font-size: 11px;
+            }
+            
+            #legacy-transfer-form button {
+                margin-right: 8px;
+            }
+
+            #ajax-response {
+                width: 100%;
+                color: black;
+                margin: 5px 0;
+                font-weight: 600;
+            }
+            
+            
+        </style>
+
+        <?=$xpII->initializeJavascriptModuleObject()?>
 
         <script>
 
             $( function () {
-
-                const module = <?php echo json_encode($xpII->getJavascriptModuleObject()); ?>;
-
+                
+                const module = <?=$this->getJavascriptModuleObjectName()?>;
                 const legacy_transfer_status = "<?php echo $legacy_transfer_status; ?>";
+                
+                const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
+                const $description = $emSettingsContainer.find('div.external-modules-description');
 
+                console.log("YES3 Exporter II module object: ", module);
+                console.log("Legacy transfer status: ", legacy_transfer_status);
+                
                 if (legacy_transfer_status==='pending') {
 
                     renderLegacyTransferForm();
@@ -5074,29 +5188,84 @@ WHERE project_id=? AND log_entry_type=?
 
                 function renderLegacyTransferForm() {
 
-                    const $form = $('<form>').attr('id', 'legacy-transfer-form');
-                    const $submit = $('<button>').attr('type', 'submit').text('Transfer Legacy Environment');
-                    
-                    const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
-                    const $description = $emSettingsContainer.find('div.external-modules-description');
-                    
-                    $form.append($submit);
+                    const $form              = $('<form>').attr('id', 'legacy-transfer-form').prop('novalidate', true);
+                    const $explain           = $('<div>').addClass('explanation').text('Legacy Yes3 Exporter I environment detected. Click the button below to transfer legacy settings, specifications, and logs to the new YES3 Exporter II module. This will not overwrite any existing settings or logs in the new module.');
+                    const $submit_transfer   = $('<button>').attr('id', 'submit-transfer').attr('action', 'legacy-transfer').attr('type', 'submit').text('Yes, please transfer').addClass('btn btn-success btn-sm');
+                    const $submit_notransfer = $('<button>').attr('id', 'submit-notransfer').attr('action', 'no-legacy-transfer').attr('type', 'submit').text(`No, do not transfer (and don't ask again)`).addClass('btn btn-sm btn-rcred btn-rcred-light');
 
-                    $description.append($form);
+                    $form
+                    .append($explain)
+                    .append($submit_transfer)
+                    .append($submit_notransfer)
+                    ;
+
+                    $description
+                    .append($form);
+
+                    addFormListener();
                 }
 
+                function addFormListener(){
+
+                    const $form = $('#legacy-transfer-form');
+
+                    $form.on('submit', function (e) {
+
+                        e.preventDefault(); // action irrelevant here
+
+                        const btn    = e.originalEvent.submitter;  // <- jQuery wraps, so use .originalEvent
+                        const action = btn.getAttribute('action');
+
+                        module.ajax(action, {}).then(function(response) {
+
+                            $form.remove();
+                            $description.append($('<div>').attr('id', 'ajax-response').text(response['summary']));
+                            // Process response
+                            console.log('Detailed transfer log:', response['log']);
+                        }).catch(function(err) {
+                            // Handle error
+                            console.error('AJAX error:', err);
+                        });                        
+                    });
+                }
             });
 
         </script>
 
         <?php
-
-
     }
 
-    // causes a crash on the system settings dialog
-    public function redcap_module_configuration_settings_setaside($project_id, $settings){
-        // Implement your configuration settings logic here
-        return true;
+    private function handleLegacyTransfer()
+    {
+        // Handle legacy transfer
+        return $this->transferLegacyEnvironment();
     }
+
+    private function handleNoLegacyTransfer()
+    {
+        $this->setProjectSetting('legacy-transfer-status', 'declined');
+
+        // Handle no legacy transfer
+        return [
+            'summary' => 'Legacy transfer declined. No further action taken.',
+            'errors' => 0,
+            'log' => ''
+        ];
+    }
+
+    public function redcap_module_ajax($action, $payload, $project_id, $record, $instrument, $event_id, $repeat_instance, $survey_hash, $response_id, $survey_queue_hash, $page, $page_full, $user_id, $group_id)
+    {
+        // Handle AJAX requests
+        if ($action === 'legacy-transfer') {
+
+            return $this->handleLegacyTransfer();
+
+        } elseif ($action === 'no-legacy-transfer') {
+
+            return $this->handleNoLegacyTransfer();
+        }
+
+        return "Sorry, the action '$action' is most abhorrent.";
+    }
+
 }

@@ -32,15 +32,13 @@ function testTheLegacyTransfer(){
 
     $result = $module->transferLegacyEnvironment();
 
+    echo $result['summary'];
+
     echo "<pre>";
 
-    echo "Legacy environment transfer results:\n";
+    echo "Legacy environment transfer log:\n";
     echo $result['log'];
     echo "\n";
-
-    if ( $result['errors'] > 0 ) {
-        echo "Encountered {$result['errors']} errors during legacy environment transfer.";
-    }
 
     echo "</pre>";
 
