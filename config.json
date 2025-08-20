@@ -347,11 +347,13 @@
     "no-auth-pages": [
     ],
 
+    "auth-ajax-actions": [ "legacy-transfer", "no-legacy-transfer" ],
+
     "compatibility": {
-    "php-version-min": "7.4",
+    "php-version-min": "8.1",
     "php-version-max": "8.99",
-    "redcap-version-min": "13.7.3"
+    "redcap-version-min": "15.0.0"
     },
 
-    "framework-version": 14
+    "framework-version": 15
 }
