@@ -121,7 +121,7 @@ function validateExportFile(){
     if ( !$file ){
 
         return $module->stdReturnObj(
-            Yes3K::STD_RETURN_OBJECT_FAIL,
+            Yes3Fn::STD_RETURN_OBJECT_FAIL,
             "Uploaded file not detected on server.",
             print_r($_FILES, true)
         );
@@ -151,6 +151,23 @@ function validateExportFile(){
     $XValidator->initialize($project_id, $destPath, $ddPackage);
 
     $ValResults = $XValidator->validate();
+
+    $error_report = "";
+    if ( count($XValidator->error_report) ) {
+
+        $error_report = implode("\n", array_column($XValidator->error_report, 'message'));
+    }
+
+    $module->log("export validation", [
+        'export_uuid' => $ddPackage['export_uuid'],
+        'export_name' => $ddPackage['export_name'],
+        'datasheet_name' => $file['name'],
+        'summary' => $XValidator->sysmsg,
+        'count_rows' => $XValidator->counts['rows'] ?? 0,
+        'count_cells' => $XValidator->counts['cells'] ?? 0,
+        'count_errors' => $XValidator->counts['errors'] ?? 0,
+        'error_report' => $error_report
+    ]);
 
     return json_encode($ValResults);
 }
@@ -260,7 +277,7 @@ function addExportSpecification()
 
     $qParams = [
         'removed' => "0"
-        , 'log_entry_type' => EMLOG_TYPE_EXPORT_SPECIFICATION
+        , 'log_entry_type' => $module::EMLOG_TYPE_EXPORT_SPECIFICATION
         , 'export_uuid' => $_POST['export_uuid']
         , 'export_name' => $_POST['export_name']
         , 'export_order' => "32767"
@@ -289,7 +306,7 @@ function addExportSpecification()
     ];
 
     $log_id = $module->log(
-        EMLOG_MSG_EXPORT_SPECIFICATION,
+        $module::EMLOG_MSG_EXPORT_SPECIFICATION,
         $qParams
     );
 
@@ -309,7 +326,7 @@ function saveExportSpecification()
 
     $qParams = [
         'removed' => ""
-        , 'log_entry_type' => EMLOG_TYPE_EXPORT_SPECIFICATION
+        , 'log_entry_type' => $module::EMLOG_TYPE_EXPORT_SPECIFICATION
         , 'export_uuid' => ""
         , 'export_name' => ""
         , 'export_order' => ""
@@ -363,7 +380,7 @@ function saveExportSpecification()
     $log_id = 0;
 
     $log_id = $module->log(
-        EMLOG_MSG_EXPORT_SPECIFICATION,
+        $module::EMLOG_MSG_EXPORT_SPECIFICATION,
         $qParams
     );
 
@@ -500,7 +517,7 @@ function getExportSpecificationList():string
     WHERE x.external_module_id=? and x.project_id=? and x.message=?
     ";
 
-    $params = [ $module->getModuleId(), $module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION];
+    $params = [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_MSG_EXPORT_SPECIFICATION];
 
     if ( $log_id ){
 
@@ -612,7 +629,7 @@ function getExportSpecificationList2( $get_removed=0 )
     WHERE x.external_module_id=? AND x.project_id=? AND x.message=?
     ";
 
-    $UUIDs = $module->fetchRecords($sqlUUID, [$module->getModuleId(), $module->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
+    $UUIDs = $module->fetchRecords($sqlUUID, [$module->getModuleId(), $module->getProjectId(), $module::EMLOG_MSG_EXPORT_SPECIFICATION]);
 
     $data = [];
 
@@ -749,7 +766,7 @@ function downloadExportLog()
 
     //exit("downloadExportLog: {$export_uuid}, {$export_name}, {$path}, {$bytes}, {$sql}");
 
-    foreach ( $module->recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
+    foreach ( $module->recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
 
         if ( !$bytes ) {
 
@@ -819,7 +836,7 @@ FROM redcap_external_modules_log x
 WHERE x.external_module_id=? AND x.project_id=? AND p1.`value`=? AND p2.`value`=?
     ";
 
-    $params = [ $module->getModuleId(), $module->getProjectId(), EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ];
+    $params = [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ];
 
     if ( $username ){
 
@@ -1138,10 +1155,10 @@ function saveEventSettings()
     
     // the 'setting' parameter will be dropped in a future release (in favor of log_entry_type)
     $logId = $module->log(
-        EMLOG_MSG_EXPORT_EVENTS,
+        $module::EMLOG_MSG_EXPORT_EVENTS,
         [
             "user" => $module->getUsername(),
-            "log_entry_type" => EMLOG_TYPE_EXPORT_EVENTS,
+            "log_entry_type" => $module::EMLOG_TYPE_EXPORT_EVENTS,
             "setting" => "export-events",
             "export_events_json" => json_encode($events)
         ]
@@ -1502,13 +1519,13 @@ ORDER BY m.`field_order`
          foreach ( $vv as $value => $label) {
             $choices[] = [
                'value' => $value,
-               'label' => $module->truncate($module->printableEscHtmlString($label), MAX_LABEL_LEN)
+               'label' => $module->truncate($module->printableEscHtmlString($label), Yes3Fn::MAX_LABEL_LEN)
             ];
          }
       }
       $xx[] = [
          'field_name' => $field['field_name'],
-         'field_label' => $module->truncate($module->printableEscHtmlString($field['element_label']), MAX_LABEL_LEN),
+         'field_label' => $module->truncate($module->printableEscHtmlString($field['element_label']), Yes3Fn::MAX_LABEL_LEN),
          'field_type' => $field['element_type'],
          'field_choices' => $choices
       ];

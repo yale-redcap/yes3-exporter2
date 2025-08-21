@@ -21,7 +21,7 @@ class Yes3ExportItem {
     public $repeatable = 0;
 
     public $non_missing_count = 0;
-    public $min_length = Yes3K::VERY_LARGE_NUMBER;
+    public $min_length = Yes3Fn::VERY_LARGE_NUMBER;
     public $max_length = 0;
     public $min_value = NULL;
     public $max_value = NULL;

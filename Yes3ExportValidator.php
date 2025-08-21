@@ -17,8 +17,6 @@ use REDCap;
 
 use RuntimeException;
 
-use Yale\Yes3Exporter2\Yes3K;
-
 use Generator;
 
 use Records;
@@ -40,8 +38,8 @@ class Yes3ExportValidator {
 
     public $sysmsg = '';
 
-    private const ROW_LIMIT = 100;
-    private const ERROR_LIMIT = 6000;
+    private const ROW_LIMIT = 10000;
+    private const ERROR_LIMIT = 2000;
     private const ERROR_LABELS = [
         'HDR_COUNT' => 'The column count does not match the field count in the data dictionary.',
         'HDR_NAME' => 'One or more column names do not match the field names in the data dictionary.',
@@ -82,7 +80,7 @@ class Yes3ExportValidator {
 
     private $redcap_data_table = "";
 
-    private $delimiter = ","; // default delimiter for all exports
+    private $delimiter = "\t"; // default delimiter for all exports
 
     private $fileType = "csv"; // csv or tsv
 
@@ -180,11 +178,23 @@ class Yes3ExportValidator {
         return in_array($var_name, $redcap_vars);
     }
 
+    /**
+     * Check if the given data dictionary checkbox item is a checkbox *option* variable (as opposed to a checkbox *list*).
+     *
+     * These are characterized by having a 'redcap_source_option' dd field set to the checkbox option value, as defined in the REDCap form designer.
+     * In the export, checkbox option variables have names that follow the REDCap convention, i.e
+     * [redcap field name]___[redcap source option], and take on values of 1 or blank (no way to distinguish 'unchecked' from 'missing').
+     * Their var_type is NOMINAL (same as for radio, dropdown, yesno and truefalse fields).
+     */
     private function isCheckboxOption( $ddItem ){
 
         return (( isset($ddItem['redcap_source_option']) && $ddItem['redcap_source_option'] ));
     }
 
+    /**
+     * A checkbox *list* variable is named [redcap_field_name], 
+     * its var_type is CHECKBOX and its value is a comma-delimited string of checked option values.
+     */
     private function isCheckboxList( $ddItem ){
 
         return (( isset($ddItem['var_type']) && $ddItem['var_type']==='CHECKBOX' ));
@@ -199,9 +209,20 @@ class Yes3ExportValidator {
 
         $this->sysmsg = "";
 
+        //xx$yieldLog = "";
+
         foreach($this->processUploadedRecords() as $row) {
 
+            if ( !is_array( $row ) ){
+
+                throw new Exception("Invalid row format.");
+            }
+
+            //xx$yieldLog .= "Row {$rowCount}: " . implode(", ", $row) . "\n";
+
             if ($rowCount === 0) {
+            
+                $row[0] = $this->cleanString($row[0]); // clean the first column of the first row to remove BOM
 
                 $header = $row;
 
@@ -210,35 +231,27 @@ class Yes3ExportValidator {
 
                 if (!$headerValidation) {
 
-                    return Yes3Fn::failObject("Header validation failed.",
-                    [
-                        'counts' => $this->counts,
-                        'error_report' => $this->error_report,
-                        'header' => $header,
-                        'dd' => $this->dd
-                    ]);
+                    $this->sysmsg = "Header validation failed.";
+
+                    break;
                 }
-
-                $colCount = count($row);
-
-                // Skip the header row
-                $rowCount++;
-                continue;
             }
+            else {
 
-            // Validate each row
-            // returns true or false depending on whether an error is found in the row
-            $rowValidation = $this->validateRow($row); // true or false
+                // Validate each row
+                // returns true or false depending on whether an error is found in the row
+                $rowValidation = $this->validateRow($row); // true or false
+
+                if ( $this->counts['errors'] > self::ERROR_LIMIT ) {
+                    $this->sysmsg = "Error limit exceeded: {$this->counts['errors']} errors found.";
+                    break; // stop processing if we hit the error limit
+                }
+            }
 
             $rowCount++;
 
-            if ( $this->counts['errors'] > self::ERROR_LIMIT ) {
-                $this->sysmsg = "Error limit exceeded: {$this->counts['errors']} errors found.";
-                break; // stop processing if we hit the error limit
-            }
-
             if ($rowCount > self::ROW_LIMIT ) {
-                $this->sysmsg = "Row limit exceeded: {$rowCount} rows processed.";
+                $this->sysmsg = "Row limit exceeded: {$rowCount} rows processed. {$this->counts['errors']} discrepancies found.";
                 break; // stop processing if we hit the row limit
             }
         }
@@ -255,13 +268,17 @@ class Yes3ExportValidator {
                 'counts' => $this->counts,
                 'error_report' => $this->error_report,
                 'dd' => $this->dd
+                //xx, 'yield_log' => $yieldLog
             ]);
         }
 
         return Yes3Fn::successObject(
             $this->sysmsg,
             [
-                'counts' => $this->counts
+                'counts' => $this->counts,
+                'error_report' => [],
+                'dd' => $this->dd
+                //xx, 'yield_log' => $yieldLog
             ]
         );
     }
@@ -275,7 +292,7 @@ class Yes3ExportValidator {
 
         if ( $hdr_col_count !== $dd_count ) {
 
-            $this->reportValidationError([], "HDR_COUNT", "The number of fields in the header ({$hdr_col_count}) does not match the data dictionary field count ({$dd_count}).");
+           $this->reportValidationError([], "HDR_COUNT", "The number of fields in the header ({$hdr_col_count}) does not match the data dictionary field count ({$dd_count}).");
             return false;
         }
 
@@ -290,7 +307,7 @@ class Yes3ExportValidator {
 
                 $hdrOk = false; // header validation failed
 
-                $this->reportValidationError([], "HDR_NAME", "Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}' for column {$i}.");
+               $this->reportValidationError([], "HDR_NAME", "Column name '{$export_col_name}' does not match data dictionary field name '{$dd_col_name}' for column {$i}.");
             }
         }
 
@@ -322,11 +339,26 @@ class Yes3ExportValidator {
             'redcap_data_access_group_id' => 0,
             'redcap_repeat_instance' => 1,
             'redcap_field_name' => "",
+            'value' => "",
             'stored_value' => "",
             'exported_value' => ""
         ];
 
+
         $this->counts['rows']++;
+
+        $debug_row = false;
+
+        $rowStr = implode(", ", $row);
+    
+        if ( $debug_row ) {
+
+            $this->reportValidationError([], 'debug', $rowStr);
+        }
+
+        //$this->reportValidationError([], 'debug',$rowStr);
+        //$xStr = print_r($x, true);
+        //$this->reportValidationError($x, "debug", $xStr);
 
         if ( $this->export_hash_recordid ) {
 
@@ -336,7 +368,7 @@ class Yes3ExportValidator {
 
             if ( !$x['record'] ) {
 
-                $this->reportValidationError([], 'ROW_HASH', "Record ID hash {$record_hash} not matched to any record.");
+               $this->reportValidationError([], 'ROW_HASH', "Record ID hash {$record_hash} not matched to any record.");
 
                 return false;
             }
@@ -344,79 +376,67 @@ class Yes3ExportValidator {
 
         if ( ! $x['record'] ) {
 
-            $this->reportValidationError([], 'ROW_ID', "Missing record ID.");
+           $this->reportValidationError([], 'ROW_ID', "Missing record ID.");
 
             return false;
         }
 
         $pre_error_count = $this->counts['errors']; // keep track of errors before validation
 
+
         // skip the first column (record ID) and gather any other redcap fields
         for ($i = 1; $i < count($row); $i++) {
 
+            $x['value'] = "";
+            $x['exported_value'] = "";
+
             $value = $row[$i] ?? "";
 
-            $var_name = $this->dd[$i]['var_name'];
+            $ddItem = $this->dd[$i] ?? null;
+
+            $var_name = $ddItem['var_name'];
+
+            $x['var_name'] = $var_name;
 
             if ( $this->isRedCapVar($var_name) ) {
 
-                switch ($var_name) {
-
-                    case 'redcap_event_id':
-                        $x['redcap_event_id'] = (int) $value;
-                        break;
-
-                    case 'redcap_event_name':
-                        $x['redcap_event_name'] = $value;
-                        break;
-
-                    case 'redcap_data_access_group_id':
-                        $x['redcap_data_access_group_id'] = (int) $value;
-                        break;
-
-                    case 'redcap_repeat_instance':
-                        $x['redcap_repeat_instance'] = (int) $value;
-                        break;
-                }
-
-                continue; // skip validation for redcap fields
+                $x[$var_name] = $value; // assign the value to the redcap variable
             }
-
-            
-            //continue; // shut down whilst I refactor
-
-            $x['exported_value'] = $value;
-            $x['redcap_field_name'] = $this->dd[$i]['redcap_field_name'];
-
-            // for horiz layout, the event_id comes from the dd
-            if ( isset($this->dd[$i]['redcap_event_id']) && $this->dd[$i]['redcap_event_id'] ) {
-
-                $x['redcap_event_id'] = (int) $this->dd[$i]['redcap_event_id'];
-                $x['redcap_event_name'] = $this->dd[$i]['redcap_event_name'] ?? "";
-            }
-
-            $this->counts['cells']++;
-
-            if ( $this->isCheckboxOption($this->dd[$i]) ) {
-
-                $validationResult = $this->validateCheckboxOption($x, $this->dd[$i]);
-            }
-            else if ( $this->isCheckboxList($this->dd[$i]) ) {
-
-                $validationResult = $this->validateCheckboxList($x, $this->dd[$i]);
-            }
-            //else if ( $this->dd[$i]['var_type'] === 'DATE' && $this->export_shift_dates ) {
-            //    $validationResult = $this->validateShiftedDate($record, $redcap_event_id, $redcap_field_name, $redcap_repeat_instance, $value, $this->dd[$i]);
-            //}
             else {
 
-                $validationResult = $this->validateValue($x, $this->dd[$i]); // a success or fail std return object
+                $x['value'] = $value;
+                $x['exported_value'] = $value;
+                $x['redcap_field_name'] = $ddItem['redcap_field_name'];
+
+                // for horiz layout, the event_id comes from the dd
+                
+                if ( $this->export_layout==='h' && isset($ddItem['redcap_event_id']) && $ddItem['redcap_event_id'] ) {
+
+                    $x['redcap_event_id'] = (int) $ddItem['redcap_event_id'];
+                    $x['redcap_event_name'] = $ddItem['redcap_event_name'] ?? "";
+                }
+                
+                $this->counts['cells']++;
+
+                if ( $this->isCheckboxOption($ddItem) ) {
+
+                    $validationResult = $this->validateCheckboxOption($x, $ddItem);
+                }
+                else if ( $this->isCheckboxList($ddItem) ) {
+
+                    $validationResult = $this->validateCheckboxList($x, $ddItem);
+                }
+                else {
+
+                    $validationResult = $this->validateValue($x, $ddItem); // a success or fail std return object
+                }
             }
 
-            // bail on failed validation
-            //if ($validationResult['result'] !== Yes3K::STD_RETURN_OBJECT_SUCCESS) {
-            //    return $validationResult;
-            //}
+            if ( $debug_row ) {
+
+                $xStr = print_r($x, true);
+                $this->reportValidationError($x, "debug-x", "i = " . $i . ", " . $var_name . " = " . substr($row[$i], 0, 10));
+            }
         }
 
         return ( $this->counts['errors'] === $pre_error_count );
@@ -488,7 +508,7 @@ class Yes3ExportValidator {
             return true;
         }
 
-        $this->reportValidationError($x, "CHKBX_OPTN", "option '{$option_value}': the exported ({$exported_checked_state}) and stored ({$stored_checked_state}) checked states do not match.");
+       $this->reportValidationError($x, "CHKBX_OPTN", "option '{$option_value}': the exported ({$exported_checked_state}) and stored ({$stored_checked_state}) checked states do not match.");
 
         return false;
     }
@@ -547,7 +567,7 @@ class Yes3ExportValidator {
 
                 $listCorrect = false;
 
-                $this->reportValidationError($x, "CHKBX_LIST", "selection '{$selection}': exported: {$in_exported}, stored: {$in_stored}.");
+               $this->reportValidationError($x, "CHKBX_LIST", "selection '{$selection}': exported: {$in_exported}, stored: {$in_stored}.");
             }
         }
 
@@ -555,6 +575,10 @@ class Yes3ExportValidator {
     }
 
     private function validateValue($x, $ddItem) {
+
+        if ( empty($x['redcap_repeat_instance']) || !is_numeric($x['redcap_repeat_instance']) || $x['redcap_repeat_instance'] < 1 ) {
+            $x['redcap_repeat_instance'] = 1;
+        }
 
         $sql = "SELECT value FROM {$this->redcap_data_table} WHERE project_id = ? AND record = ? AND field_name = ? AND event_id = ? AND ifnull(instance, 1) = ? LIMIT 1";
         $params = [
@@ -565,27 +589,47 @@ class Yes3ExportValidator {
             $x['redcap_repeat_instance']
         ];
 
-        $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "")."-foo";
+        $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "");
+        /*
+        if ( $x['redcap_field_name'] === 'participant_type' ) {
 
-        //$x['exported_value'] = trim($x['value']);
+            $xStr = print_r($x, true);
+            $ddStr = print_r($ddItem, true);
 
+            throw new Exception("Debug participant_type: x['stored_value'] is '{$x['stored_value']}'. Data: {$xStr}. DD: {$ddStr}");
+        }
+        */
         if ( $x['stored_value'] === $x['exported_value'] ) {
 
             return true;
         }
+        /*
+        if ( $x['redcap_field_name'] === 'participant_type' ) {
+
+            $xStr = print_r($x, true);
+            $ddStr = print_r($ddItem, true);
+
+            throw new Exception("Debug participant_type: x['stored_value'] is '{$x['stored_value']}'. Data: {$xStr}. DD: {$ddStr}");
+        }
+        */
 
         // no match, but it could be a shifted date
         if ( $ddItem['var_type'] === 'DATE' && $this->export_shift_dates ) {
 
             $days_to_shift = Records::get_shift_days($x['record'], $this->date_shift_max, $this->project_salt);
+            /*
+            if ( !is_numeric(substr($x['stored_value'],5,2)) ) {
 
+                throw new Exception("Stored date value '{$x['stored_value']}' is not in a valid format.");
+            }
+            */
             $shifted_stored_value = Records::shift_date_format($x['stored_value'], $days_to_shift);
 
             if ( $shifted_stored_value === $x['exported_value'] ) {
                 return true;
             }
             else {
-                $this->reportValidationError($x, "DATE_SHIFT", "the exported value '{$x['exported_value']}' does not match the shifted stored value '{$shifted_stored_value}'.");
+               $this->reportValidationError($x, "DATE_SHIFT", "the exported value '{$x['exported_value']}' does not match the shifted stored value '{$shifted_stored_value}'.");
                 return false;
             }
         }
@@ -612,10 +656,16 @@ class Yes3ExportValidator {
         }
         else {
 
+            if ( $x['redcap_field_name'] === 'participant_type' ) {
+
+                $strx = print_r($x, true);
+
+                //throw new Exception("Validation error: exported value '{$x['exported_value']}' does not match stored value '{$x['stored_value']}' for record {$x['record']} and field {$x['redcap_field_name']}. Data: {$strx}");
+            }
             $msg = "The exported value '{$x['exported_value']}' does not match the stored value '{$x['stored_value']}'";
         }
 
-        $this->reportValidationError($x, "VALUE", $msg);
+       $this->reportValidationError($x, "VALUE", $msg);
 
         return false;
     }

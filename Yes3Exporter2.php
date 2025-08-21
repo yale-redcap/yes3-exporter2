@@ -5,20 +5,20 @@ namespace Yale\Yes3Exporter2;
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-ini_set('memory_limit', '512M'); // increase memory limit for large exports
+//ini_set('memory_limit', '512M'); // increase memory limit for large exports
 
 /**
  * defines and enums, should be a static class?
  */
-require "defines/yes3_defines.php";
+//require "defines/yes3_defines.php"; replaced by class constants 
 
 require "Yes3Trait.php";
 require "Yes3Export.php";
 require "Yes3ExportItem.php";
 require "Yes3SasCoder.php";
 require "Yes3ExportValidator.php";
-require "Yes3Fn.php";
-require "Yes3K.php";
+require "Yes3Fn.php"; // factory functions
+require "Yes3K.php"; // class for EM constants
 
 use Exception;
 use REDCap;
@@ -47,6 +47,21 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
     const DESTINATION_FILESYSTEM = "filesystem";
     const DESTINATION_BATCH = "filesystem(batch)";  // user-requested batch filesystem export
     const DESTINATION_CRON = "filesystem(cron)";  // cron batch export
+
+    const EMLOG_MSG_EXPORT_SPECIFICATION = 'yes3-export-specification';
+    const EMLOG_MSG_EXPORT_EVENTS = 'yes3-export-events';
+    const EMLOG_TYPE_EXPORT_SPECIFICATION = 'yes3-export-specification';
+    const EMLOG_TYPE_EXPORT_EVENTS = 'yes3-export-events';
+    const EMLOG_TYPE_EXPORT_LOG_ENTRY = 'yes3-export-log';
+    const EMLOG_TYPE_ERROR_REPORT = 'yes3-export-error-report';
+    const EMLOG_TYPE_CRON_LOG = 'yes3-exporter-cron-log';
+    const VARNAME_GROUP_ID = 'redcap_data_access_group_id';
+    const VARNAME_GROUP_NAME = 'redcap_data_access_group';
+    const VARNAME_EVENT_ID = 'redcap_event_id';
+    const VARNAME_EVENT_NAME = 'redcap_event_name';
+    const VARNAME_INSTANCE = 'redcap_repeat_instance';
+
+    const ALL_OF_THEM = '_all_'; // a token for 'all events', 'all forms' etc
 
     use Yes3Trait;
 
@@ -410,14 +425,14 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         if ( $this->getGroupNames() ) {
 
-            $this->addExportItem_otherProperty($export, VARNAME_GROUP_ID,   "REDCap Data Access Group Id", "INTEGER");
-            $this->addExportItem_otherProperty($export, VARNAME_GROUP_NAME, "REDCap Data Access Group Name", "TEXT");
+            $this->addExportItem_otherProperty($export, self::VARNAME_GROUP_ID,   "REDCap Data Access Group Id", "INTEGER");
+            $this->addExportItem_otherProperty($export, self::VARNAME_GROUP_NAME, "REDCap Data Access Group Name", "TEXT");
         }
 
         if ( $export->export_layout !== "h" && $this->isLongitudinal() ) {
 
-            $this->addExportItem_otherProperty($export, VARNAME_EVENT_ID,   "REDCap Event Id", "INTEGER");
-            $this->addExportItem_otherProperty($export, VARNAME_EVENT_NAME, "REDCap Event Name", "TEXT");
+            $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_ID,   "REDCap Event Id", "INTEGER");
+            $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_NAME, "REDCap Event Name", "TEXT");
         }
 
         /**
@@ -426,12 +441,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         /*if ( $export->export_layout === "r" ) {
 
-        //    $this->addExportItem_otherProperty($export, VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
+        //    $this->addExportItem_otherProperty($export, self::VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
         }*/
 
         if ( isset($export_specification['export_has_repeatables']) && $export_specification['export_has_repeatables'] ) {
 
-            $this->addExportItem_otherProperty($export, VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
+            $this->addExportItem_otherProperty($export, self::VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
         }
 
         $export_items = json_decode( $export_specification['export_items_json'], true);
@@ -448,12 +463,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             else*/
             if ( $element['redcap_field_name'] ) {
     
-                $this->addExportItem_REDCapField( $export, $element['redcap_field_name'], $element[VARNAME_EVENT_ID], $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
+                $this->addExportItem_REDCapField( $export, $element['redcap_field_name'], $element[self::VARNAME_EVENT_ID], $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
             }
     
             elseif ( $element['redcap_form_name'] ) {
     
-                $this->addExportItem_REDCapForm( $export, $element['redcap_form_name'], $element[VARNAME_EVENT_ID], $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
+                $this->addExportItem_REDCapForm( $export, $element['redcap_form_name'], $element[self::VARNAME_EVENT_ID], $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
             }
         }
 
@@ -476,8 +491,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 'redcap_source_option' => $export_item->multiselect_option,
                 'redcap_form_name' => $export_item->redcap_form_name,
                 'redcap_events' => json_encode($export_item->redcap_events),
-                VARNAME_EVENT_ID => $export_item->redcap_event_id,
-                VARNAME_EVENT_NAME => $export_item->redcap_event_name,
+                self::VARNAME_EVENT_ID => $export_item->redcap_event_id,
+                self::VARNAME_EVENT_NAME => $export_item->redcap_event_name,
                 'non_missing_count' => $export_item->non_missing_count,
                 'min_length' => $export_item->min_length,
                 'max_length' => $export_item->max_length,
@@ -659,7 +674,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $bytesWritten = strlen($code);
 
         return [
-            'result' => Yes3K::STD_RETURN_OBJECT_SUCCESS,
+            'result' => Yes3Fn::STD_RETURN_OBJECT_SUCCESS,
             'path' => $path,
             'code_filename_base' => $codeFilenameBase,
             'message' => "{$bytesWritten} bytes and {$codeLineCount} lines were written to {$codeFilenameBase}."
@@ -669,7 +684,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
     private function genCodeReturnObjectFail($message)
     {
         return [
-            'result' => Yes3K::STD_RETURN_OBJECT_FAIL,
+            'result' => Yes3Fn::STD_RETURN_OBJECT_FAIL,
             'path' => "",
             'code_filename_base' => "",
             'message' => $message
@@ -762,8 +777,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             "columns" => $C,
             "rows" => $R,
             "destination" => $destination,
-            "notification_email" => $this->getProjectSetting("notification-email"),
-            "username" => $this->getUsername()
+            "notification_email" => $this->getAdminEmail(),
+            "username" => $this->getAdminUsername()
         ];
 
         $json = $this->json_encode_pretty($info);
@@ -1086,21 +1101,21 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
             if ( $export_layout==="h" ){
 
-                if ( $dd[$i]['redcap_field_name'] && $dd[$i][VARNAME_EVENT_ID] && is_numeric($dd[$i][VARNAME_EVENT_ID]) ){
+                if ( $dd[$i]['redcap_field_name'] && $dd[$i][self::VARNAME_EVENT_ID] && is_numeric($dd[$i][self::VARNAME_EVENT_ID]) ){
 
                     if ( $dd[$i]['origin'] === "redcap" ){
 
-                        $dd_index[$dd[$i]['redcap_field_name']][$dd[$i][VARNAME_EVENT_ID]] = $i;
+                        $dd_index[$dd[$i]['redcap_field_name']][$dd[$i][self::VARNAME_EVENT_ID]] = $i;
     
                         if ( $this->ddIsMultiselect($dd[$i]) ){
 
-                            $dd_multiselect_index[$dd[$i]['redcap_field_name']][$dd[$i][VARNAME_EVENT_ID]][$dd[$i]['redcap_source_option']] = $i;
+                            $dd_multiselect_index[$dd[$i]['redcap_field_name']][$dd[$i][self::VARNAME_EVENT_ID]][$dd[$i]['redcap_source_option']] = $i;
                         }
                     }
 
                     elseif ( $dd[$i]['origin'] === "specification" ){
 
-                        $dd_specmap_index[$dd[$i]['redcap_field_name']][$dd[$i][VARNAME_EVENT_ID]] = $i;
+                        $dd_specmap_index[$dd[$i]['redcap_field_name']][$dd[$i][self::VARNAME_EVENT_ID]] = $i;
                     }
                 }
             }
@@ -1650,7 +1665,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             'user_name' => $uRights['username'],
             'user_designer' => $uRights['isDesigner'],
             'user_dag' => $uRights['dag'],
-            'log_entry_type' => EMLOG_TYPE_EXPORT_LOG_ENTRY,
+            'log_entry_type' => self::EMLOG_TYPE_EXPORT_LOG_ENTRY,
             'destination' => $destination,
             'export_uuid' => $export_uuid,
             'export_name' => $export_name,
@@ -1694,7 +1709,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $params = [ 
             $this->getProjectId(), 
-            EMLOG_TYPE_EXPORT_LOG_ENTRY 
+            self::EMLOG_TYPE_EXPORT_LOG_ENTRY 
         ];
 
         if ( $export_uuid ){
@@ -2183,8 +2198,8 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ( $export_layout!=="h" && $this->isLongitudinal() ) {
     
-                    $y[VARNAME_EVENT_ID  ] = $x['event_id'];
-                    $y[VARNAME_EVENT_NAME] = $eventName[$x['event_id']];
+                    $y[self::VARNAME_EVENT_ID  ] = $x['event_id'];
+                    $y[self::VARNAME_EVENT_NAME] = $eventName[$x['event_id']];
                 }
 
                 /**
@@ -2193,13 +2208,13 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ( $export_has_repeatables ) {
     
-                    $y[VARNAME_INSTANCE  ] = $x_instance;
+                    $y[self::VARNAME_INSTANCE  ] = $x_instance;
                 }
 
-                if ( isset($y[VARNAME_GROUP_ID]) ) {
+                if ( isset($y[self::VARNAME_GROUP_ID]) ) {
 
-                    $y[VARNAME_GROUP_ID  ] = $this->getGroupIdForRecord($record);
-                    $y[VARNAME_GROUP_NAME] = $dagNameForGroupId[ $y[VARNAME_GROUP_ID  ] ];
+                    $y[self::VARNAME_GROUP_ID  ] = $this->getGroupIdForRecord($record);
+                    $y[self::VARNAME_GROUP_NAME] = $dagNameForGroupId[ $y[self::VARNAME_GROUP_ID  ] ];
                 }
             }
 
@@ -3144,7 +3159,7 @@ WHERE project_id=? AND log_entry_type=?
             $redcap_form_name = (string) $export_item['redcap_form_name'] ?? "";
             $redcap_field_name = (string) $export_item['redcap_field_name'] ?? "";
 
-            if ( $this->isLongitudinal() && $redcap_event_id && $redcap_event_id !== ALL_OF_THEM && !in_array( $redcap_event_id, $all_event_ids ) ){
+            if ( $this->isLongitudinal() && $redcap_event_id && $redcap_event_id !== self::ALL_OF_THEM && !in_array( $redcap_event_id, $all_event_ids ) ){
 
                 $errors++;
 
@@ -3159,10 +3174,10 @@ WHERE project_id=? AND log_entry_type=?
 
             if ( $redcap_form_name ) {
 
-                if ($redcap_form_name === ALL_OF_THEM) {
+                if ($redcap_form_name === self::ALL_OF_THEM) {
 
                     // special case if all events are selected
-                    if ( !$this->isLongitudinal() || $redcap_event_id === ALL_OF_THEM ) {
+                    if ( !$this->isLongitudinal() || $redcap_event_id === self::ALL_OF_THEM ) {
 
                         $specification_forms = $all_forms;
 
@@ -3432,7 +3447,7 @@ WHERE project_id=? AND log_entry_type=?
                 WHERE project_id=? AND message=? AND export_uuid=?
                 ORDER BY timestamp DESC
             ";
-            $params = [$this->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION, $export_uuid];
+            $params = [$this->getProjectId(), self::EMLOG_MSG_EXPORT_SPECIFICATION, $export_uuid];
         }
 
         if ( $history ){
@@ -3743,7 +3758,7 @@ WHERE project_id=? AND log_entry_type=?
 
         if ( !$event_id ) return "";
 
-        if ( $event_id === ALL_OF_THEM ) return "all events";
+        if ( $event_id === self::ALL_OF_THEM ) return "all events";
 
         $event_id = intval($event_id); if ( !$event_id ) return "";
 
@@ -3760,7 +3775,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $params = [$this->getProjectId()];
 
-        if ( $form_name === ALL_OF_THEM ){
+        if ( $form_name === self::ALL_OF_THEM ){
 
             if ( $this->isLongitudinal() ) {
 
@@ -3839,7 +3854,7 @@ WHERE project_id=? AND log_entry_type=?
         foreach ($fields as $field){
 
             $field_name = Yes3Fn::sanitizeForObjectname($field['field_name']);
-            $field_label = Yes3Fn::sanitizeForLabel( $field['element_label'], Yes3K::MAX_LABEL_LEN);
+            $field_label = Yes3Fn::sanitizeForLabel( $field['element_label'], Yes3Fn::MAX_LABEL_LEN);
             $form_name = Yes3Fn::sanitizeForObjectname($field['form_name']);
 
             $field_type = $field['element_type'];
@@ -3880,7 +3895,7 @@ WHERE project_id=? AND log_entry_type=?
                 foreach ( $vv as $value => $label) {
                     $valueset[] = [
                         'value' => Yes3Fn::sanitizeForText((string)$value, 0, true, false, true),
-                        'label' => Yes3Fn::sanitizeForLabel($label, Yes3K::MAX_LABEL_LEN)
+                        'label' => Yes3Fn::sanitizeForLabel($label, Yes3Fn::MAX_LABEL_LEN)
                     ];
                 }
             }
@@ -3996,8 +4011,8 @@ WHERE project_id=? AND log_entry_type=?
                     'origin' => "specification",
                     'redcap_field_name' => $element['redcap_field_name'],
                     'redcap_form_name'  => $this->getREDCapFormForField($element['redcap_field_name']),
-                    VARNAME_EVENT_ID    => $element[VARNAME_EVENT_ID],
-                    VARNAME_EVENT_NAME  => $this->getEventName($element[VARNAME_EVENT_ID], $event_settings)
+                    self::VARNAME_EVENT_ID    => $element[self::VARNAME_EVENT_ID],
+                    self::VARNAME_EVENT_NAME  => $this->getEventName($element[self::VARNAME_EVENT_ID], $event_settings)
                 ]);
 
                 break;    
@@ -4106,8 +4121,8 @@ WHERE project_id=? AND log_entry_type=?
 
         $event_ids = [];
 
-        //if ( $redcap_event_id === ALL_OF_THEM && $export->export_layout === "h" ){
-        if ( $redcap_event_id === ALL_OF_THEM ){
+        //if ( $redcap_event_id === self::ALL_OF_THEM && $export->export_layout === "h" ){
+        if ( $redcap_event_id === self::ALL_OF_THEM ){
 
             $form_index = $forms['form_index'][$form_name];
 
@@ -4141,7 +4156,7 @@ WHERE project_id=? AND log_entry_type=?
                     foreach ( $valueset as $option ){
 
                         $export->addExportItem([
-                            'var_name' =>  Yes3Fn::sanitizeForObjectname($var_name . Yes3K::MULTISELECT_DELIM . $option['value']),
+                            'var_name' =>  Yes3Fn::sanitizeForObjectname($var_name . Yes3Fn::MULTISELECT_DELIM . $option['value']),
                             'var_label' =>  Yes3Fn::sanitizeForLabel($var_label. ": " . $option['label']),
                             'var_type' => "INTEGER",
                             'valueset' => [],
@@ -4151,8 +4166,8 @@ WHERE project_id=? AND log_entry_type=?
                             'redcap_form_name' => $form_name,
                             'multiselect' => "1",
                             'multiselect_option' => strval($option['value']),
-                            VARNAME_EVENT_ID => $event_id,
-                            VARNAME_EVENT_NAME => $event_name
+                            self::VARNAME_EVENT_ID => $event_id,
+                            self::VARNAME_EVENT_NAME => $event_name
                         ],
                         $this->getRecordIdField());
                     }
@@ -4167,8 +4182,8 @@ WHERE project_id=? AND log_entry_type=?
                         'redcap_field_name' => $redcap_field_name,
                         'redcap_events' => [ (int)$event_id ],
                         'redcap_form_name' => $form_name,
-                        VARNAME_EVENT_ID => $event_id,
-                        VARNAME_EVENT_NAME => $event_name
+                        self::VARNAME_EVENT_ID => $event_id,
+                        self::VARNAME_EVENT_NAME => $event_name
                     ],
                     $this->getRecordIdField());
                 }
@@ -4192,8 +4207,8 @@ WHERE project_id=? AND log_entry_type=?
             'origin' => "other",
             'redcap_field_name' => "",
             'redcap_form_name' => "",
-            VARNAME_EVENT_ID => "",
-            VARNAME_EVENT_NAME => ""
+            self::VARNAME_EVENT_ID => "",
+            self::VARNAME_EVENT_NAME => ""
         ],
         $this->getRecordIdField());
     }
@@ -4203,14 +4218,14 @@ WHERE project_id=? AND log_entry_type=?
 
         $form_names = [];
 
-        if ( $redcap_form_name === ALL_OF_THEM ){
+        if ( $redcap_form_name === self::ALL_OF_THEM ){
 
             foreach ( $forms['form_metadata'] as $form ){
 
                 // no longer exlude repeating forms
                 if ( in_array($form['form_name'], $allowed['forms']) /*&& !$form['form_repeating']*/) {
 
-                    $includeForm = ( $redcap_event_id === ALL_OF_THEM || !$this->isLongitudinal() );
+                    $includeForm = ( $redcap_event_id === self::ALL_OF_THEM || !$this->isLongitudinal() );
 
                     if ( !$includeForm ){
 
@@ -4245,7 +4260,7 @@ WHERE project_id=? AND log_entry_type=?
 
             $event_ids = [];
 
-            if ( $redcap_event_id === ALL_OF_THEM ) {
+            if ( $redcap_event_id === self::ALL_OF_THEM ) {
 
                 foreach ( $forms['form_metadata'][$form_index]['form_events'] as $event ){
 
@@ -4344,12 +4359,49 @@ WHERE project_id=? AND log_entry_type=?
 
     /* ==== CRONS ==== */
 
+    public function getAdminEmail()
+    {
+        $admin_user = $this->getProjectSetting("cron-user");
+
+        if ( $admin_user ){
+
+            $userObj = $this->getUser( $admin_user );
+
+            if ( $userObj ) return $userObj->getEmail();
+        }
+
+        return "joe.user@trantor.gov";
+    }
+
+    public function getAdminUsername()
+    {
+        $admin_user = $this->getProjectSetting("cron-user");
+
+        if ( $admin_user ){
+
+            $userObj = $this->getUser( $admin_user );
+
+            if ( $userObj ) return $userObj->getUsername();
+        }
+
+        return "joe user";
+    }
+
+    /**
+     * CRON manager
+     * 
+     * Handles the scheduling and execution of CRON jobs for the YES3 Exporter II.
+     * 
+     * Per config.json, this function is called every 30 minutes, and is allowed up to an hour to run.
+     * However, the daily tasks are executed only once in a given 24-hour period.
+     * 
+     * While this is run at the system level, the cron log for each project is stored in the project settings.
+     * 
+     */
     public function yes3_exporter_cron( $cronInfo=['cron_description'=>"noname"] )
     {
-        //$this->logDebugMessage(0, "YES3 Exporter cron job started", "yes3_exporter_cron");
-
-        //return;
-
+        // ensures only one cron execution per 24 hour period,
+        // based on the last execution time that is stored in the system settings
         if ( !$this->okayToRunCron() ){
 
             return "";
@@ -4436,7 +4488,7 @@ WHERE project_id=? AND log_entry_type=?
         $cron_summary = "YES3 Exporter cron jobs completed for {$projects} project(s). Run time was {$seconds} seconds.";
 
         $params = [
-            "log_entry_type" => EMLOG_TYPE_CRON_LOG,
+            "log_entry_type" => self::EMLOG_TYPE_CRON_LOG,
             "cronlog" => $cronlog
         ];
 
@@ -4461,10 +4513,10 @@ WHERE project_id=? AND log_entry_type=?
     }
 
     /**
-     * Ensures cron runs once per 24 hour interval
+     * Ensures cron runs once per 24 hour interval,
+     * based on the cron run time specified in the system settings (defaults to 00:11:00).
      * 
      * function: okayToRunCron
-     * 
      * 
      * @return int|false
      * @throws Exception
@@ -4538,12 +4590,12 @@ WHERE project_id=? AND log_entry_type=?
 
     public function emailDailyLog(){
 
-        if ( !$to = $this->getProjectSetting('notification-email') ){
+        if ( !$to = $this->getAdminEmail() ){
 
             return "Cannot email daily log summary: no email address is provided.";
         }
 
-        $sincewhen = strftime("%F %T", time()-ONE_DAY);
+        $sincewhen = strftime("%F %T", time()-Yes3Fn::ONE_DAY);
 
         $cc = "";
 
@@ -4750,7 +4802,7 @@ WHERE project_id=? AND log_entry_type=?
                 $log .= ": " . $removed . " generations saved before " . strftime("%F %T", strtotime($ts)) . " removed. ";
 
                 $pSql = "project_id = ? and export_uuid = ? and message = ? and timestamp < ?";
-                $params = [$this->getProjectId(), $export['export_uuid'], EMLOG_MSG_EXPORT_SPECIFICATION, $ts];
+                $params = [$this->getProjectId(), $export['export_uuid'], self::EMLOG_MSG_EXPORT_SPECIFICATION, $ts];
                 $this->removeLogs( $pSql, $params);
             }
         }
@@ -4769,7 +4821,7 @@ WHERE project_id=? AND log_entry_type=?
         WHERE x.external_module_id=? and x.project_id=? and x.message=?
         ";
 
-        $UUIDs = $this->fetchRecords($sqlUUID, [$this->getModuleId(), $this->getProjectId(), EMLOG_MSG_EXPORT_SPECIFICATION]);
+        $UUIDs = $this->fetchRecords($sqlUUID, [$this->getModuleId(), $this->getProjectId(), self::EMLOG_MSG_EXPORT_SPECIFICATION]);
 
         $data = [];
 
@@ -5189,7 +5241,7 @@ WHERE project_id=? AND log_entry_type=?
                 function renderLegacyTransferForm() {
 
                     const $form              = $('<form>').attr('id', 'legacy-transfer-form').prop('novalidate', true);
-                    const $explain           = $('<div>').addClass('explanation').text('Legacy Yes3 Exporter I environment detected. Click the button below to transfer legacy settings, specifications, and logs to the new YES3 Exporter II module. This will not overwrite any existing settings or logs in the new module.');
+                    const $explain           = $('<div>').addClass('explanation').text('Legacy Yes3 Exporter I environment detected. Click the button below to transfer all of your legacy exporter project settings, export specifications and logs to the new YES3 Exporter II module. This will not overwrite any existing settings or specifications in the new module.');
                     const $submit_transfer   = $('<button>').attr('id', 'submit-transfer').attr('action', 'legacy-transfer').attr('type', 'submit').text('Yes, please transfer').addClass('btn btn-success btn-sm');
                     const $submit_notransfer = $('<button>').attr('id', 'submit-notransfer').attr('action', 'no-legacy-transfer').attr('type', 'submit').text(`No, do not transfer (and don't ask again)`).addClass('btn btn-sm btn-rcred btn-rcred-light');
 
@@ -5221,7 +5273,7 @@ WHERE project_id=? AND log_entry_type=?
                             $form.remove();
                             $description.append($('<div>').attr('id', 'ajax-response').text(response['summary']));
                             // Process response
-                            console.log('Detailed transfer log:', response['log']);
+                            console.log('Transfer log:', response['log']);
                         }).catch(function(err) {
                             // Handle error
                             console.error('AJAX error:', err);

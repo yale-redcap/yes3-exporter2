@@ -305,7 +305,7 @@ trait Yes3Trait {
 
         $params = [
             'username' => $this->getUsername(),
-            'log_entry_type' => EMLOG_TYPE_ERROR_REPORT,
+            'log_entry_type' => "yes3-export-error-report",
             'exception_report' => $exceptionReport,
         ];
 
@@ -787,66 +787,6 @@ trait Yes3Trait {
         return $s;
     }
 
-
-    /**
-    * These SQL escaping functions will be retired
-    * once parameterized queries are fully implemented.
-    *
-    */
-
-    public function sql_string($x)
-    {
-        if (is_null($x)) {
-
-            return "null";
-        } 
-        else if (strlen($x) == 0) {
-
-            return "null";
-        } 
-        else if (is_numeric($x)) {
-
-            return "'" . $x . "'";
-        } 
-        else {
-            
-            return "'" . db_real_escape_string($x) . "'";
-        }
-    }
-
-    public function sql_datetime_string($x)
-    {
-        if (!$x) {
-            return "null";
-        } else {
-            return "'" . strftime("%F %T", strtotime($x)) . "'";
-        }
-    }
-
-    public function sql_date_string($x)
-    {
-        if (!$x) {
-            return "null";
-        } else {
-            $d = strtotime($x);
-            // if this didn't work, could be due to mm-dd-yyyy which doesn't fly
-            if (!$d) {
-                $date = str_replace('-', '/', $x);
-                $d = strtotime($date);
-            }
-            if ($d) {
-                return "'" . strftime("%F", $d) . "'";
-            } else {
-                return "null";
-            }
-        }
-    }
-
-    public function sql_timestamp_string()
-    {
-        return "'" . strftime("%F %T") . "'";
-    }
-
     /*
     * LOGGING DEBUG INFO
     * Call this function to log messages intended for debugging, for example an SQL statement.
@@ -867,9 +807,9 @@ trait Yes3Trait {
 
     public function logDebugMessage($project_id, $msg, $msgcat="") 
     {   
-        if ( !LOG_DEBUG_MESSAGES || !$this->tableExists(DEBUG_LOG_TABLE) ) return false;
+        if ( !Yes3Fn::LOG_DEBUG_MESSAGES || !$this->tableExists(Yes3Fn::DEBUG_LOG_TABLE) ) return false;
 
-        $sql = "INSERT INTO `".DEBUG_LOG_TABLE."` (project_id, debug_message, debug_message_category) VALUES (?,?,?)";
+        $sql = "INSERT INTO `".Yes3Fn::DEBUG_LOG_TABLE."` (project_id, debug_message, debug_message_category) VALUES (?,?,?)";
 
         return $this->query($sql, [$project_id, $msg, $msgcat]);
     }

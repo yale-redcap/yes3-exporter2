@@ -228,7 +228,7 @@ class Yes3SasCoder {
 
             $label = Yes3Fn::sanitizeForLabel(
                 $row['var_label'] ?? "no label for $var_name", 
-                Yes3K::SAS_LENGTH_MAX_LABEL,
+                Yes3Fn::SAS_LENGTH_MAX_LABEL,
                 $this->ascii, // whether to generate ASCII labels
             );
             $dd_var_type = $row['var_type'];
@@ -489,7 +489,7 @@ class Yes3SasCoder {
 
                 $label = Yes3Fn::sanitizeForText(
                     $vsTuple['label'] ?? '', 
-                    Yes3K::SAS_LENGTH_MAX_LABEL,
+                    Yes3Fn::SAS_LENGTH_MAX_LABEL,
                     true, // no HTML tags
                     $this->ascii, // whether to generate ASCII labels
                     true , // no unprintable characters
@@ -580,10 +580,10 @@ class Yes3SasCoder {
 
         $len = strlen($this->dataset_name);
 
-        if ( $len + strlen($suffix) > Yes3K::SAS_LENGTH_MAX_FMTNAME ) {
+        if ( $len + strlen($suffix) > Yes3Fn::SAS_LENGTH_MAX_FMTNAME ) {
 
             // if the format name is too long, truncate the dataset name
-            $fmtname_base = substr($this->dataset_name, 0, Yes3K::SAS_LENGTH_MAX_FMTNAME - strlen($suffix));
+            $fmtname_base = substr($this->dataset_name, 0, Yes3Fn::SAS_LENGTH_MAX_FMTNAME - strlen($suffix));
         } else {
             $fmtname_base = $this->dataset_name;
         }
