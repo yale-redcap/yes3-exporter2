@@ -10,14 +10,41 @@ use Project;
 
 use REDCap;
 
-use function PHPUnit\Framework\assertFalse;
-
 class Yes3Fn {
 
-   static function helloWorld() {
-      return "hello world!";
-   }
+    public const DEBUG_LOG_TABLE = 'ydcclib_debug_messages';
+    public const LOG_DEBUG_MESSAGES = 1; // 0 for no logging, 1 for logging
+    
+    public const YES3_MODULE_NAME = "Yes3Exporter2";
+    public const YES3_MODULE_PREFIX = "yes3_exporter2";
+    
+    public const ONE_MINUTE = 60;
+    public const ONE_HOUR = 60*60;
+    public const ONE_DAY = 24*60*60;
 
+    public const DATA_MANAGEMENT_ROLE_NAME  = "data";
+    public const DATA_COLLECTION_ROLE_NAME  = "staff";
+
+    public const STD_RETURN_OBJECT_FAIL = "fail";
+    public const STD_RETURN_OBJECT_SUCCESS = "success";
+
+    public const FORM_COMPLETION_COMPLETE = 2;
+    public const FORM_COMPLETION_INCOMPLETE = 1;
+    public const FORM_COMPLETION_NA = 9;
+    public const FORM_COMPLETION_UNINITIALIZED = ".";
+
+    public const SAS_LENGTH_MAX_VARNAME = 32; // SAS variable names are limited to 32 characters.
+    public const SAS_LENGTH_MAX_LABEL = 256; // SAS variable labels are limited to 256 characters.
+    public const SAS_LENGTH_MAX_FMTNAME = 30; // SAS format names are limited to 32 characters, INCLUDING the trailing period and the leading dollar sign, so we impose a 30-char limit.
+
+    public const MULTISELECT_DELIM = "___";
+    public const MAX_LABEL_LEN = 1024; // max length of field label in the database
+
+    public const VERY_LARGE_NUMBER = 9999999999; // used for min_value in calculations    
+
+    static function helloWorld() {
+        return "hello world!";
+    }
 
     /**
      * Compacts a UUIDv4 to a 22-character base64 string (URL-safe)
@@ -361,7 +388,7 @@ class Yes3Fn {
       $normalizedDir = str_replace(DIRECTORY_SEPARATOR, '/', __DIR__);
   
       // Define the regex pattern for the root path
-      $pattern = '~^(.*?/modules/'. Yes3K::YES3_MODULE_PREFIX . '_v\d+\.\d+\.\d+)/~';
+      $pattern = '~^(.*?/modules/'. self::YES3_MODULE_PREFIX . '_v\d+\.\d+\.\d+)/~';
   
       // Perform the regex match
       if (preg_match($pattern, $normalizedDir, $matches)) {
@@ -1072,17 +1099,17 @@ class Yes3Fn {
         }
 
         // Truncate to the maximum length allowed for SAS variable names
-        if (strlen($varname) > Yes3K::SAS_LENGTH_MAX_VARNAME) {
+        if (strlen($varname) > self::SAS_LENGTH_MAX_VARNAME) {
 
             if ($varnameHasSuffix) {
 
                 // If the variable name is a special case, truncate the prefix and append the suffix
-                $varPrefix = substr($varPrefix, 0, Yes3K::SAS_LENGTH_MAX_VARNAME - strlen($varSuffix));
+                $varPrefix = substr($varPrefix, 0, self::SAS_LENGTH_MAX_VARNAME - strlen($varSuffix));
                 $varname = $varPrefix . $varSuffix;
             } else {
 
                 // Otherwise, we just truncate the variable name
-                $varname = substr($varname, 0, Yes3K::SAS_LENGTH_MAX_VARNAME);
+                $varname = substr($varname, 0, self::SAS_LENGTH_MAX_VARNAME);
             }
         }
 
@@ -1095,7 +1122,7 @@ class Yes3Fn {
 
             // insert the 'usegment' between the prefix and suffix, truncating the prefix if necessary
 
-            $varname = substr($varPrefix, 0, Yes3K::SAS_LENGTH_MAX_VARNAME - strlen($uSegment) - strlen($varSuffix)) . $uSegment . $varSuffix;
+            $varname = substr($varPrefix, 0, self::SAS_LENGTH_MAX_VARNAME - strlen($uSegment) - strlen($varSuffix)) . $uSegment . $varSuffix;
             
             $counter++;
         }
@@ -1123,8 +1150,8 @@ class Yes3Fn {
         }
 
         // Truncate to the maximum length allowed for SAS format names
-        if (strlen($fmtname) > Yes3K::SAS_LENGTH_MAX_FMTNAME) {
-            $fmtname = substr($fmtname, 0, Yes3K::SAS_LENGTH_MAX_FMTNAME);
+        if (strlen($fmtname) > self::SAS_LENGTH_MAX_FMTNAME) {
+            $fmtname = substr($fmtname, 0, self::SAS_LENGTH_MAX_FMTNAME);
         }
 
         return $fmtname;
@@ -1359,9 +1386,9 @@ class Yes3Fn {
          return $rc;
       }  
       if ( $rc['errors'] ) {
-         return Yes3K::STD_RETURN_OBJECT_FAIL . ": " . (( is_array( $rc['errors']) ) ? implode($rc['errors']) : $rc['errors']);
+         return self::STD_RETURN_OBJECT_FAIL . ": " . (( is_array( $rc['errors']) ) ? implode($rc['errors']) : $rc['errors']);
       }
-      return Yes3K::STD_RETURN_OBJECT_SUCCESS . ": " . $rc['item_count'] . " item(s) saved";
+      return self::STD_RETURN_OBJECT_SUCCESS . ": " . $rc['item_count'] . " item(s) saved";
    }
 
     public static function REDCapSaveRCToStdRetObj( $rc, $json=true )
@@ -1369,7 +1396,7 @@ class Yes3Fn {
         $result = self::REDCapSaveRCSummary( $rc );
 
         return self::stdReturnObj( 
-            ( strpos($result, Yes3K::STD_RETURN_OBJECT_SUCCESS) === 0 ) ? Yes3K::STD_RETURN_OBJECT_SUCCESS : Yes3K::STD_RETURN_OBJECT_FAIL,
+            ( strpos($result, self::STD_RETURN_OBJECT_SUCCESS) === 0 ) ? self::STD_RETURN_OBJECT_SUCCESS : self::STD_RETURN_OBJECT_FAIL,
             $result,
             $rc,
             $json
@@ -1378,12 +1405,12 @@ class Yes3Fn {
 
     public static function failString($msg) {
 
-        return Yes3K::STD_RETURN_OBJECT_FAIL . ": " . $msg;
+        return self::STD_RETURN_OBJECT_FAIL . ": " . $msg;
     }
 
     public static function successString($msg) {
 
-        return Yes3K::STD_RETURN_OBJECT_SUCCESS . ": " . $msg;
+        return self::STD_RETURN_OBJECT_SUCCESS . ": " . $msg;
     }
 
     public static function stdReturnObj( $result, $message="", $data=[], $json=true){
@@ -1399,12 +1426,12 @@ class Yes3Fn {
 
     public static function failObject( $msg, $data=[], $json=false ) {
 
-        return self::stdReturnObj( Yes3K::STD_RETURN_OBJECT_FAIL, $msg, $data, $json );
+        return self::stdReturnObj( self::STD_RETURN_OBJECT_FAIL, $msg, $data, $json );
     }
 
     public static function successObject( $msg, $data=[], $json=false ) {
 
-        return self::stdReturnObj( Yes3K::STD_RETURN_OBJECT_SUCCESS, $msg, $data, $json );
+        return self::stdReturnObj( self::STD_RETURN_OBJECT_SUCCESS, $msg, $data, $json );
     }
 
     public static function BOMsAway($str) {

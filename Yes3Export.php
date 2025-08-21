@@ -6,6 +6,9 @@ use Yale\Yes3Exporter2\Yes3Fn;
 
 class Yes3Export {
 
+    const VARTYPE_TEXT = 'TEXT';
+    const HASHED_VALUE_LENGTH = 32; // SHA-256 hash length
+
     public $export_name = "";
     public $export_label = "";
     public $export_order = "";
@@ -104,9 +107,9 @@ class Yes3Export {
 
                 // If the record ID is hashed, we set the hashed flag
                 $exportItemProperties['hashed'] = 1;
-                $exportItemProperties['var_type'] = Yes3K::VARTYPE_TEXT; // hashed record ID is always a text field
-                //$exportItemProperties['min_length'] = Yes3K::HASHED_VALUE_LENGTH; // SHA-256 hash length
-                //$exportItemProperties['max_length'] = Yes3K::HASHED_VALUE_LENGTH;
+                $exportItemProperties['var_type'] = self::VARTYPE_TEXT; // hashed record ID is always a text field
+                //$exportItemProperties['min_length'] = Yes3Fn::HASHED_VALUE_LENGTH; // SHA-256 hash length
+                //$exportItemProperties['max_length'] = Yes3Fn::HASHED_VALUE_LENGTH;
             }
         }
 
@@ -134,7 +137,7 @@ class Yes3Export {
                 return true;
             }
             // goddam multiselects
-            if ( strpos($this->export_items[$i]->var_name, $var_name . Yes3K::MULTISELECT_DELIM) === 0 ){
+            if ( strpos($this->export_items[$i]->var_name, $var_name . Yes3Fn::MULTISELECT_DELIM) === 0 ){
 
                 return true;
             }
