@@ -7,18 +7,12 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 //ini_set('memory_limit', '512M'); // increase memory limit for large exports
 
-/**
- * defines and enums, should be a static class?
- */
-//require "defines/yes3_defines.php"; replaced by class constants 
-
 require "Yes3Trait.php";
 require "Yes3Export.php";
 require "Yes3ExportItem.php";
 require "Yes3SasCoder.php";
 require "Yes3ExportValidator.php";
-require "Yes3Fn.php"; // factory functions
-require "Yes3K.php"; // class for EM constants
+require "Yes3Fn.php"; // factory functions and constants
 
 use Exception;
 use REDCap;
