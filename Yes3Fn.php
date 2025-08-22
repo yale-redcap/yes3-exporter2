@@ -798,7 +798,7 @@ class Yes3Fn {
      * NOTE: This function assumes you've already handled control chars, tabs, CR/LF.
      *
      * @param string $input
-     * @param bool $enforce enforce ASCII-only output
+     * @param bool $enforce enforce printable ASCII-only output
      * @param string $repl replacement for non-ASCII characters
      * @return string
      * 
@@ -920,7 +920,6 @@ class Yes3Fn {
 
         // --- 2) Transliterate to ASCII (diacritics + non-Latin scripts) ---
         // Prefer ICU Transliterator (ext/intl). Fallback to iconv.
-        
         
         if (class_exists('Transliterator')) {
             $t = \Transliterator::create('Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC');
