@@ -12,6 +12,10 @@ use Yale\Yes3\Yes3;
 use REDCap;
 use HtmlPage;
 
+use Normalizer;
+use Collator;
+use Transliterator;
+
 $HtmlPage = new HtmlPage();
 $HtmlPage->ProjectHeader();
 
@@ -21,11 +25,95 @@ $HtmlPage->ProjectHeader();
 
 //phpinfo();
 
-testTheLegacyTransfer();
+//testTheLegacyTransfer();
 
 //echo $module->getModuleId();
 
+echo "<pre>";
+xliterate();
+echo "</pre>";
+
 exit();
+
+function xliterate(){
+
+    // Requires: intl (for Normalizer, Collator, Transliterator, grapheme_*)
+    // Optional but nice: mbstring
+
+    $cases = [
+    'simple_ascii'        => 'Hello, world!',
+    'latin_accents'       => "Curaçao, Ångström, façade, über, naïve",
+    'combining_mark'      => "e\u{0301} = e + COMBINING ACUTE (looks like é)",
+    'precomposed'         => "é (precomposed)",
+    'rtl_arabic'          => "Arabic: مَرْحَبًا بالعالم",
+    'rtl_hebrew'          => "Hebrew: שָׁלוֹם עולם",
+    'thai'                => "สวัสดี",
+    'khmer'               => "សួស្តី",
+    'cjk'                 => "中文，日本語，한국어",
+    'hangul_decomposed'   => "\u{1112}\u{1161}\u{11AB}\u{1100}\u{1173}\u{11AF} (decomposed 한글)",
+    'emoji_simple'        => "🙂 😬 🤖",
+    'emoji_skin_tone'     => "👍🏽 👩🏾‍💻",
+    'emoji_zwj_family'    => "Family: 👨‍👩‍👧‍👦",
+    'emoji_flag'          => "Flag: 🇺🇳 (regional indicators)",
+    'zwj_sequence'        => "Ninja cat: 🐱‍👤",
+    'zero_width'          => "ZWSP here\u{200B}and\u{200B}here",
+    'variation_selector'  => "HEAVY CHECK ✔︎ vs ✔ (VS-16)",
+    ];
+
+    echo "== Bytes vs Grapheme clusters ==\n";
+    foreach ($cases as $k => $s) {
+    $bytes = strlen($s);
+    $graphemes = function_exists('grapheme_strlen') ? grapheme_strlen($s) : 'n/a';
+    echo str_pad($k, 22) . " bytes=" . str_pad($bytes, 4) . " graphemes=" . $graphemes . " | $s\n";
+    }
+
+    echo "\n== Normalization (NFD → NFC) ==\n";
+    $weird = "e\u{0301} + \u{212B} (Angstrom sign) + \u{00E9}";
+    if (class_exists('Normalizer')) {
+    echo "Original:  $weird\n";
+    echo "is NFC?   " . (Normalizer::isNormalized($weird, Normalizer::FORM_C) ? 'yes' : 'no') . "\n";
+    $nfc = Normalizer::normalize($weird, Normalizer::FORM_C);
+    echo "To NFC:   $nfc\n";
+    echo "is NFC?   " . (Normalizer::isNormalized($nfc, Normalizer::FORM_C) ? 'yes' : 'no') . "\n";
+    } else {
+    echo "Normalizer not available.\n";
+    }
+
+    echo "\n== Locale-aware sort (Collator) ==\n";
+    $names = ["Zoe", "Zoë", "Åsa", "Álvaro", "Angstrom", "Åke"];
+    if (class_exists('Collator')) {
+    foreach (['en_US','sv_SE','es_ES'] as $loc) {
+        $c = new Collator($loc);
+        $tmp = $names;
+        $c->sort($tmp);
+        echo "$loc: " . implode(', ', $tmp) . "\n";
+    }
+    } else {
+    echo "Collator not available.\n";
+    }
+
+    echo "\n== Transliteration (strip accents / Latinize) ==\n";
+    if (class_exists('Transliterator')) {
+    $t = Transliterator::create('Any-Latin; NFD; [:Nonspacing Mark:] Remove; NFC');
+    $src = "àéîøü — Русский — Ελληνικά — 中文 — 日本語 — 한국어";
+    echo "Src : $src\n";
+    echo "Latinized: " . $t->transliterate($src) . "\n";
+    } else {
+    echo "Transliterator not available.\n";
+    }
+
+    echo "\n== Regex sanity (grapheme-aware substr) ==\n";
+    $g = "👨‍👩‍👧‍👦👍🏽ée\u{0301}";
+    if (function_exists('grapheme_substr')) {
+    echo "First 5 graphemes: " . grapheme_substr($g, 0, 5) . "\n";
+    echo "Length (graphemes): " . grapheme_strlen($g) . "\n";
+    } else {
+    echo "grapheme_* not available.\n";
+    }
+
+    echo "\nDone.\n";
+
+}
 
 function testTheLegacyTransfer(){
     global $module;
