@@ -112,7 +112,7 @@ $csrf_token = $module->getCSRFToken();
         </div>
 
         <div class="yes3-hleft yes3-fmapr-validator-inbox-noborders" id="yes3-fmapr-export-validate">
-            <form id="yes3-fmapr-export-upload-form" enctype="multipart/form-data">
+            <form id="yes3-fmapr-export-validate-form" enctype="multipart/form-data">
                 <input type="button" id="yes3-fmapr-export-validate-button" value="validate">
             </form>
         </div>

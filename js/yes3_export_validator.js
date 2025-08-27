@@ -111,6 +111,12 @@ FMAPR.hideValidationResultsTable = function()
     $resultsTable.css('display', 'none');
 }
 
+FMAPR.isEmptyFormData = function(fd) {
+  if (!(fd instanceof FormData)) return true;
+  for (const _ of fd.entries()) return false;
+  return true;
+}
+
 FMAPR.setValidatorListeners = function()
 {
     $( '#yes3-fmapr-export-selection span.export_name' ).off('click').on('click', function(){
@@ -145,33 +151,29 @@ FMAPR.setValidatorListeners = function()
     $( '#yes3-fmapr-export-upload-file' ).off('change').on('change', function(){
 
         // Get the file from the input
-        var fileInput = $(this)[0];
-        var file = fileInput.files[0];
+        const file = this.files && this.files[0];
+        if (!file) return;
 
-        if ( file ) {
+        FMAPR.formData = new FormData();
 
-            FMAPR.formData = new FormData();
+        FMAPR.formData.append('datasheetToValidate', file);
 
-            FMAPR.formData.append('datasheetToValidate', file);
-
-            // inspect the FormData object
-            const obj = {};
-            for (const [key, value] of FMAPR.formData.entries()) {
-                obj[key] = value;
-            }
-            console.log('FMAPR.formData:', obj);
-
-            FMAPR.fileToValidate = file.name;
-            FMAPR.hideUploadOptionsContainer();
-            FMAPR.showValidateOptionsContainer();
+        
+        // dev-only: verify file presence
+        for (const [k, v] of FMAPR.formData.entries()) {
+            console.log('FormData entry:', k, (v instanceof File) ? { name: v.name, size: v.size, type: v.type } : v);
         }
+
+        FMAPR.fileToValidate = file.name;
+        FMAPR.hideUploadOptionsContainer();
+        FMAPR.showValidateOptionsContainer();
     });
 
     // validate button
     $( '#yes3-fmapr-export-validate-button' ).off('click').on('click', function(){
 
-        if ( !FMAPR.formData || FMAPR.formData.size === 0 ) {
-            YES3.hello( 'Please select a file to upload.' );
+        if (!FMAPR.formData || FMAPR.isEmptyFormData(FMAPR.formData)) {
+            YES3.hello('Please select a file to upload.');
             return;
         }
 
@@ -181,13 +183,6 @@ FMAPR.setValidatorListeners = function()
 
         FMAPR.formData.append( 'export_name', $( '#yes3-fmapr-export-selection div.selected span.export_name' ).text() );
         FMAPR.formData.append( 'export_uuid', $( '#yes3-fmapr-export-selection div.selected' ).attr('id') );
-
-        // inspect the FormData object
-        const obj = {};
-        for (const [key, value] of FMAPR.formData.entries()) {
-            obj[key] = value;
-        }
-        console.log('upload: FMAPR.formData:', obj);
         
         FMAPR.validator_ajax( "validateExportFile", FMAPR.formData, FMAPR.uploadCallback );
 
@@ -263,33 +258,38 @@ FMAPR.validator_ajax = function( request, data, callback ) {
     const isFormData = data instanceof FormData;
 
     // add redcap_csrf_token and request to the data object, according to object type
-    if ( isFormData ) {
-
+    if (isFormData) {
         data.append('request', request);
         data.append('redcap_csrf_token', redcap_csrf_token);
-
     } else {
-
-        data.request = request;
-        data.redcap_csrf_token = redcap_csrf_token;
+        data = Object.assign({}, data, { request, redcap_csrf_token });
     }
 
-    $.ajax({
+    const ajaxOpts = {
         url: YES3.serviceUrl,
-        type: "POST",
-        dataType: "json",
+        method: 'POST',
         cache: false,
-        contentType: isFormData ? false : $.ajaxSettings.contentType,
-        processData: !isFormData,                       
         data: data
-    })
-    .done( callback )
-    .fail(function(jqXHR, textStatus, errorThrown) 
-    {
-        console.error('AJAX error: ' + errorThrown, 'jqXHR:', jqXHR);
+    };
 
-        alert('AJAX error (check console for more info): ' + errorThrown);
-    });
+    if (isFormData) {
+        ajaxOpts.contentType = false;
+        ajaxOpts.processData = false;
+    }
+
+    // Only enforce JSON if the server guarantees valid JSON (content + headers)
+    ajaxOpts.dataType = 'json';
+
+    // If cross-origin + cookies/session needed:
+    // ajaxOpts.xhrFields = { withCredentials: true };
+
+    $.ajax(ajaxOpts)
+        .done(callback)
+        .fail(function (jqXHR, textStatus, errorThrown) {
+            console.error('AJAX error:', { textStatus, errorThrown, status: jqXHR.status, response: jqXHR.responseText });
+            alert('AJAX error: ' + (errorThrown || textStatus));
+        })
+    ;
 }
 
 FMAPR.postValidationMessage = function( msg ){
