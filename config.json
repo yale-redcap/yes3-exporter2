@@ -22,6 +22,12 @@
 
     "versions": [
         {
+            "version": "2.0.3",
+            "date": "2025-08-28",
+            "description": "validation refactoring",
+            "comments": "for Firefox compatibility"
+        },        
+        {
             "version": "2.0.2",
             "date": "2025-08-26",
             "description": "Link to new documentation",
