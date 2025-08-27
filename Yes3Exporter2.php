@@ -132,22 +132,22 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
     public function getDocumentationUrl(){
 
-        return "https://yale-redcap.github.io/yes3-exporter-1.0-docs/";
+        return "https://yale-redcap.github.io/yes3-exporter2-docs/";
     }
 
     public function getChangelogUrl(){
 
-        return "https://yale-redcap.github.io/yes3-exporter-1.0-docs/changelog.html";
+        return "https://yale-redcap.github.io/yes3-exporter2-docs/guides/technical-guide/";
     }
 
     public function getTechnicalDocumentationUrl(){
 
-        return "https://yale-redcap.github.io/yes3-exporter-1.0-docs/technical.html";
+        return "https://yale-redcap.github.io/yes3-exporter2-docs/guides/technical-guide/";
     }
 
     public function getOverviewDocumentationUrl(){
 
-        return "https://yale-redcap.github.io/yes3-exporter-1.0-docs/about.html";
+        return "https://yale-redcap.github.io/yes3-exporter2-docs/getting-started/";
     }
 
     /**
