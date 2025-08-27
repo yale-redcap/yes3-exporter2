@@ -8,6 +8,11 @@ YES3.Functions.Open_validator = function() {
     FMAPR.openValidator();
 }
 
+YES3.Functions.Help_openDocumentation = function() {
+
+    FMAPR.openDocumentation();
+}
+
 FMAPR.useYes3Functions = true; // override FMAPR function if function of same name exists in YES3 namespace
 
 FMAPR.exportSpecification = {};
@@ -673,8 +678,13 @@ FMAPR.saveExportSpecificationCallback = function( response ){
 }
 
 /*
- * VALIDATOR
+ * DOCUMENTATION
  */
+
+FMAPR.openDocumentation = function(){
+
+    window.open(YES3.documentationUrl, "_blank");
+}
 
 FMAPR.openValidator = function()
 {
