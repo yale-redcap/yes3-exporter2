@@ -186,8 +186,13 @@ FMAPR.setValidatorListeners = function()
             xhrFields: { withCredentials: true }, // if cross-site cookies/sessions are required
         })
         .done(FMAPR.uploadCallback)
-        .fail((jq,x,e)=>console.error('upload fail', {status:jq.status, url:jq.responseURL, x,e, resp:jq.responseText}));
+        .fail((jq,x,e)=>{ 
+            console.error('upload fail', {status:jq.status, url:jq.responseURL, x,e, resp:jq.responseText}); 
+            alert('AJAX error: check console log for details');
+        });
     });
+};
+
 
     /*
 
@@ -237,7 +242,6 @@ FMAPR.setValidatorListeners = function()
         FMAPR.postValidationMessage( 'Validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
     });
     */
-}
 
 FMAPR.clearFileSelectionForm = function() {
 
@@ -408,5 +412,5 @@ $( function(){
 
     YES3.displayActionIcons();
 
-    FMAPR.loadSpecifications(); 
+    FMAPR.loadSpecifications();
 })
