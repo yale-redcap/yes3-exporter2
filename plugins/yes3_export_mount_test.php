@@ -46,9 +46,9 @@ if (substr($mount_path, -1) !== DIRECTORY_SEPARATOR) {
 // path to the file to be created
 $file_path = $mount_path . $filename;
 
-$file_content = "This is a test file created by the Yes3 Exporter External Module on " . date('Y-m-d H:i:s') . ".\n";
+$file_content = "This is a test file created by the Yes3 Exporter2 External Module on " . date('Y-m-d H:i:s');
 
-$file_content .= "\nProject: " . $module->getProject()->getTitle() . " ( pid " . $module->getProjectId() . " )\n";
+$file_content .= "\nProject: " . $module->getProject()->getTitle() . " ( pid " . $module->getProjectId() . " )";
 
 $file_content .= "\nUser: " . $module->getUser()->getUsername() . "\n";
 
@@ -59,6 +59,8 @@ if ($write_result === false) {
     echo "Failed to write to file: $file_path.\n";
 } else {
     echo "Successfully wrote $write_result bytes to file: $file_path.\n";
+    // delete the test file after writing
+    //unlink($file_path);
 }
 
 echo "</pre>";

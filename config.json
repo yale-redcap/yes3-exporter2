@@ -22,7 +22,7 @@
 
     "versions": [
         {
-            "version": "2.0.3",
+            "version": "2.0.4",
             "date": "2025-08-28",
             "description": "validation refactoring",
             "comments": "for Firefox compatibility"
@@ -47,26 +47,21 @@
         }
     ],
 
-    "links": {
+    "links": {  
         "project": [
             {
                 "name": "YES3 Exporter II Manager",
-                "icon": "fab fa-connectdevelop",
+                "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_manager.php"
             },
             {
                 "name": "YES3 Exporter II Event Prefixes",
-                "icon": "fab fa-connectdevelop",
+                "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_prefixes.php"
             },
             {
-                "name": "YES3 Exporter II Logs",
-                "icon": "fab fa-connectdevelop",
-                "url":  "plugins/yes3_export_logs.php"
-            },
-            {
                 "name": "YES3 Exporter II Mount Test",
-                "icon": "fab fa-connectdevelop",
+                "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_mount_test.php"
             },
             {
