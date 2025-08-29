@@ -9,6 +9,7 @@ FMAPR.renderUI = function( data ){
 
 FMAPR.formData = {};
 FMAPR.fileToValidate = null;
+FMAPR.selectedFile = null;
 
 FMAPR.loadSpecifications = function( get_removed )
 {
@@ -119,7 +120,10 @@ FMAPR.isEmptyFormData = function(fd) {
 
 FMAPR.setValidatorListeners = function()
 {
+
     $( '#yes3-fmapr-export-selection span.export_name' ).off('click').on('click', function(){
+
+        FMAPR.selectedFile = null;
 
         const $uploadOptionsContainer = $( '#yes3-fmapr-export-upload' );
         const $uploadButton = $( '#yes3-fmapr-export-upload-button' );
@@ -146,6 +150,46 @@ FMAPR.setValidatorListeners = function()
         else {
         }
     });
+
+    $(document).on('change', '#yes3-fmapr-export-upload-file', function(){
+        FMAPR.selectedFile = this.files?.[0] || null;
+        FMAPR.fileToValidate = FMAPR.selectedFile.name;
+        FMAPR.hideUploadOptionsContainer();
+        FMAPR.showValidateOptionsContainer();
+    });
+
+    $(document).on('click', '#yes3-fmapr-export-validate-button', function(){
+        if (!FMAPR.selectedFile) { YES3.hello('Please select a file to upload.'); return; }
+
+        const fd = new FormData();
+        fd.append('datasheetToValidate', FMAPR.selectedFile);
+        fd.append('request', 'validateExportFile');
+        fd.append('redcap_csrf_token', redcap_csrf_token);
+        fd.append('export_name', $('#yes3-fmapr-export-selection .selected .export_name').text());
+        fd.append('export_uuid', $('#yes3-fmapr-export-selection .selected').attr('id'));
+
+
+        YES3.isBusy();
+        performance.mark('FMAPR.upload.start');
+
+        FMAPR.hideValidateOptionsContainer();
+        FMAPR.hideValidationResultsTable();
+        FMAPR.postValidationMessage( 'Validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
+
+        $.ajax({
+            url: YES3.serviceUrl,
+            method: 'POST',
+            data: fd,
+            contentType: false,
+            processData: false,
+            dataType: 'json',
+            xhrFields: { withCredentials: true }, // if cross-site cookies/sessions are required
+        })
+        .done(FMAPR.uploadCallback)
+        .fail((jq,x,e)=>console.error('upload fail', {status:jq.status, url:jq.responseURL, x,e, resp:jq.responseText}));
+    });
+
+    /*
 
     // file select button
     $( '#yes3-fmapr-export-upload-file' ).off('change').on('change', function(){
@@ -192,6 +236,7 @@ FMAPR.setValidatorListeners = function()
 
         FMAPR.postValidationMessage( 'Validating <span class="yes3-bold">' + FMAPR.fileToValidate + '</span>' );
     });
+    */
 }
 
 FMAPR.clearFileSelectionForm = function() {
@@ -252,7 +297,7 @@ FMAPR.buildValidationResultsTable = function( validationResults )
         FMAPR.resize();
     }
 }
-
+/*
 FMAPR.validator_ajax = function( request, data, callback ) {
 
     const isFormData = data instanceof FormData;
@@ -291,7 +336,7 @@ FMAPR.validator_ajax = function( request, data, callback ) {
         })
     ;
 }
-
+*/
 FMAPR.postValidationMessage = function( msg ){
 
     $('#yes3-fmapr-export-validate-message').html( msg );

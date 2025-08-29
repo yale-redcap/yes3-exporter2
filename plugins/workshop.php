@@ -30,10 +30,38 @@ $HtmlPage->ProjectHeader();
 //echo $module->getModuleId();
 
 echo "<pre>";
-xliterate();
+
+//xliterate();
+
+echo print_r(testSpecialValuesets(), true);
+
 echo "</pre>";
 
 exit();
+
+function testSpecialValuesets(){
+    global $module;
+
+    $dag_valueset = [];
+    if ($groupNames = $module->getGroupNames()) {
+       foreach ($groupNames as $group_id => $group_name) {
+            $dag_valueset[] = ['value' => strval($group_id), 'label' => $group_name];
+        }
+    }
+
+    $event_valueset = [];
+    if ($eventNames = $module->getEventNames(true)) {
+        foreach ($eventNames as $event_id => $event_name) {
+            $event_valueset[] = ['value' => strval($event_id), 'label' => $event_name];
+        }
+    }
+
+    return [
+        'dag_valueset' => $dag_valueset,
+        'event_valueset' => $event_valueset
+    ];
+
+}
 
 function xliterate(){
 

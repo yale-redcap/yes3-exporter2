@@ -417,15 +417,33 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $this->addExportItem_REDCapField( $export, $field_name, $this->getREDCapEventIdForField($field_name), $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
 
-        if ( $this->getGroupNames() ) {
+        if ( $groupNames = $this->getGroupNames() ) {
 
-            $this->addExportItem_otherProperty($export, self::VARNAME_GROUP_ID,   "REDCap Data Access Group Id", "INTEGER");
+            $dag_valueset = [];
+            foreach ($groupNames as $value => $label) {
+                $dag_valueset[] = [
+                    'value' => Yes3Fn::sanitizeForText((string)$value, 0, true, false, true),
+                    'label' => Yes3Fn::sanitizeForLabel($label, Yes3Fn::MAX_LABEL_LEN)
+                ];
+            }
+
+            $this->addExportItem_otherProperty($export, self::VARNAME_GROUP_ID,   "REDCap Data Access Group Id", "NOMINAL", $dag_valueset);
             $this->addExportItem_otherProperty($export, self::VARNAME_GROUP_NAME, "REDCap Data Access Group Name", "TEXT");
         }
 
         if ( $export->export_layout !== "h" && $this->isLongitudinal() ) {
 
-            $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_ID,   "REDCap Event Id", "INTEGER");
+            $event_valueset = [];
+            if ($eventNames = $this->getEventNames(true)) {
+                foreach ($eventNames as $value => $label) {
+                    $event_valueset[] = [
+                        'value' => Yes3Fn::sanitizeForText((string)$value, 0, true, false, true),
+                        'label' => Yes3Fn::sanitizeForLabel($label, Yes3Fn::MAX_LABEL_LEN)
+                    ];
+                }
+            }
+
+            $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_ID,   "REDCap Event Id", "NOMINAL", $event_valueset);
             $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_NAME, "REDCap Event Name", "TEXT");
         }
 
@@ -4191,13 +4209,13 @@ WHERE project_id=? AND log_entry_type=?
         return 1;
     }
 
-    private function addExportItem_otherProperty( $export, $property_name, $property_label, $property_type="TEXT" )
+    private function addExportItem_otherProperty( $export, $property_name, $property_label, $property_type="TEXT", $property_valueset=[] )
     {
         $export->addExportItem([
             'var_name' => $property_name,
             'var_label' => $property_label,
             'var_type' => $property_type,
-            'valueset' => [],
+            'valueset' => $property_valueset,
             'origin' => "other",
             'redcap_field_name' => "",
             'redcap_form_name' => "",
