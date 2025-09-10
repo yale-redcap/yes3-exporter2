@@ -5156,7 +5156,11 @@ WHERE project_id=? AND log_entry_type=?
     {  
         $user_rights = $this->yes3UserRights();
 
-        $projectSettings = $this->getProjectSettings();
+        $user_name = $this->getUsername();
+
+        $enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports") ?? false;
+
+        //$projectSettings = $this->getProjectSettings();
 
         if ( !$user_rights['exporter'] ){
 
@@ -5164,20 +5168,26 @@ WHERE project_id=? AND log_entry_type=?
         }
 
         // event prefixes are applicable only to longitudinal projects
-        if ( !$this->isLongitudinal() && $link['name'] !== "YES3 Exporter Event Prefixes" ){ 
+        if ( !$this->isLongitudinal() && $link['name'] !== "YES3 Exporter II Event Prefixes" ){ 
 
             return false;
         }
 
-        if ( isset($projectSettings['enable-validator']) && $projectSettings['enable-validator'] != "1" && $link['name'] === "YES3 Exporter Validator" ){
+        if ( $link['name'] === "YES3 Exporter II Mount Test" 
+            && (!$enable_host_filesystem_exports || !$user_rights['isDesigner'])) { 
+
+            return false;
+        }
+
+        if ($link['name'] === "YES3 Exporter II Workshop" 
+            && $user_name !== "criwebtoofs") { 
 
             return false;
         }
 
         if ( !$user_rights['isDesigner'] && 
-            (   $link['name'] === "YES3 Exporter Manager"  ||
-                $link['name'] === "YES3 Exporter Event Prefixes" ||
-                $link['name'] === "YES3 Export Workshop"
+            (   $link['name'] === "YES3 Exporter II Manager"  ||
+                $link['name'] === "YES3 Exporter II Event Prefixes"
             )){
 
             return false;
