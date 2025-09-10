@@ -50,14 +50,14 @@
     "links": {  
         "project": [
             {
-                "name": "YES3 Exporter II Manager",
-                "icon": "fas fa-file-export",
-                "url":  "plugins/yes3_export_manager.php"
-            },
-            {
                 "name": "YES3 Exporter II Event Prefixes",
                 "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_prefixes.php"
+            },
+            {
+                "name": "YES3 Exporter II Manager",
+                "icon": "fas fa-file-export",
+                "url":  "plugins/yes3_export_manager.php"
             },
             {
                 "name": "YES3 Exporter II Mount Test",
