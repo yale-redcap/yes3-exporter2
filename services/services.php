@@ -302,6 +302,9 @@ function addExportSpecification()
         , 'export_sascode_libref' => ""
         , 'export_sascode_libref_path' => ""
         , 'export_sascode_dsname' => ""
+        , 'export_file_type' => "csv" // csv or tsv
+        , 'export_data_extension' => "csv"
+        , 'export_data_delimiter' => ","
         , 'export_rcode' => ""
     ];
 
@@ -357,6 +360,7 @@ function saveExportSpecification()
         , 'export_sascode_libref' => ""
         , 'export_sascode_libref_path' => ""
         , 'export_sascode_dsname' => ""
+        , 'export_file_type' => "csv" // csv or tsv
         , 'export_rcode' => ""
         , 'column_count' => ""
         , "export_has_repeatables" => ""
@@ -584,6 +588,9 @@ function getExportSpecificationList():string
             'export_sascode_libref' => $module->escape($s['export_sascode_libref'] ?? ""),
             'export_sascode_libref_path' => $module->escape($s['export_sascode_libref_path'] ?? ""),
             'export_sascode_dsname' => $module->escape($s['export_sascode_dsname'] ?? ""),
+            'export_file_type' => $s['export_file_type'] ?? "csv", // csv or tsv 
+            'export_data_extension' => $s['export_data_extension'] ?? "csv",
+            'export_data_delimiter' => $s['export_data_delimiter'] ?? ",",
             'export_rcode' => $s['export_rcode'] ?? "0",
             'column_count' => $module->escape($columnCount)
         ];

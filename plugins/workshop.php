@@ -8,7 +8,6 @@ error_reporting(E_ALL);
 
 $module = new Yes3Exporter2();
 
-use Yale\Yes3\Yes3;
 use REDCap;
 use HtmlPage;
 
@@ -21,9 +20,7 @@ $HtmlPage->ProjectHeader();
 
 //testTheSanitizer();
 
-//testTheFileType();
-
-//phpinfo();
+phpinfo();
 
 //testTheLegacyTransfer();
 
@@ -33,11 +30,52 @@ echo "<pre>";
 
 //xliterate();
 
-echo print_r(testSpecialValuesets(), true);
+//echo print_r(getAuthorizationHeader(),true) . "\n";
 
 echo "</pre>";
 
 exit();
+
+
+/** 
+ * Get header Authorization
+ * */
+function getAuthorizationHeader(){
+    $headers = 2;
+    if (isset($_SERVER['Authorization'])) {
+        $headers = trim($_SERVER["Authorization"]);
+        //return 3;
+    }
+    else if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+        $headers = trim($_SERVER["HTTP_AUTHORIZATION"]);
+        //return 4;
+    }
+    
+    if (function_exists('apache_request_headers')) {
+        $requestHeaders = apache_request_headers();
+        $requestHeaders = array_combine(array_map('ucwords', array_keys($requestHeaders)), array_values($requestHeaders));
+
+        return $requestHeaders;
+        if (isset($requestHeaders['Authorization'])) {
+            $headers = trim($requestHeaders['Authorization']);
+        }
+    }
+    return $headers;
+}
+
+
+/**
+ * Get access token from header
+ * */
+function getBearerToken() {
+    $headers = getAuthorizationHeader();
+    if (!empty($headers)) {
+        if (preg_match('/Bearer\s+(\S+)/', $headers, $matches)) {
+            return $matches[1];
+        }
+    }
+    return null;
+}
 
 function testSpecialValuesets(){
     global $module;
@@ -235,20 +273,6 @@ where em.external_module_id=? and ems.project_id=? and ifnull(ems.value, '') <> 
     }
 
     return $settingsTransferred;
-}
-
-function testTheFileType(){
-    global $module;
-
-    $filetypeCsv = $module->getProjectSetting("export-filetype-csv");
-
-    $module->determineExportFileType();
-
-    $fileType = $module->EXPORT_DATA_EXTENSION;
-
-    echo "File type setting: $filetypeCsv<br>";
-
-    echo "Determined export file type: $fileType";
 }
 
 function testTheSanitizer() {

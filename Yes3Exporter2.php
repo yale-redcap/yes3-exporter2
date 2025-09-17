@@ -26,9 +26,6 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
     public $EXTERNAL_MODULE_ID = 0;
 
-    public $EXPORT_DATA_EXTENSION = "tsv"; 
-    public $EXPORT_DATA_DELIMITER = "\t"; // default delimiter for export data files
-
     const EXPORTER_DOWNLOAD_COOKIE_NAME = "yes3-exporter-download";
 
     const LOG_MESSAGE_FILES_WRITTEN = "export files written";
@@ -260,6 +257,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
          *      export_sascode_libref
          *      export_sascode_libref_path
          *      export_sascode_dsname
+         *      export_file_type
          *      export_code_filename_base
          *      export_rcode
          *      export_has_repeatables
@@ -546,6 +544,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             'export_sascode_libref' => $export->export_sascode_libref,
             'export_sascode_libref_path' => $export->export_sascode_libref_path,
             'export_sascode_dsname' => $export->export_sascode_dsname,
+            'export_file_type' => $export->export_file_type,
+            'export_data_extension' => $export->export_data_extension,
+            'export_data_delimiter' => $export->export_data_delimiter,
             'export_code_filename_base' => $export->export_code_filename_base,
             'export_multiselect' => $export->export_multiselect,
             'export_selection' => $export->export_selection,
@@ -702,10 +703,10 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             'message' => $message
         ];
     }
-    
-    private function writeSasCodeInputFile($export_name, $export_target_folder, $destination, $Sascoder)
+
+    private function writeSasCodeInputFile($export_name, $export_target_folder, $export_data_extension, $destination, $Sascoder)
     {
-        $infile_path = $this->exportDataFilename($export_name, SELF::DESTINATION_FILESYSTEM);
+        $infile_path = $this->exportDataFilename($export_name, $export_data_extension, SELF::DESTINATION_FILESYSTEM);
         $code = $Sascoder->genInputCode( $infile_path );
 
         return $this->writeCodeFile($export_name, $export_target_folder, $destination, $code, "input", "sas");
@@ -808,7 +809,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         ];
     }
 
-    private function writeExportDataDictionaryFile( $export_name, $export_target_folder, $dd, $destination, $export_layout, &$bytesWritten=0 )
+    private function writeExportDataDictionaryFile( $export_name, $export_data_extension, $export_data_delimiter, $export_target_folder, $dd, $destination, $export_layout, &$bytesWritten=0 )
     {
         /*
         if ( !$export_target_folder || $destination===self::DESTINATION_DOWNLOAD ) {
@@ -833,11 +834,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             throw new Exception("Fail: could not create export file {$path}");
         }
 
-        $path = "";
         */
+        
+        $path = "";
 
         // we include the UTF8 BOM in the data dictionary file, so that it can be opened in Excel without issues.
-        $export_filename = $this->exportDataDictionaryFilename($export_name, $destination);
+        $export_filename = $this->exportDataDictionaryFilename($export_name, $export_data_extension, $destination);
         $h = $this->export_file_handle( $path, $destination, $export_target_folder, $export_filename, true );
 
         $R = 0;
@@ -850,7 +852,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
      
         foreach ( $xx as $x ) {
 
-            $bytesWritten += Yes3Fn::fputcsv($h, $x, $this->EXPORT_DATA_DELIMITER);
+            $bytesWritten += Yes3Fn::fputcsv($h, $x, $export_data_delimiter);
             $R++;
         }
      
@@ -951,21 +953,6 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         return $etf;
     }
 
-    public function determineExportFileType()
-    {
-        $filetypeCsv = $this->getProjectSetting("export-filetype-csv");
-
-        if ( $filetypeCsv ){
-
-            $this->EXPORT_DATA_DELIMITER = ",";
-            $this->EXPORT_DATA_EXTENSION = "csv";
-        }
-        else {
-            $this->EXPORT_DATA_DELIMITER = "\t";
-            $this->EXPORT_DATA_EXTENSION = "tsv";
-        }
-    }
-
     /**
      * writeExportFiles
      * 
@@ -1020,6 +1007,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $export_sascode_libref      = $ddPackage['export_sascode_libref'] ?? "";
         $export_sascode_libref_path = $ddPackage['export_sascode_libref_path'] ?? "";
         $export_sascode_dsname      = $ddPackage['export_sascode_dsname'] ?? "";
+        $export_file_type           = $ddPackage['export_file_type'] ?? "csv";
+        $export_data_extension      = $ddPackage['export_data_extension'] ?? "csv";
+        $export_data_delimiter      = $ddPackage['export_data_delimiter'] ?? ",";
         $export_code_filename_base  = $ddPackage['export_code_filename_base'] ?? "";
 
         // these are text conditioning options not yet implemented in the UI
@@ -1027,20 +1017,20 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $export_no_newlines = false;
         $export_no_dquotes = false;
 
-        $this->determineExportFileType(); // sets delimiter and file extension
+        //$this->determineExportFileType( $export_file_type ); // sets delimiter and file extension
 
-        if ( $this->EXPORT_DATA_DELIMITER === "\t" ) {
+        if ( $export_data_delimiter === "\t" ) {
 
             $export_no_tabs = true; // tab-delimited exports should not have tabs in the text
         }
-        elseif ( $this->EXPORT_DATA_DELIMITER === "," ) {
+        elseif ( $export_data_delimiter === "," ) {
 
             $export_no_dquotes = true; // comma-delimited exports should not have double quotes in the text
             $export_no_newlines = true; // no newlines in comma-delimited exports
             $export_inoffensive_text = true; // no unprintable characters in comma-delimited exports
         }
 
-        $export_data_filename = $this->exportDataFilename($export_name, $destination);
+        $export_data_filename = $this->exportDataFilename($export_name, $export_data_extension, $destination);
 
         $dd = $ddPackage['export_data_dictionary'] ?? [];
 
@@ -1448,6 +1438,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 $export_shift_dates,
                 $export_group_id,
                 $export_has_repeatables,
+                $export_data_delimiter,
                 $K, 
                 $R, 
                 $C
@@ -1486,7 +1477,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $ddPackage['export_data_dictionary'] = $dd;
 
-        $export_data_dictionary_response = $this->writeExportDataDictionaryFile( $export_name, $export_target_folder, $dd, $destination, $export_layout );
+        $export_data_dictionary_response = $this->writeExportDataDictionaryFile( $export_name, $export_data_extension, $export_data_delimiter, $export_target_folder, $dd, $destination, $export_layout );
 
         $export_info_file_response = $this->writeExportInfoFile(
             $export_name, 
@@ -1512,7 +1503,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 $export_sascode_dsname,
                 $export_code_filename_base,
                 $export_sascode_ascii,
-                $this->EXPORT_DATA_DELIMITER,
+                $export_data_delimiter,
                 $maxRecLen
 
             );
@@ -1524,7 +1515,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
             $export_sascode_results = [
 
-                'input' => $this->writeSasCodeInputFile($export_name, $export_target_folder, $destination, $Sascoder),
+                'input' => $this->writeSasCodeInputFile($export_name, $export_target_folder, $export_data_extension, $destination, $Sascoder),
                 'fmtlib_create' => $this->writeSasCodeFormatsCreateFile($export_name, $export_target_folder, $destination, $Sascoder),
                 'fmtlib_assign' => $this->writeSasCodeFormatsAssignFile($export_name, $export_target_folder, $destination, $Sascoder)
             ];
@@ -2100,6 +2091,7 @@ WHERE project_id=? AND log_entry_type=?
         $export_shift_dates,
         $export_group_id,
         $export_has_repeatables,
+        $export_data_delimiter,
         &$K, 
         &$R, 
         &$C
@@ -2176,7 +2168,7 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ( $y && $exportValues && $h !== false ){
 
-                    $bytesWritten += $this->writeExportRecord($h, $y, $R, $C);
+                    $bytesWritten += $this->writeExportRecord($h, $y, $export_data_delimiter, $R, $C);
                     $K += $exportValues; // increment the global datum count
                 }
 
@@ -2243,8 +2235,8 @@ WHERE project_id=? AND log_entry_type=?
             $REDCapValue = $x['value'] ?? '';
 
             if ( strlen($REDCapValue) ){
-    
-                if ( $this->EXPORT_DATA_DELIMITER === "\t"){
+
+                if ($export_data_delimiter === "\t"){
 
                     $REDCapValue = Yes3Fn::sanitizeForTSV( $x['value'], $export_max_text_length, $export_ascii_text );
                 }
@@ -2360,7 +2352,7 @@ WHERE project_id=? AND log_entry_type=?
 
         if ( $y && $exportValues && $h !== false){
 
-            $bytesWritten += $this->writeExportRecord($h, $y, $R, $C);
+            $bytesWritten += $this->writeExportRecord($h, $y, $export_data_delimiter, $R, $C);
             $K += $exportValues; // increment the global datum count
         }
 
@@ -2483,19 +2475,19 @@ WHERE project_id=? AND log_entry_type=?
         return $d;
     }
 
-    private function writeExportRecord( $h, $y, &$rowNumber, &$colCount ){
+    private function writeExportRecord( $h, $y, $export_data_delimiter, &$rowNumber, &$colCount ){
 
         $bytes = 0;
 
         if ( $rowNumber===0 ){
 
-            $bytes += Yes3Fn::fputcsv($h, array_keys($y), $this->EXPORT_DATA_DELIMITER);
+            $bytes += Yes3Fn::fputcsv($h, array_keys($y), $export_data_delimiter);
             $colCount = count($y);
         }
 
         $rowNumber++;
 
-        $bytes += Yes3Fn::fputcsv($h, array_values($y), $this->EXPORT_DATA_DELIMITER);
+        $bytes += Yes3Fn::fputcsv($h, array_values($y), $export_data_delimiter);
 
         return $bytes;
     }
@@ -2515,9 +2507,9 @@ WHERE project_id=? AND log_entry_type=?
 
         $response = "";
 
-        $this->determineExportFileType();
-
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
+
+        $this->determineExportFileType( $ddPackage['export_file_type'] );
 
         if ($cron) {
             $destination = self::DESTINATION_CRON;
@@ -2693,13 +2685,15 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadDataDictionary($export_uuid)
     {
-        $this->determineExportFileType();
-
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
-        $export_name = $ddPackage['export_name'];
+        //$this->determineExportFileType( $ddPackage['export_file_type'] );
 
-        $filename = $this->exportDataDictionaryFilename( $export_name, self::DESTINATION_DOWNLOAD );
+        $export_name = $ddPackage['export_name'];
+        $export_data_extension = $ddPackage['export_data_extension'];
+        $export_data_delimiter = $ddPackage['export_data_delimiter'];
+
+        $filename = $this->exportDataDictionaryFilename( $export_name, $export_data_extension, self::DESTINATION_DOWNLOAD );
 
         $ddPackage['export_data_dictionary'] = $this->tidyUpDDv2($ddPackage['export_data_dictionary'], true);
 
@@ -2744,7 +2738,7 @@ WHERE project_id=? AND log_entry_type=?
 
             $C++;
 
-            Yes3Fn::fputcsv($h, $x, $this->EXPORT_DATA_DELIMITER);
+            Yes3Fn::fputcsv($h, $x, $export_data_delimiter);
         }
      
         fclose($h);
@@ -2758,13 +2752,16 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadData($export_uuid)
     {
-        $this->determineExportFileType();
         
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
 
-        $export_name = $ddPackage['export_name'];
+        //$this->determineExportFileType();
 
-        $filename = $this->exportDataFilename( $export_name, self::DESTINATION_DOWNLOAD );
+        $export_name = $ddPackage['export_name'];
+        $export_data_extension = $ddPackage['export_data_extension'];
+
+
+        $filename = $this->exportDataFilename( $export_name, $export_data_extension, self::DESTINATION_DOWNLOAD );
 
         $xFileResponse = $this->writeExportFiles($ddPackage, self::DESTINATION_DOWNLOAD);     
 
@@ -2837,9 +2834,10 @@ WHERE project_id=? AND log_entry_type=?
      */
     public function downloadZip($export_uuid, $support_package=false)
     {
-        $this->determineExportFileType();
 
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
+
+        //$this->determineExportFileType();
 
         $bytesWritten = 0;
 
@@ -2878,10 +2876,12 @@ WHERE project_id=? AND log_entry_type=?
          */
 
         $timestamp = $xFileResponse['export_info_timestamp'] ?? $this->timeStampString();
+        $export_name = $ddPackage['export_name'];
+        $export_data_extension = $ddPackage['export_data_extension'];
 
-        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($ddPackage['export_name'], self::DESTINATION_DOWNLOAD, NULL);
-        $exportDataFilename = $this->exportDataFilename($ddPackage['export_name'], self::DESTINATION_DOWNLOAD, NULL);
-        $exportInfoFilename = $this->exportInfoFilename($ddPackage['export_name'], self::DESTINATION_DOWNLOAD, NULL);
+        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($export_name, $export_data_extension, self::DESTINATION_DOWNLOAD);
+        $exportDataFilename = $this->exportDataFilename($export_name, $export_data_extension, self::DESTINATION_DOWNLOAD, NULL);
+        $exportInfoFilename = $this->exportInfoFilename($export_name, self::DESTINATION_DOWNLOAD, NULL);
 
         if ( !$zip->addFile($xFileResponse['export_data_dictionary_filename'], $exportDataDictionaryFilename) ) {
 
@@ -3005,16 +3005,16 @@ WHERE project_id=? AND log_entry_type=?
         return "";
     }
 
-    public function exportDataFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
+    public function exportDataFilename( $export_name, $export_data_extension="csv", $target=self::DESTINATION_DOWNLOAD, $timestamp="")
     {
-        $this->determineExportFileType();
-        return $this->exportFilename($export_name, "data", $this->EXPORT_DATA_EXTENSION, $target, $timestamp);
+        //$this->determineExportFileType();
+        return $this->exportFilename($export_name, "data", $export_data_extension, $target, $timestamp);
     }
 
-    public function exportDataDictionaryFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
+    public function exportDataDictionaryFilename( $export_name, $export_data_extension="csv", $target=self::DESTINATION_DOWNLOAD, $timestamp="")
     {
-        $this->determineExportFileType();
-        return $this->exportFilename($export_name, "dd", $this->EXPORT_DATA_EXTENSION, $target, $timestamp);
+        //$this->determineExportFileType();
+        return $this->exportFilename($export_name, "dd", $export_data_extension, $target, $timestamp);
     }
 
     public function exportInfoFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
@@ -3442,6 +3442,7 @@ WHERE project_id=? AND log_entry_type=?
         , export_sascode_libref_path
         , export_sascode_dsname
         , export_rcode
+        , export_file_type
         , column_count
         , export_has_repeatables
         ";
@@ -4563,7 +4564,7 @@ WHERE project_id=? AND log_entry_type=?
     {
         $project_id = $this->getProjectId();
 
-        $this->determineExportFileType();
+        //$this->determineExportFileType();
 
         $time = time();
 
@@ -5180,7 +5181,7 @@ WHERE project_id=? AND log_entry_type=?
         }
 
         if ($link['name'] === "YES3 Exporter II Workshop" 
-            && $user_name !== "criwebtoofs") { 
+            && $user_name !== "criwebtools" && $user_name !== "charpe" ) { 
 
             return false;
         }
