@@ -51,7 +51,7 @@ $csrf_token = $module->getCSRFToken();
             Here's some help
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 

@@ -40,7 +40,12 @@ class Yes3Export {
     public $export_sascode_ascii = "";
     public $export_sascode_libref = "";
     public $export_sascode_libref_path = "";
-    public $export_sascode_dsname = ""; 
+    public $export_sascode_dsname = "";
+
+    public $export_file_type = ""; // csv or tsv
+    public $export_data_delimiter = ","; // default delimiter for export data files
+    public $export_data_extension = "csv"; // default extension for export data files
+
     public $export_code_filename_base = "";
     public $export_rcode = "";
 
@@ -91,7 +96,13 @@ class Yes3Export {
         $this->export_sascode_libref_path = $exportSettings['export_sascode_libref_path'] ?? "";
         $this->export_sascode_dsname = $exportSettings['export_sascode_dsname'] ?? "";
 
+        $this->export_file_type = $exportSettings['export_file_type'] ?? "csv"; // csv or tsv
+
         $this->export_code_filename_base = Yes3Fn::normalized_string($exportSettings['export_name'] ?? "");
+
+        // derived properties
+        $this->export_data_delimiter = ( $this->export_file_type === "tsv" ) ? "\t" : "," ;
+        $this->export_data_extension = $this->export_file_type;
     }
 
     public function addExportItem( $exportItemProperties, $RecordIdField )

@@ -210,7 +210,7 @@ FMAPR.exportTableRowHtml = function( data ){
     rowHtml += `<td class="yes3-col-md yes3-halign-left yes3-required-column" data-name="export_name"  >${data.export_name}</td>`;
     rowHtml += `<td class="yes3-col-lg yes3-halign-left"                      data-name="export_label" >${data.export_label}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_layout" title="${layout_tooltip}">${FMAPR.layoutLabel(data.export_layout)}</td>`;
-    if ( YES3.EMSettings['enable-cron-batch-exports'] ) rowHtml += `<td class="yes3-col-sm yes3-halign-center" data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
+    if ( YES3.EMSettings['enable-cron-batch-exports'] && YES3.EMSettings['enable-host-filesystem-exports'] ) rowHtml += `<td class="yes3-col-sm yes3-halign-center" data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="column_count" >${data.column_count}</td>`;
 
     // if ( YES3.EMSettings['enable-validator'] === 'Y' ) {

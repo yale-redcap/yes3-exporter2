@@ -140,6 +140,33 @@ YES3.Functions.Help_sascode = function()
     let thePanel = YES3.openPanel("yes3-fmapr-sascode-help-panel", true);
 }
 
+YES3.Functions.Help_export_file_type = function()
+{
+    let thePanel = YES3.openPanel("yes3-fmapr-export-file-type-help-panel", true);
+}
+
+YES3.Functions.Help_multiselect = function()
+{
+    let thePanel = YES3.openPanel("yes3-fmapr-multiselect-help-panel", true);
+}
+
+YES3.Functions.Help_openDocumentation = function() {
+
+    FMAPR.openDocumentation();
+}
+
+
+/*
+ * DOCUMENTATION
+ */
+
+FMAPR.openDocumentation = function(){
+
+    window.open(YES3.documentationUrl, "_blank");
+}
+
+
+
 FMAPR.postWarningMessage = function( message )
 {
     const $msgContainer = $("div#yes3-export-editor-warning");
@@ -1367,16 +1394,17 @@ YES3.Functions.saveExportSpecification = function(auditOnly)
     if ( !auditOnly ){
 
         YES3.isBusy( YES3.captions.wait_saving_specification );
-        
-       //console.warn( 'saveExportSpecification', postParams );
 
+        //console.warn( 'saveExportSpecification: postParams', postParams );
+        //console.warn( 'saveExportSpecification: specItems', specItems );
+       
         YES3.requestService( postParams, FMAPR.saveExportSpecificationCallback, false );
     }
  }
  
 FMAPR.saveExportSpecificationCallback = function( response ){
   
-    //console.warn( 'saveExportSpecificationCallback', response );
+    console.warn( 'saveExportSpecificationCallback', response );
 
     //YES3.notBusy();
 
@@ -3996,7 +4024,10 @@ FMAPR.populateSpecificationTables = function( specification )
 
     //try {
         FMAPR.setConstrainedAutocompleteSource(); // alternate source for repeaters
+
+        // settingsAreDirty will be true if any settings were blank and set to default values
         const settingsAreDirty = FMAPR.populateSettingsTable( specification );
+
         FMAPR.emptyExportItemsTable();
         /**
          * Use the save function to audit the settings just loaded, and mark any blank or bad entries
@@ -4009,11 +4040,11 @@ FMAPR.populateSpecificationTables = function( specification )
     //    errors++;
     //}
 
-    if ( settingsAreDirty ){
-        FMAPR.markAsDirty();
-    } else {
+    //if ( settingsAreDirty ){
+    //    FMAPR.markAsDirty("Be sure to save the specification before exiting.");
+    //} else {
         FMAPR.markAsClean(true);
-    }
+    //}
 
     FMAPR.showLayoutItems(); // show or hide longitudinal project items (events)
     FMAPR.resizeExportItemsTable();
@@ -4251,9 +4282,31 @@ FMAPR.populateSettingsTable = function( specification )
     }
     $(".yes3-fmapr-export-layout-text").html(export_layout_text);
 
+    // set some defaults
+    if ( FMAPR.setDefaultOptionValue( "export_file_type", "csv" ) ) isDirty = true;
+    if ( FMAPR.setDefaultOptionValue( "export_multiselect", "1" ) ) isDirty = true;
+
     FMAPR.exportSettingsTableSkipper();
 
     return isDirty;
+}
+
+FMAPR.setDefaultOptionValue = function( setting_name, defaultOptionSelection )
+{
+    const $ctl = $(`input[type=radio][data-setting=${setting_name}]`);
+
+    let optionSet = false;
+
+    if ( $ctl.length && !$(`input[type=radio][data-setting=${setting_name}]:checked`).length ) {
+        $ctl.each(function(){
+            if ( $(this).val() === defaultOptionSelection ) {
+                $(this).prop('checked', true);
+                optionSet = true;
+            }
+        });
+    }
+
+    return optionSet;
 }
 
 FMAPR.emptyExportItemsTable = function()

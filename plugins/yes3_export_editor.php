@@ -78,7 +78,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             Export specification errors
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: FMAPR.ErrReport_closePanel()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: FMAPR.ErrReport_closePanel()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
@@ -99,7 +99,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             Here's some help
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
@@ -111,24 +111,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
    <div class="yes3-panel-row yes3-duck" >
         <table>
             <tbody>
-
-                <tr>
-                    <td>
-                        <i class="fas fa-list-alt yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Add a new export specification.
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <i class="fas fa-plus yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Open the bulk insertion tool, which will allow you to insert or append one or more form or field items.
-                    </td>
-                </tr>
                 
                 <tr>
                     <td>
@@ -162,7 +144,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         <i class="fas fa-download yes3-action-icon yes3-nohandler"></i>
                     </td>
                     <td>
-                        Download the data dictionary and/or data spreadsheet.
+                        Download the data dictionary and/or datasheet.
                     </td>
                 </tr>
                 
@@ -171,7 +153,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         <i class="fas fa-file-export yes3-action-icon yes3-nohandler"></i>
                     </td>
                     <td>
-                        Export data dictionary and data spreadsheet to the file system (if configured; requires super user and IT support).
+                        Export data dictionary and datasheet to the file system (if configured; requires super user and IT support).
                     </td>
                 </tr>
 
@@ -180,7 +162,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i>
                     </td>
                     <td>
-                        Display a Help panel (like this one).
+                        Display a topic-specific help panel.
                     </td>
                 </tr>
 
@@ -189,7 +171,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i>
                     </td>
                     <td>
-                        Open the YES3 Exporter online documentation.
+                        Open the YES3 Exporter online documentation (it will open into a new tab in your browser).
                     </td>
                 </tr>
                             
@@ -216,29 +198,16 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
    </div>
 
    <div class='yes3-panel-row'>
-        At the end of the Export Item list is a 'QUICK ADD' form that you may use to append a single study form or field to the item list.
-        It lacks the more advanced options available on the bulk insertion tool.
+        <h5>EDIT MODE</h5>
+        <p>
+            The Export Editor has two editing modes: <strong>Settings</strong> and <strong>Items</strong>.
+            The edit mode is set by the EDIT MODE radio buttons at the top left of the Export Editor panel.
+        </p>
+        <p>
+            Export <strong>Settings</strong> mode allows you to configure the export options, while <strong>Items</strong> mode lets you manage the specific items to be exported.
+        </p>
+        <p>You may switch between edit modes freely as you work.</p>
    </div>
-
-   <div class='yes3-panel-row'>
-        <span class='yes3-information-em'>Need more help?</span> 
-            Click <a href="javascript:YES3.Help_openReadMe();">here</a> for the Yes3 Exporter documentation.
-    </div>
-
-    <!--div class='yes3-panel-row'>
-        Click <a href="javascript:YES3.Help_openChangeLog();">here</a> to view the development change log.
-    </div-->
-
-    <div class='yes3-panel-row'>
-        You may leave this help panel open as you use the Yes3 Exporter. Grab it on the top row to drag it out of the way.
-    </div>
-
-    <div class='yes3-panel-row yes3-help-panel-got-it'>
-        <label class="yes3-checkmarkContainer">
-            <input type="checkbox" name="yes3_got_it" onclick="YES3.Help_setGotIt()">
-            <span class="yes3-checkmark"></span>Got it! Do not automatically display this panel again.
-        </label>
-    </div>
    
 </div>
 
@@ -251,7 +220,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             Adding Forms to the Export Specification
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: FMAPR.closeHelpFormInsertionForm()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: FMAPR.closeHelpFormInsertionForm()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
@@ -317,6 +286,77 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
     </div>
 </div>
 
+<!-- MULTISELECT HELP -->
+
+<div id="yes3-fmapr-multiselect-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
+
+    <div class="yes3-panel-header-row">
+        <div class="yes3-panel-row-left">
+            Multi-select field handling
+        </div>
+        <div class="yes3-panel-row-right">
+            <a href='javascript: YES3.closePanel("yes3-fmapr-multiselect-help-panel")'><i class="fas fa-times fa-2x"></i></a>
+        </div>
+    </div>
+
+        <p>REDCap "multi select" fields are checkbox fields that allow the user to select any number of choices from a list of options.</p>
+        <p>As for REDCap itself, the YES3 Exporter allows you to export multi-select fields in two ways:</p>
+
+        <ol>
+            <li>
+                <p>
+                As <strong>Multiple Columns</strong>, with one column per choice in the list. In the export, each column will contain a 1 (selected) or <em>blank</em> if not.
+                As is typical for checklist data structures, there is no way that we are aware of to distinguish between "not selected" and "missing" for checkbox fields, so we leave it up to the user to interpret the results.
+                Each column will be named according to the REDCap convention of appending a triple underscore ("___") and the choice code to the field name.
+                </p><p>
+                For example, a multi-select field named "fruits" with choices "1, Apple", "2, Banana" and "3, Cherry" would be represented in the export by three columns named:
+                "fruits___1", "fruits___2" and "fruits___3".
+                </p>
+            </li>
+            <li>
+                <p>
+                As a <strong>Single Column</strong>, with the selected choices represented as a comma-separated list of choice codes.
+                </p><p>
+                For example, if the user selected "Apple" and "Cherry" for the "fruits" field, the value in the export file would be "1,3".
+                </p>
+            </li>
+        </ol>
+</div>
+
+<!-- FILE TYPE HELP -->
+
+<div id="yes3-fmapr-export-file-type-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
+
+    <div class="yes3-panel-header-row">
+        <div class="yes3-panel-row-left">
+            Export File Type
+        </div>
+        <div class="yes3-panel-row-right">
+            <a href='javascript: YES3.closePanel("yes3-fmapr-export-file-type-help-panel")'><i class="fas fa-times fa-2x"></i></a>
+        </div>
+    </div>
+
+    <div class="yes3-information yes3-legroom">
+        <p>You may choose to have the Exporter generate either tab-delimited (TSV) or comma-delimited (CSV) export files.</p>
+        <p>While CSV is a very common format and is the default, you might consider exporting TSV files, for the following reasons:</p>
+        <ul>
+            <li>TSV files are less likely to contain embedded tabs in text fields than CSV files are to contain embedded commas.</li>
+            <li>TSV files do not require double quotes around text fields, which makes them easier to read and inspect.</li>
+            <li>TSV files can be imported into Excel without any special handling, whereas CSV files may be misinterpreted by Excel if they contain embedded commas or double quotes.</li>
+            <li>TSV files "play nicer" with SAS and other industrial-strength data analysis tools.</li>
+        </ul>
+        <p>The main drawbacks to TSV files are (1) they are not as widely used as CSV files, so some software may not support them and (2) Excel may not automatically recognize them as delimited files.</p>
+        <p>To open a TSV file in Excel, do the following:</p>
+        <ol>
+            <li>Open a blank Excel workbook.</li>
+            <li>From the "Data" tab, select "Get Data" &rarr; "From File" &rarr; "From Text/CSV".</li>
+            <li>Select the TSV file you wish to open.</li>
+            <li>In the dialog that appears, select "Tab" as the delimiter, then click "Load".</li>
+        </ol>
+    </div>
+
+</div>
+
 <!-- SASCODE HELP -->
 
 <div id="yes3-fmapr-sascode-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
@@ -326,82 +366,100 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             SAS Code Generation
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: FMAPR.closeHelpSasCodeForm()"><i class="fas fa-times fa-x"></i></a>
+            <a href='javascript: YES3.closePanel("yes3-fmapr-sascode-help-panel")'><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
-    <div class="yes3-information yes3-legroom">
-        You may choose to have the Exporter generate execution-ready SAS code to input the data from the Export specification into a SAS dataset.
+    <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
+
+        <div class="yes3-information yes3-legroom">
+            You may choose to have the Exporter generate execution-ready SAS code to input the data from the Export specification into a SAS dataset.
+        </div>
+
+        <h5>Generated files</h5>
+
+        <div class="yes3-information">
+            The following code files will be included in download packages as well as file system exports.
+        </div>
+
+        <table class="yes3-fmapr-panel-table yes3-headroom yes3-legroom">
+            <tr>
+                <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_input.sas</td>
+                <td>
+                    A SAS code file that will read the exported tsv data file to create a permanent SAS dataset.
+                </td>
+            </tr>
+            <tr>
+                <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_create_formats.sas</td>
+                <td>
+                    A SAS code file that will create (or update) a permanent SAS format library containing PROC FORMAT code for all fields having choice sets (radio buttons, dropdown menus).
+                    One format is defined for each unique choice set among the fields in the Export specification.
+                </td>
+            </tr>
+            <tr>
+                <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_assign_formats.sas</td>
+                <td>
+                    A SAS code file that will assign the formats created in the format library to the corresponding variables in the SAS dataset.
+                    Code from this file may be copied and pasted as needed for SAS programs that use the dataset.
+                </td>
+            </tr>
+        </table>
+
+        <h5>Required fields</h5>
+
+        <div class="yes3-information yes3-headroom">
+            The following items are required to generate the SAS LIBNAME statement, which specifies where your SAS datasets will be written. 
+        </div>
+
+        <table class="yes3-fmapr-panel-table yes3-table-borders yes3-headroom yes3-legroom">
+            <tr>
+                <td class="propvalue">Library&nbsp;reference&nbsp;(libref)&nbsp;</td>
+                <td>
+                    Enter a SAS libref (1-8 characters). 
+                    Must start with a letter or underscore and contain only letters, digits, or underscores. 
+                    Used to reference the data folder in your SAS code.
+                    Typically this is an abbreviation of your project name. 
+                </td>
+            </tr>
+            <tr>
+                <td class="propvalue">Library&nbsp;path</td>
+                <td>
+                    Enter the full path to the folder containing your SAS datasets (e.g., \\storage.yale.edu\myshare\myproject). 
+                    This will be assigned to the libref in your generated code.
+                </td>
+            </tr>
+        </table>
+
+        <h5>Default settings</h5>
+
+        <div class="yes3-information yes3-headroom yes3-legroom">
+            Typically, the same libref and SAS dataset folder is used for all SAS datasets for a project.
+            Accordingly, you may enter the default libref and SAS dataset folder for all project export specifications 
+            into the YES3 Exporter External Module settings.
+            These defaults will automatically populate exports, but may be overridden for individual export specifications.
+        </div>
+
+        <div class="yes3-information-em yes3-headroom yes3-legroom">
+            Note: the generated SAS code uses the observed maximum lengths of REDCap field values to define the lengths of SAS character variables.
+            In this way, the generated code will not truncate any data and the SAS dataset will be as compact as possible.
+            We recommend that you regenerate and execute the updated SAS code each time you export data, as the maximum value lengths may change over time as you add or modify REDCap data.
+        </div>
+
+        <h5>A note on the export file format</h5>
+        
+        <div class="yes3-information-em yes3-headroom yes3-legroom">
+            <p>The SAS code generated by the YES3 Exporter will support either tab-delimited (TSV) or comma-delimited (CSV) export file types.</p>
+            <p>However, we recommend that you use the tab-delimited (TSV) file type, as it is less likely to break the INPUT program.
+                We have found that embedded line feeds, quotation marks and other characters in text fields are less likely to cause problems in TSV files than in CSV files.
+            </p>
+            <ul>
+                <li>TSV files are less likely to contain embedded tabs in text fields than CSV files are to contain embedded commas.</li>
+                <li>TSV files do not require double quotes around text fields, which makes them easier to read and inspect.</li>
+                <li>TSV files can be imported into Excel without any special handling, whereas CSV files may be misinterpreted by Excel if they contain embedded commas or double quotes.</li>
+        </div>
+
     </div>
 
-    <h5>Generated files</h5>
-
-    <div class="yes3-information">
-        The following code files will be included in download packages as well as file system exports.
-    </div>
-
-    <table class="yes3-fmapr-panel-table yes3-headroom yes3-legroom">
-        <tr>
-            <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_input.sas</td>
-            <td>
-                A SAS code file that will read the exported tsv data file to create a permanent SAS dataset.
-            </td>
-        </tr>
-        <tr>
-            <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_create_formats.sas</td>
-            <td>
-                A SAS code file that will create (or update) a permanent SAS format library containing PROC FORMAT code for all fields having choice sets (radio buttons, dropdown menus).
-                One format is defined for each unique choice set among the fields in the Export specification.
-            </td>
-        </tr>
-        <tr>
-            <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_assign_formats.sas</td>
-            <td>
-                A SAS code file that will assign the formats created in the format library to the corresponding variables in the SAS dataset.
-                Code from this file may be copied and pasted as needed for SAS programs that use the dataset.
-            </td>
-        </tr>
-    </table>
-
-    <h5>Required fields</h5>
-
-    <div class="yes3-information yes3-headroom">
-        The following items are required to generate the SAS LIBNAME statement, which specifies where your SAS datasets will be written. 
-    </div>
-
-    <table class="yes3-fmapr-panel-table yes3-table-borders yes3-headroom yes3-legroom">
-        <tr>
-            <td class="propvalue">Library&nbsp;reference&nbsp;(libref)&nbsp;</td>
-            <td>
-                Enter a SAS libref (1-8 characters). 
-                Must start with a letter or underscore and contain only letters, digits, or underscores. 
-                Used to reference the data folder in your SAS code.
-                Typically this is an abbreviation of your project name. 
-            </td>
-        </tr>
-        <tr>
-            <td class="propvalue">Library&nbsp;path</td>
-            <td>
-                Enter the full path to the folder containing your SAS datasets (e.g., \\storage.yale.edu\myshare\myproject). 
-                This will be assigned to the libref in your generated code.
-            </td>
-        </tr>
-    </table>
-
-    <h5>Default settings</h5>
-
-    <div class="yes3-information yes3-headroom yes3-legroom">
-        Typically, the same libref and SAS dataset folder is used for all SAS datasets for a project.
-        Accordingly, you may enter the default libref and SAS dataset folder for all project export specifications 
-        into the YES3 Exporter External Module settings.
-        These defaults will automatically populate exports, but may be overridden for individual export specifications.
-    </div>
-
-    <div class="yes3-information-em yes3-headroom yes3-legroom">
-        Note: the generated SAS code uses the observed maximum lengths of REDCap field values to define the lengths of SAS character variables.
-        In this way, the generated code will not truncate any data and the SAS dataset will be as compact as possible.
-        We recommend that you regenerate and execute the updated SAS code each time you export data, as the maximum value lengths may change over time as you add or modify REDCap data.
-    </div>
 
 </div>
 
@@ -414,88 +472,87 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             Selection criterion: value(s)
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: FMAPR.closeHelpCriterionValueForm()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: FMAPR.closeHelpCriterionValueForm()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
+    
+    <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-    <div class="yes3-information">
-        <p>
-            This entry is used to select records based on the value of the criterion field.
-        </p>
-        <p>
-            You may enter a single value, in which case only records having this value will be downloaded and/or exported.
-        </p>
-        <p>
-            You may also enter a <em>criterion expression</em> to select based on a range of values.
-            <br>Here are examples of valid criterion expression syntax: 
-        </p>
-        <table class="yes3-fmapr-panel-table yes3-table-borders">
-            <tr><td class="propvalue">1        </td><td>Value must be 1.</td></tr>
-            <tr><td class="propvalue">= 1      </td><td>Value must be 1 (alternate syntax).</td></tr>
-            <tr><td class="propvalue">3,1,4,5,9</td><td>Value must be 3, 1, 4, 5 or 9.</td></tr>
-            <tr><td class="propvalue">< 10     </td><td>Value must be less than 10 (numeric comparison).</td></tr>
-            <tr><td class="propvalue"><= 10    </td><td>Value must be less than or equal to 10 (numeric comparison).</td></tr>
-            <tr><td class="propvalue">> 10     </td><td>Value must be greater than 10 (numeric comparison).</td></tr>
-            <tr><td class="propvalue">>= 10    </td><td>Value must be greater than or equal to 10 (numeric comparison).</td></tr>
-            <tr><td class="propvalue"><> 10    </td><td>Value must be not equal to 10.</td></tr>
-            <tr><td class="propvalue">apple, table, penny</td><td>Value must be 'apple', 'table' or 'penny'.</td></tr>
-            <tr><td class="propvalue">>= 1952-06-25</td><td>Value must be June 25th, 1952 or later (note: you must use the date format yyyy-mm-dd).</td></tr>
-            <tr><td class="propvalue"><></td><td>Value must be nonblank.</td></tr>
-        </table>
+        <div class="yes3-information">
+            <p>
+                This entry is used to select records based on the value of the criterion field.
+            </p>
+            <p>
+                You may enter a single value, in which case only records having this value will be downloaded and/or exported.
+            </p>
+            <p>
+                You may also enter a <em>criterion expression</em> to select based on a range of values.
+                <br>Here are examples of valid criterion expression syntax: 
+            </p>
+            <table class="yes3-fmapr-panel-table yes3-table-borders">
+                <tr><td class="propvalue">1        </td><td>Value must be 1.</td></tr>
+                <tr><td class="propvalue">= 1      </td><td>Value must be 1 (alternate syntax).</td></tr>
+                <tr><td class="propvalue">3,1,4,5,9</td><td>Value must be 3, 1, 4, 5 or 9.</td></tr>
+                <tr><td class="propvalue">< 10     </td><td>Value must be less than 10 (numeric comparison).</td></tr>
+                <tr><td class="propvalue"><= 10    </td><td>Value must be less than or equal to 10 (numeric comparison).</td></tr>
+                <tr><td class="propvalue">> 10     </td><td>Value must be greater than 10 (numeric comparison).</td></tr>
+                <tr><td class="propvalue">>= 10    </td><td>Value must be greater than or equal to 10 (numeric comparison).</td></tr>
+                <tr><td class="propvalue"><> 10    </td><td>Value must be not equal to 10.</td></tr>
+                <tr><td class="propvalue">apple, table, penny</td><td>Value must be 'apple', 'table' or 'penny'.</td></tr>
+                <tr><td class="propvalue">>= 1952-06-25</td><td>Value must be June 25th, 1952 or later (note: you must use the date format yyyy-mm-dd).</td></tr>
+                <tr><td class="propvalue"><></td><td>Value must be nonblank.</td></tr>
+            </table>
 
-    </div>
+        </div>
 
-    <div class="yes3-panel-bottom-row yes3-panel-row-border-top yes3-headroom">
-        <p class="yes3-headroom">
-            <span class="yes3-information-em-light">Criterion field properties</span>: below is a table of REDCap properties for the criterion field you have selected.
-        </p>
+        <div class="yes3-panel-bottom-row yes3-panel-row-border-top yes3-headroom">
+            <p class="yes3-headroom">
+                <span class="yes3-information-em-light">Criterion field properties</span>: below is a table of REDCap properties for the criterion field you have selected.
+            </p>
 
-        <table class='yes3-fmapr-panel-table'>
-            <tbody>
+            <table class='yes3-fmapr-panel-table'>
+                <tbody>
+            
+                    <tr property="field_name">
+                        <td>
+                            REDCap&nbsp;field&nbsp;name
+                        </td>
+                        <td class="propvalue"></td>
+                    </tr>
         
-                <tr property="field_name">
-                    <td>
-                        REDCap&nbsp;field&nbsp;name
-                    </td>
-                    <td class="propvalue"></td>
-                </tr>
-       
-                <tr property="field_label">
-                    <td>
-                        REDCap&nbsp;field&nbsp;label
-                    </td>
-                    <td class="propvalue"></td>
-                </tr>
-                 
-                <tr property="field_type" class="yes3-fmapr-criterion-field-defined">
-                    <td>
-                        REDCap&nbsp;field&nbsp;type
-                    </td>
-                    <td class="propvalue"></td>
-                </tr>
-                 
-                <tr property="field_valueset" class="yes3-fmapr-criterion-field-defined yes3-fmapr-nominal">
-                    <td>
-                        Values
-                    </td>
-                    <td class="propvalue">
-                        <table class="yes3-scrollable yes3-fmapr-help-valueset">
-                            <tbody style="height:8rem" >
+                    <tr property="field_label">
+                        <td>
+                            REDCap&nbsp;field&nbsp;label
+                        </td>
+                        <td class="propvalue"></td>
+                    </tr>
+                    
+                    <tr property="field_type" class="yes3-fmapr-criterion-field-defined">
+                        <td>
+                            REDCap&nbsp;field&nbsp;type
+                        </td>
+                        <td class="propvalue"></td>
+                    </tr>
+                    
+                    <tr property="field_valueset" class="yes3-fmapr-criterion-field-defined yes3-fmapr-nominal">
+                        <td>
+                            Values
+                        </td>
+                        <td class="propvalue">
+                            <table class="yes3-scrollable yes3-fmapr-help-valueset">
+                                <tbody style="height:8rem" >
 
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
 
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+
+        </div>
 
     </div>
-
-   <!--div class='yes3-panel-row'>
-        <span class='yes3-information-em'>Need more help?</span> 
-            Click <a href="javascript:YES3.Help_openReadMe();">here</a> for the Yes3 Exporter documentation.
-    </div-->
 
 </div>
 
@@ -508,7 +565,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
          Wayback Machine
       </div>
       <div class="yes3-panel-row-right">
-         <a href="javascript: FMAPR.Wayback_closeForm()"><i class="fas fa-times fa-x"></i></a>
+         <a href="javascript: FMAPR.Wayback_closeForm()"><i class="fas fa-times fa-2x"></i></a>
       </div>
    </div>
 
@@ -543,7 +600,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             Export Item Editor
         </div>
         <div class="yes3-panel-row-right">
-            <a href="javascript: FMAPR.closeItemEditorForm()"><i class="fas fa-times fa-x"></i></a>
+            <a href="javascript: FMAPR.closeItemEditorForm()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
@@ -650,15 +707,16 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
             <i class="fas fa-download yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-download-options" id="yes3-fmapr-download-control" action="download" title="Download."></i>
 
-                <i class="fas fa-file-export yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-export-options" id="yes3-fmapr-export-control" action="export" title="Export to file system."></i>
-                
-                <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only" action="Wayback_openForm" title="Restore the specification from a stored backup."></i>
-    
-                <i class="far fa-question-circle yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="Get some help"></i>
-                <!--i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" action="Open_docPage" title="Open the YES3 Exporter documentation page"></i-->
+            <i class="fas fa-file-export yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-export-options" id="yes3-fmapr-export-control" action="export" title="Export to file system."></i>
+            
+            <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only" action="Wayback_openForm" title="Restore the specification from a stored backup."></i>
 
-                <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
-                <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" action="Theme_light" title="Switch to the sunny side"></i>
+            <i class="far fa-question yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="Get some help"></i>
+ 
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" action="Help_openDocumentation" title="Open the YES3 Exporter2 online documentation"></i>
+
+            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
+            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" action="Theme_light" title="Switch to the sunny side"></i>
 
                 <!--img class="yes3-square-logo yes3-logo" alt="YES3 Logo" title="More about YES3..." /-->
 
@@ -672,7 +730,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <div class="yes3-flex-hleft yes3-flex-col-33 yes3-dashboard-options">
 
-            <span class="yes3-semibold">EDIT:&nbsp;&nbsp;</span>
+            <span class="yes3-semibold">EDIT MODE:&nbsp;&nbsp;</span>
 
             <input type="radio" class="balloon" value="settings" name="yes3-dashboard-options" id="yes3-dashboard-option-settings" onclick="FMAPR.dashboardOptionHandler()">
             <label for="yes3-dashboard-option-settings" title="Display the export settings form">Settings</label>&nbsp;
@@ -724,7 +782,10 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                     </tr>
 
                     <tr>
-                        <td>Multi-select values exported as:</td>
+                        <td>
+                            Multi-select values exported as:
+                            <i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_multiselect" title="Guidance for multi-select values export."></i>
+                        </td>
 
                         <td class="yes3-fmapr-export-specification yes3-fmapr-layout-options">
 
@@ -906,6 +967,31 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                 </table>
 
                 <div class="yes3-fmapr-settings-section">
+                    Export File Type
+                    <i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_export_file_type" title="Guidance for export file type."></i>
+                </div>
+
+                <table class="yes3-fmapr-settings yes3-full-width">
+
+                    <tr>
+
+                        <td class="yes3-fmapr-export-specification">Export data as:</td>
+
+                        <td class="yes3-fmapr-export-specification">
+
+                            <input type="radio" class="balloon" value="csv" name="export_file_type" data-setting="export_file_type" id="yes3-fmapr-export_file_type-csv">
+                            <label for="yes3-fmapr-export_file_type-csv" title="Export data and data dictionary as comma-separated-value (csv) datasheets">Comma-separated values (CSV)</label>&nbsp;
+
+                            <input type="radio" class="balloon" value="tsv" name="export_file_type" data-setting="export_file_type" id="yes3-fmapr-export_file_type-tsv">
+                            <label for="yes3-fmapr-export_file_type-tsv" title="Export data and data dictionary as tab-separated-value (tsv) datasheets">Tab-separated values (TSV)</label>&nbsp;
+
+                        </td>                                  
+                    </tr>
+
+                </table>
+
+
+                <div class="yes3-fmapr-settings-section">
                     Options for SAS code generation
                     <i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_sascode" title="Guidance for SAS code generation."></i>
                 </div>
@@ -1061,27 +1147,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
         </div>
 
     </div>
-
-    <!--div class="row" id="yes3-fmapr-page-footer">
-
-        <div class="col-xl-4" style="padding-left: 0">
-
-            <div id="yes3-fmapr-copyright"></div>
-
-        </div>
-
-        <div class="col-xl-8" style="padding-left: 0">
-
-            <div id="yes3-fmapr-system-message"></div>
-
-        </div>
-
-    </div-->
-
-    <!--div id='yes3-fmapr-page-footer'>
-                
-            <div id="yes3-fmapr-copyright"></div>
-    </div-->
 
 </div> <!-- container -->
 

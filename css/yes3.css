@@ -1634,6 +1634,12 @@ div.yes3-max-headroom {
     padding-right: 0 !important;
  }
 
+ /* close icon in upper right of panel */
+ .yes3-panel .fa-2x {
+
+   font-size: 1em !important;
+ }
+
 
 /* CHECKBOXES */
 
@@ -2169,7 +2175,6 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 
     scrollbar-color: var(--y3-separator-color);
     scrollbar-width: 10px;
-    /*height: 500px;*/
     overflow-y: auto;
 }
 
@@ -2191,4 +2196,9 @@ table.yes3-dashboard th:not(.yes3-th-title) {
     /*border-radius: 2px;*/
     /*box-shadow: inset 0 0 5px rgba(0,0,0,.3);*/
     background-color: var(--y3-separator-color);
+}
+
+.yes3-default-panel-height {
+   height: 500px;
+   min-height: 300px !important;
 }

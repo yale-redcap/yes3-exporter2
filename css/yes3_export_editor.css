@@ -7,6 +7,12 @@ div.yes3-fmapr-settings-section {
     font-weight: var(--yes3-font-weight-semibold);
 }
 
+td.yes3-fmapr-export-specification-title {
+    padding-top: 1em;
+    color: var(--yes3-panel-title-color) !important;
+    font-weight: var(--yes3-font-weight-semibold) !important;
+}
+
 table.yes3-fmapr-settings {
     border-collapse: collapse;
 }
