@@ -640,6 +640,7 @@ class Yes3ExportValidator {
             $x['stored_value'],
             $this->export_max_text_length,
             $this->export_ascii_text,
+            $this->export_inoffensive_text,
             $this->fileType
         );
 

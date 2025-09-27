@@ -516,176 +516,56 @@ class Yes3Fn {
       }
       // Return events as array
       return $events;
-   }
+    }
 
-   public static function getEventIdForEventName($unique_event_name, $project_id=null)
-   {
-      if ( !$project_id ) $project_id = self::getProjectId();
+    public static function getEventIdForEventName($unique_event_name, $project_id=null)
+    {
+        if ( !$project_id ) $project_id = self::getProjectId();
 
-      // Make sure project is longitudinal, else return FALSE
-      if (!self::isLongitudinal( $project_id )) return false;
+        // Make sure project is longitudinal, else return FALSE
+        if (!self::isLongitudinal( $project_id )) return false;
 
-      // Get event id using unique event name
-   
-      $Proj = new Project((int) $project_id);
+        // Get event id using unique event name
+    
+        $Proj = new Project((int) $project_id);
 
-      return $Proj->getEventIdUsingUniqueEventName($unique_event_name);
-   }
+        return $Proj->getEventIdUsingUniqueEventName($unique_event_name);
+    }
 
-   public static function dateTimeString()
-   {
-      return date("Y-m-d H:i:s");
-   }
+    public static function dateTimeString()
+    {
+        return date("Y-m-d H:i:s");
+    }
 
-   public static function saveRepeatingData( int $project_id, string $record, string $form_name, array $x, int $event_id, int $instance, bool $overwriteWithBlank = true, bool $dataLogging = false )
-   {
-      $data = [];
+    public static function saveRepeatingData( int $project_id, string $record, string $form_name, array $x, int $event_id, int $instance, bool $overwriteWithBlank = true, bool $dataLogging = false )
+    {
+        $data = [];
 
-      $data[$record]['repeat_instances'][$event_id][$form_name][$instance] = $x;
+        $data[$record]['repeat_instances'][$event_id][$form_name][$instance] = $x;
 
-      $params = [
-         'project_id'=>$project_id,
-         'dataFormat'=>'array',
-         'data'=>$data,
-         'overwriteBehavior'=> (( $overwriteWithBlank ) ? 'overwrite' : 'normal'),
-         'dataLogging'=>$dataLogging,
-         'commitData'=>TRUE
-      ];
+        $params = [
+            'project_id'=>$project_id,
+            'dataFormat'=>'array',
+            'data'=>$data,
+            'overwriteBehavior'=> (( $overwriteWithBlank ) ? 'overwrite' : 'normal'),
+            'dataLogging'=>$dataLogging,
+            'commitData'=>TRUE
+        ];
 
-      $rc = REDCap::saveData( $params );
+        $rc = REDCap::saveData( $params );
 
-      return $rc;
-   }
+        return $rc;
+    }
 
-   public static function safeFieldName( $field_name )
-   {
-      
-      if ( !is_string($field_name) ) return "";
+    public static function safeFieldName( $field_name )
+    {
+        
+        if ( !is_string($field_name) ) return "";
 
-      // remove any non-alphanumeric characters except underscores, and ensure the string starts with a letter
-      
-      return strtolower(preg_replace("/^[^a-z]|[^a-z0-9_]/", "", strtolower(trim($field_name))));
-   }
-
-   /**
-    * Sanitizes a string to allow only characters suitable for a record key.
-    * Allowed characters: A-Z, a-z, 0-9, and a limited set of safe special characters.
-    *
-    * @param string $input The string to sanitize.
-    * @return string The sanitized string.
-    */
-    public static function sanitizeForKey( $input ): string {
-
-      if ( !is_string($input) ) return "";
-
-      // Define a pattern for allowed characters: alphanumeric and safe special characters
-      $allowedPattern = '/[^a-zA-Z0-9!@#$%^&*()\-_=+[\]{}|;:\'",.?\/]/';
-
-      // Remove characters that do not match the allowed set
-      return preg_replace($allowedPattern, '', $input);
-   }
-
-   /**
-    * Sanitizes a string for suitability as a name
-    *
-    * @param string $input The string to sanitize.
-    * @return string The sanitized string.
-    */
-    public static function sanitizeForName($input): string {
-
-      if ( !is_string($input) ) return "";
-
-      // Define a pattern for allowed characters: alphanumeric and safe special characters
-      $allowedPattern = '/[^a-zA-Z0-9\-_. ]/';
-
-      // Remove characters that do not match the allowed set
-      return preg_replace($allowedPattern, '', $input);
-   }
-
-   /**
-    * Sanitizes a string for suitability as a REDCap API token
-    *
-    * @param string $input The string to sanitize.
-    * @return string The sanitized string.
-    */
-    public static function sanitizeForApiToken($input): string {
-
-      if ( !is_string($input) ) return "";
-
-      // Define a pattern for allowed characters: alphanumeric and safe special characters
-      $allowedPattern = '/[^A-Z0-9]/';
-
-      // Remove characters that do not match the allowed set
-      return preg_replace($allowedPattern, '', $input);
-   }
-
-   public static function keyTransform($string, $ucase=false)
-   {
-       if ( $string === null ) {
-           
-           return "";
-       }
-       
-       if ( !is_string($string) ) {
-           
-           $string = strval($string);
-       }
-
-       if ( $ucase ) $string = strtoupper($string);
-       else $string = strtolower($string);
-       
-       // trimmed, non alpha-numeric characters converted to underscores
-       return preg_replace("/[^a-zA-Z0-9]/", "_", $string);
-   }
-
-   // a 'key parm' is a string conforming to the rules for a REDCap field name, but uppercase
-   public static function sanitizeForKeyParm( $input )
-   {
-
-        return self::keyTransform($input);
-        //return strtoupper( self::sanitizeForName($input) );
-   }
-
-   /**
-    * Sanitizes a string to allow any UTF-8 printable character, including '<' and '>',
-    * while making it safe from code injection.
-    *
-    * @param string $input The string to sanitize.
-    * @return string The sanitized string.
-    */
-   public static function sanitizeUtf8Printable($input): string {
-
-      if ( !is_string($input) ) return "";
-
-      // Convert the string to UTF-8 encoding
-      $input = mb_convert_encoding($input, 'UTF-8', 'UTF-8');
-      
-      // Strip or encode control characters (ASCII < 32 except for newline, carriage return, and tab)
-      $input = preg_replace('/[\x00-\x08\x0B-\x0C\x0E-\x1F\x7F]/u', '', $input);
-
-      // Escape characters that could lead to code injection in HTML or SQL
-      // Use htmlspecialchars to prevent HTML injection
-      $safeString = htmlspecialchars($input, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-
-      // Return the safe, sanitized string
-      return $safeString;
-   }
-
-   public static function sanitizeForInteger( $input ):string
-   {
-      if ( is_string($input) && is_numeric($input) ) {
-
-         return $input;
-      }
-
-      if ( is_string($input) && $input === "0" ) {
-
-         return "0";
-      }
-
-      return "";
-   }
-
+        // remove any non-alphanumeric characters except underscores, and ensure the string starts with a letter
+        
+        return strtolower(preg_replace("/^[^a-z]|[^a-z0-9_]/", "", strtolower(trim($field_name))));
+    }
 
     public static function truncate( $s, $len=64 )
     {
@@ -707,6 +587,9 @@ class Yes3Fn {
         return $s;
     }
 
+    /**
+     * Sanitizes a string for use in CSV or TSV files. (default is CSV)
+     */
     public static function sanitizeForFiletype( 
         $input,
         $maxLen=0,
@@ -718,10 +601,26 @@ class Yes3Fn {
         else return self::sanitizeForCSV($input, $maxLen, $ascii);
     }
 
+    /**
+     * Sanitizes a string, with defaults suitable for use in TSV files.
+     *
+     * @param string $input                     The input string to sanitize.
+     * @param int  $maxLen                      Optional maximum length of the output string. Default is 0 (no limit).
+     * @param bool $ascii                       Optional flag to enforce ASCII-only output. Default is false.
+     * @param bool $noUnprintableCharacters     Optional flag to remove unprintable characters. Default is true.
+     * @param bool $newLineToSpace              Optional flag to convert newlines to spaces. Default is false.
+     * @param bool $tabToSpace                  Optional flag to convert tabs to spaces. Default is true.
+     * @param bool $DQuoteToSQuote              Optional flag to convert double quotes to single quotes. Default is false.
+     * @return string                           Sanitized string for TSV.
+     */
     public static function sanitizeForTSV(
         $input,
         $maxLen=0,
-        $ascii=false    
+        $ascii=false,                       // UTF-8 is okay
+        $noUnprintableCharacters=true,      // unprintable control characters probably NOT okay
+        $newLineToSpace=false,              // embedded newlines okay
+        $tabToSpace=true,                   // embedded tabs probably NOT okay
+        $DQuoteToSQuote=false               // embedded double quotes okay
         ): string {
 
         return self::sanitizeForText(
@@ -729,17 +628,33 @@ class Yes3Fn {
             $maxLen,
             false, // tags okay
             $ascii, // ascii
-            true, // noUnprintableCharacters
-            false, // noNewlines
-            true, // noTabs
-            false  // noDQuotes
+            $noUnprintableCharacters, // noUnprintableCharacters
+            $newLineToSpace, // newLineToSpace
+            $tabToSpace, // tabToSpace
+            $DQuoteToSQuote  // DQuoteToSQuote
         );
     }
 
+    /**
+     * Sanitizes a string, with defaults suitable for use in CSV files.
+     *
+     * @param string $input                     The input string to sanitize.
+     * @param int  $maxLen                      Optional maximum length of the output string. Default is 0 (no limit).
+     * @param bool $ascii                       Optional flag to enforce ASCII-only output. Default is false.
+     * @param bool $noUnprintableCharacters     Optional flag to remove unprintable characters. Default is true.
+     * @param bool $newLineToSpace              Optional flag to convert newlines to spaces. Default is false.
+     * @param bool $tabToSpace                  Optional flag to convert tabs to spaces. Default is true.
+     * @param bool $DQuoteToSQuote              Optional flag to convert double quotes to single quotes. Default is false.
+     * @return string                           Sanitized string for CSV.
+     */
     public static function sanitizeForCSV(
         $input,
         $maxLen=0,
-        $ascii=false    
+        $ascii=false,                       // UTF-8 is okay  
+        $noUnprintableCharacters=true,      // unprintable control characters probably NOT okay
+        $newLineToSpace=false,              // embedded newlines okay
+        $tabToSpace=false,                  // embedded tabs okay
+        $DQuoteToSQuote=false               // embedded double quotes okay
         ): string {
 
         return self::sanitizeForText(
@@ -747,13 +662,22 @@ class Yes3Fn {
             $maxLen,
             false, // tags okay
             $ascii, // ascii
-            true, // noUnprintableCharacters
-            false, // noNewlines
-            true, // noTabs
-            false  // noDQuotes
+            $noUnprintableCharacters, // noUnprintableCharacters
+            $newLineToSpace, // newLineToSpace
+            $tabToSpace, // tabToSpace
+            $DQuoteToSQuote  // DQuoteToSQuote
         );
     }
 
+    /**
+     * Sanitizes a string for use as a label (e.g., variable label, field label).
+     * The output will have no tags, no tabs, no unprintable characters, no embedded double quotes.
+     *
+     * @param string $input The input string to sanitize.
+     * @param int  $maxLen Optional maximum length of the output string. Default is 0 (no limit).
+     * @param bool $ascii Optional flag to enforce ASCII-only output. Default is false.
+     * @return string Sanitized label.
+     */
     public static function sanitizeForLabel(
         $input,
         $maxLen=0,
@@ -766,12 +690,21 @@ class Yes3Fn {
             true, // notags
             $ascii, // ascii
             true, // noUnprintableCharacters
-            false, // noNewlines
-            true, // noTabs
-            true  // noDQuotes
+            false, // newLineToSpace
+            true, // tabToSpace
+            true  // DQuoteToSQuote
         );
     }
 
+    /**
+     * Sanitizes a string for use as an object name (e.g., field name, form name, file name).
+     * The output will be pure ascii, lowercase, with no tags, no newlines, no CRs, no unprintable characters, no embedded double quotes.
+     * Note: This does NOT ensure the name is a valid variable name in any specific programming language, and allows embedded spaces.
+     *
+     * @param string $input The input string to sanitize.
+     * @param int  $maxLen Optional maximum length of the output string. Default is 0 (no limit).
+     * @return string Sanitized object name.
+     */
     public static function sanitizeForObjectname(
         $input,
         $maxLen=0   
@@ -783,9 +716,9 @@ class Yes3Fn {
             true, // notags
             true, // ascii
             true, // noUnprintableCharacters
-            true, // noNewlines
-            true, // noTabs
-            true  // noDQuotes
+            true, // newLineToSpace
+            true, // tabToSpace
+            true  // DQuoteToSQuote
         ));
     }
 
@@ -963,9 +896,9 @@ class Yes3Fn {
      * @param bool $notags If true, removes HTML tags. Default is true.
      * @param bool $ascii If true, converts non-ASCII characters to their ASCII equivalents. Default is false.
      * @param bool $noUnprintableCharacters (aka inoffensiveText) If true, removes unprintable characters except for newline, carriage return, and tab. Default is false.
-     * @param bool $noNewlines If true, removes newline characters. Default is false.
-     * @param bool $notabs If true, replaces tab characters with spaces. Default is TRUE (since exports are tsv by default).
-     * @param bool $nodquotes If true, replaces double quotes with single quotes. Suitable for labels. Default is false.
+     * @param bool $newLineToSpace If true, removes newline characters. Default is false.
+     * @param bool $tabToSpace If true, replaces tab characters with spaces. Default is TRUE (since exports are tsv by default).
+     * @param bool $DQuoteToSQuote If true, replaces double quotes with single quotes. Suitable for labels. Default is false.
      * @return string The sanitized string.
      */
     public static function sanitizeForText( $input, 
@@ -973,29 +906,34 @@ class Yes3Fn {
         $notags=false, 
         $ascii=false, 
         $noUnprintableCharacters=false,
-        $noNewlines=false,
-        $noTabs=true,
-        $noDQuotes=false
+        $newLineToSpace=false,
+        $tabToSpace=true,
+        $DQuoteToSQuote=false
         ):string
     {
-        if ( !is_string($input) ) return "";
+        if ( !is_scalar($input) ) return ""; // reject arrays and objects
 
-        // always remove leading and trailing whitespace
-        $input = trim($input);
+        if ( is_bool($input) ) return $input ? "1" : "0"; // convert bool to [0,1] string
+        
+        if ( !is_string($input) ) return strval($input); // convert [int,float,null] to string
+
+        // Okay, it's a string. Always remove leading and trailing whitespace.
+        $output = trim($input);
 
         // always ensure correct UTF8
-        $input = mb_convert_encoding($input, 'UTF-8', 'UTF-8');
+        $output = mb_convert_encoding($output, 'UTF-8', 'UTF-8');
 
-        // always remove CR, to prevent embedded CRLF which is the CSV/TSV row terminator
-        $input = str_replace("\r", '', $input);
+        // always replace CRLF with LF, to prevent embedded CRLF which is the CSV/TSV row terminator
+        $output = str_replace("\r\n", "\n", $output);
+        
+        // strip HTML tags, if requested
+        if ( $notags ) {
 
-        // remove control characters except for newline and tab
-        //if ( $noUnprintableCharacters ) {
+            $output = strip_tags($output);
+        }
 
-        //    $input = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $input);
-        //}
-
-        // Clean up input by removing:
+        // Remove unprintable characters, if requested
+        // This removes:
         //   1. All Unicode control characters (\p{Cc}), except:
         //      - Horizontal tab (U+0009, \x09)
         //      - Line feed (U+000A, \x0A)
@@ -1008,53 +946,47 @@ class Yes3Fn {
         //      - Byte Order Mark (U+FEFF)
         // This ensures that only meaningful printable characters, tabs, and line feeds remain.
         // Works safely for both ASCII and UTF-8 encoded input.
-        // ref: GPT 5
+        // Regex generated by GPT5
         if ($noUnprintableCharacters) {
 
-            $input = preg_replace(
+            $output = preg_replace(
                 '/[\p{Cc}\p{Zl}\p{Zp}\x{00A0}\x{200B}-\x{200F}\x{2028}-\x{202F}\x{2060}-\x{206F}\x{FEFF}&&[^\x09\x0A]]/u',
                 '',
-                $input
+                $output
             );
         }
 
-        // replace newline and carriage return with a single space
-        if ( $noNewlines) {
+        // convert newlines to spaces, if requested
+        if ( $newLineToSpace) {
 
-            $input = str_replace("\n", ' ', $input);
-        }
-        
-        if ( $notags ) {
-
-            // remove all HTML tags
-            $input = strip_tags($input);
+            $output = str_replace("\n", ' ', $output);
         }
 
-        if ( $noTabs ) {
+        // convert tabs to spaces, if requested
+        if ( $tabToSpace ) {
 
-            // replace tabs with a single space
-            $input = str_replace("\t", ' ', $input);
+            $output = str_replace("\t", ' ', $output);
         }
 
         // convert to ASCII if requested
         if ( $ascii ) {
 
-            $input = self::utf8_to_ascii($input); // enforce ASCII-only output
+            $output = self::utf8_to_ascii($output); // enforce ASCII-only output
         }
 
         // convert double quotes to single quotes if requested (appropriate for labels)
-        if ( $noDQuotes ) {
+        if ( $DQuoteToSQuote ) {
             
-            $input = str_replace('"', "'", $input);
+            $output = str_replace('"', "'", $output);
         }
 
         // Truncate to the specified length if maxLen is greater than 0
-        if ($maxLen > 0 && strlen($input) > $maxLen) {
+        if ($maxLen > 0 && strlen($output) > $maxLen) {
 
-            $input = substr($input, 0, $maxLen);
+            $output = substr($output, 0, $maxLen);
         }
 
-        return $input;
+        return $output;
     }
  
     public static function sanitizeForSASVarname($varname, $varnames = []) {

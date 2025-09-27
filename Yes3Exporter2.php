@@ -2238,11 +2238,11 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ($export_data_delimiter === "\t"){
 
-                    $REDCapValue = Yes3Fn::sanitizeForTSV( $x['value'], $export_max_text_length, $export_ascii_text );
+                    $REDCapValue = Yes3Fn::sanitizeForTSV( $x['value'], $export_max_text_length, $export_ascii_text, $export_inoffensive_text );
                 }
                 else {
 
-                    $REDCapValue = Yes3Fn::sanitizeForCSV( $x['value'], $export_max_text_length, $export_ascii_text );
+                    $REDCapValue = Yes3Fn::sanitizeForCSV( $x['value'], $export_max_text_length, $export_ascii_text, $export_inoffensive_text );
                 }
             }
 
