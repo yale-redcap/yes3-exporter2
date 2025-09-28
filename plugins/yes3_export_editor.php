@@ -917,7 +917,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
                 <div class="yes3-fmapr yes3-flex-container">
 
-                    <!--div class="yes3-flex-left">
+                    <div class="yes3-flex-left">
 
                         <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
                             <label class="yes3-checkmarkContainer">
@@ -926,13 +926,13 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                             </label>
                         </div>
 
-                        <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block yes3-fmapr-sanitize-option">
+                        <!--div class="yes3-fmapr-filter-option yes3-fmapr-settings-block yes3-fmapr-sanitize-option">
                             <label class="yes3-checkmarkContainer">
                                 <input type="checkbox" name="export_no_tags" data-setting="export_no_tags" value="1" />
                                 <span class="yes3-checkmark"></span>Remove HTML tags
                             </label>
-                        </div>
-                    </div-->
+                        </div-->
+                    </div>
 
                     <div class="yes3-flex-left">
 
