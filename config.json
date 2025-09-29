@@ -22,6 +22,12 @@
 
     "versions": [
         {
+            "version": "2.0.6",
+            "date": "2025-09-28",
+            "description": "usability improvements, bug fixes, new options",
+            "comments": "New 'remove unprintables' option. Data dictionary export now excel-friendly csv. Data exporter refactored for efficiency and performance (unbuffered generator, uses record cache for selection)."
+        },        
+        {
             "version": "2.0.5",
             "date": "2025-09-17",
             "description": "export-level support for export file type, topic help for editor settings",
