@@ -5,9 +5,12 @@ namespace Yale\Yes3Exporter2;
 use REDCap;
 use Project;
 use ExternalModules\ExternalModules as EM;
+use System;
 
 use \DateTime;
 use \DateTimeZone;
+use \Exception;
+use \Throwable;
 
 trait Yes3Trait {
 
@@ -71,6 +74,7 @@ trait Yes3Trait {
     public function getUsername(){
 
         if ( $this->getCronUsername() ) return $this->getCronUsername();
+        
         return $this->getUser()->getUsername();
     }
 
@@ -362,6 +366,22 @@ trait Yes3Trait {
         while ($row = $resultSet->fetch_assoc()) {
 
             yield $row;
+        }
+    }
+
+    public function recordGeneratorUnbuffered( $sql, $parameters = [] )
+    {
+        global $rc_connection;
+
+        $result = System::queryWithParameters($rc_connection, $sql, $parameters, MYSQLI_USE_RESULT);
+
+        try {
+            while ($row = $result->fetch_assoc()) {
+
+                yield $row;
+            }
+        } finally {
+            if ($result) {$result->free();}
         }
     }
 

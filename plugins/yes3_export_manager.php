@@ -12,6 +12,15 @@ $module = new Yes3Exporter2();
 
 $copy = $module->getCopyright();
 
+$uRights = $module->yes3UserRights();
+
+$uSummary = $uRights['username'];
+
+if ( $uRights['dag'] ) {
+
+    $uSummary .= " / " . $uRights['dag'];
+}
+
 use Yale\Yes3\Yes3;
 use REDCap;
 use HtmlPage;
@@ -160,9 +169,15 @@ $module->getCodeFor("yes3_export_manager", true);
 
         </div>
 
-        <div class="yes3-flex-col-67 yes3-flex-vcenter-hleft">
+        <div class="yes3-flex-col-33 yes3-flex-vcenter-hleft">
 
             <div id="yes3-message"></div>
+
+        </div>
+
+        <div class="yes3-flex-col-33 yes3-flex-vcenter-hright">
+
+            <div id="yes3-user"><?= $uSummary ?></div>
 
         </div>
 

@@ -213,6 +213,22 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 		return $newdate;
 	}
 
+    /**
+     * Build the export data dictionary
+     * 
+     * The export data dictionary is an array of associative arrays, one per export column
+     * It is built from the export specification as follows:
+     * 
+     * export specification -> export object -> export items -> data dictionary.
+     * 
+     * Too much invested in the legacy 'array of arrays' approach to refactor to 'array of objects' at this time.
+     * 
+     * The export specification, export object and data dictionary are all returned to the caller.
+     * 
+     * function: buildExportDataDictionary
+     * @param mixed $export_uuid
+     */
+
     public function buildExportDataDictionary( $export_uuid )
     {
         /**
@@ -445,15 +461,6 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             $this->addExportItem_otherProperty($export, self::VARNAME_EVENT_NAME, "REDCap Event Name", "TEXT");
         }
 
-        /**
-         * Starting v1.1.*, instance is always included in the export
-         */
-
-        /*if ( $export->export_layout === "r" ) {
-
-        //    $this->addExportItem_otherProperty($export, self::VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
-        }*/
-
         if ( isset($export_specification['export_has_repeatables']) && $export_specification['export_has_repeatables'] ) {
 
             $this->addExportItem_otherProperty($export, self::VARNAME_INSTANCE, "REDCap Repeat Instance", "INTEGER");
@@ -465,12 +472,6 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
     
         foreach ($export_items as $element){
     
-            /*if ( $element['export_item_origin'] === 'specification' ) {
-    
-                $this->addExportItem_Specification( $export, $element, $event_settings, $export_uspec );
-            }
-    
-            else*/
             if ( $element['redcap_field_name'] ) {
     
                 $this->addExportItem_REDCapField( $export, $element['redcap_field_name'], $element[self::VARNAME_EVENT_ID], $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
@@ -482,9 +483,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             }
         }
 
-        $dd = [];
+        $dd = []; // data dictionary array of arrays
 
-        $fields_rejected = 0;
+        $fields_rejected = 0; // always zero: we don't dynamically remove columns any more
 
         //$this->logDebugMessage($this->getProjectId(), print_r($uRights['form_permissions'], true), "buildExportDataDictionary:fp");
         //$this->logDebugMessage($this->getProjectId(), print_r($export->export_items, true), "buildExportDataDictionary:fp");
@@ -521,20 +522,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             ];
         }
 
-        //return print_r($event_settings, true);
-        //return print_r($export, true);
-        //return print_r($fields['field_index'], true);
-        //return print_r($dd, true);
-        //return "";
-
-        /**
-         * Goal: reduce this down to 3 props: export_specification, export_data_dictionary, fields_rejected
-         */
+        // nuke the export_items to save memory
+        $export->export_items = [];
 
         return [
-            'export' => $export,
-
             'export_uuid' => $export_uuid,
+            'export' => $export,
             /*
             'export_name' => $export->export_name,
             'export_label' => $export->export_label,
@@ -651,7 +644,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
                 if ( !in_array($i, $columns_to_delete) ){
 
-                    $x[] = $v[$i];
+                    $x[] = Yes3Fn::sanitizeForExcel($v[$i]);
                 }
             }
 
@@ -790,7 +783,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             "host" => APP_PATH_WEBROOT_FULL,
             "timestamp" => $timestamp,
             "project_id" => $project->getProjectId(),
-            "export_specification" => $export_props,
+            "export_properties" => $export_props,
             "project_recordid_field" => $this->getRecordIdField(),
             "project_title" => $project->getTitle(),
             "project_is_longitudinal" => ( $this->isLongitudinal() ) ? 1:0,
@@ -810,7 +803,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         fclose($h);
 
-        unset($info['export_specification']); // too much detail for the return object
+        unset($info['export_properties']); // too much detail for the return object
 
         return [
             'export_info_filename' => $path,
@@ -821,7 +814,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         ];
     }
 
-    private function writeExportDataDictionaryFile( $export_name, $export_data_extension, $export_data_delimiter, $export_target_folder, $dd, $destination, $export_layout, &$bytesWritten=0 )
+    private function writeExportDataDictionaryFile( $export_name, $export_target_folder, $dd, $destination, $export_layout, &$bytesWritten=0 )
     {
         /*
         if ( !$export_target_folder || $destination===self::DESTINATION_DOWNLOAD ) {
@@ -851,7 +844,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $path = "";
 
         // we include the UTF8 BOM in the data dictionary file, so that it can be opened in Excel without issues.
-        $export_filename = $this->exportDataDictionaryFilename($export_name, $export_data_extension, $destination);
+        $export_filename = $this->exportDataDictionaryFilename($export_name, $destination);
         $h = $this->export_file_handle( $path, $destination, $export_target_folder, $export_filename, true );
 
         $R = 0;
@@ -864,7 +857,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
      
         foreach ( $xx as $x ) {
 
-            $bytesWritten += Yes3Fn::fputcsv($h, $x, $export_data_delimiter);
+            $bytesWritten += Yes3Fn::fputcsv($h, $x,",");
             $R++;
         }
      
@@ -1218,6 +1211,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $sqlParams = [$this->getProjectId()];
 
+        // selection by criterion, possibly within a DAG
         if ( $export->export_selection=='2' ) {
 
             if ( !strlen($export->export_criterion_field) ||
@@ -1289,7 +1283,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             }
 
             if ( $export_group_id ){
-
+                /*
                 $sql = "
                 SELECT DISTINCT d.`record`
                 FROM $redcap_data d
@@ -1297,30 +1291,57 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 AND d.`record` IN(SELECT DISTINCT dg.`record` FROM $redcap_data dg WHERE dg.`project_id`=? AND dg.field_name='__GROUPID__' AND dg.`value`=?)
                 ";
                 $sqlParams = array_merge([ $this->getProjectId(), $export->export_criterion_event, $export->export_criterion_field ], $sqlCritXParams, [$this->getProjectId(), $export_group_id]);
+                */
+                
+                $sql = "
+                SELECT DISTINCT rl.`record`, rl.dag_id
+                FROM redcap_record_list rl 
+                INNER JOIN $redcap_data d on d.project_id=rl.project_id AND d.record=rl.record
+                WHERE rl.`project_id`=? AND rl.dag_id=? AND d.`event_id`=? AND d.`field_name`=? AND d.`value` IS NOT NULL AND d.`value` {$critXQ}
+                ";
+                $sqlParams = array_merge([ $this->getProjectId(), $export_group_id, $export->export_criterion_event, $export->export_criterion_field ], $sqlCritXParams);
             }
             else {
-
+                /*
                 $sql = "
                 SELECT DISTINCT d.`record`
                 FROM $redcap_data d
                 WHERE d.`project_id`=? AND d.`event_id`=? AND d.`field_name`=? AND d.`value` IS NOT NULL AND d.`value` {$critXQ}";
 
                 $sqlParams = array_merge([$this->getProjectId(), $export->export_criterion_event, $export->export_criterion_field ], $sqlCritXParams);
+                */
+                
+                $sql = "
+                SELECT DISTINCT rl.`record`, rl.dag_id
+                FROM redcap_record_list rl 
+                INNER JOIN $redcap_data d on d.project_id=rl.project_id AND d.record=rl.record
+                WHERE rl.`project_id`=? AND d.`event_id`=? AND d.`field_name`=? AND d.`value` IS NOT NULL AND d.`value` {$critXQ}
+                ";
+                $sqlParams = array_merge([ $this->getProjectId(), $export->export_criterion_event, $export->export_criterion_field ], $sqlCritXParams);
             }
         }
+        // no selection criterion, export all records (possibly within a DAG)
         else if ( $export->export_selection=='1' ) {
 
             if ( $export_group_id ){
-
+                /*
                 $sql = "SELECT DISTINCT dg.`record` FROM $redcap_data dg WHERE dg.`project_id`=? AND dg.field_name='__GROUPID__' AND dg.`value`=?";
+
+                $sqlParams = [ $this->getProjectId(), $export_group_id ];
+                */
+                $sql = "SELECT DISTINCT `record`, `dag_id` FROM redcap_record_list WHERE `project_id`=? AND `dag_id`=?";
 
                 $sqlParams = [ $this->getProjectId(), $export_group_id ];
             }
             else {
-
+                /*
                 $sql = "SELECT DISTINCT d.`record` FROM $redcap_data d WHERE d.`project_id`=?";
 
-                $sqlParams = [ $this->getProjectId() ];                
+                $sqlParams = [ $this->getProjectId() ];
+                */                
+                $sql = "SELECT DISTINCT `record`, `dag_id` FROM redcap_record_list WHERE `project_id`=?";
+
+                $sqlParams = [ $this->getProjectId() ];
             }
         }
         else {
@@ -1335,16 +1356,16 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $records = [];
         $all_numeric = true;
-        foreach ( $this->recordGenerator($sql, $sqlParams) as $x ){
+        foreach ( $this->recordGeneratorUnbuffered($sql, $sqlParams) as $x ){
 
-            $records[] = $x['record'];
+            $records[] = [ 'record' => $x['record'], 'group_id' => $x['dag_id'] ];
 
             if ( $all_numeric && !ctype_digit((string)$x['record']) ){
 
                 $all_numeric = false;
             }
          }
-
+        /*
         if ( $all_numeric ){
 
             sort($records, SORT_NUMERIC);
@@ -1353,7 +1374,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
             sort($records, SORT_NATURAL | SORT_FLAG_CASE);
         }
-
+        */
         /**
          * More helper arrays, required by writeExportDataForRecord()
          */
@@ -1400,13 +1421,17 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $maxRecLen = 0;
 
-        foreach ( $records as $record ){
+        foreach ( $records as $recordSpec ){
+
+            $record = $recordSpec['record'];
+            $group_id = $recordSpec['group_id'];
 
             $sqlSelectParams = array_merge([$this->getProjectId(), $record], $sqlEventParams);
 
             $recLen = $this->writeExportDataForRecord(
                 $export,
-                $record, 
+                $record,
+                $group_id,
                 $sqlSelect, 
                 $sqlSelectParams, 
                 $eventName, 
@@ -1469,7 +1494,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $ddPackage['export_data_dictionary'] = $dd;
 
-        $export_data_dictionary_response = $this->writeExportDataDictionaryFile( $export->export_name, $export->export_data_extension, $export->export_data_delimiter, $export->export_target_folder, $dd, $destination, $export->export_layout );
+        $export_data_dictionary_response = $this->writeExportDataDictionaryFile( $export->export_name, $export->export_target_folder, $dd, $destination, $export->export_layout );
 
         $export_info_file_response = $this->writeExportInfoFile(
             $export,
@@ -2062,6 +2087,7 @@ WHERE project_id=? AND log_entry_type=?
     private function writeExportDataForRecord( 
         Yes3Export $export,
         $record,
+        $group_id,
         $sqlSelect, 
         $sqlSelectParams, 
         $eventName, 
@@ -2123,7 +2149,7 @@ WHERE project_id=? AND log_entry_type=?
         //$this->logDebugMessage($this->getProjectId(), $sqlSelect, "writeExportDataForRecord: sqlSelect");
         //$this->logDebugMessage($this->getProjectId(), print_r($sqlSelectParams, true), "writeExportDataForRecord: sqlSelectParams");
 
-        foreach ( $this->recordGenerator($sqlSelect, $sqlSelectParams) as $x ){
+        foreach ( $this->recordGeneratorUnbuffered($sqlSelect, $sqlSelectParams) as $x ){
         //$xx = $this->fetchRecords($sql, $sqlParams);
         //foreach ( $xx as $x ){
 
@@ -2211,8 +2237,8 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ( isset($y[self::VARNAME_GROUP_ID]) ) {
 
-                    $y[self::VARNAME_GROUP_ID  ] = $this->getGroupIdForRecord($record);
-                    $y[self::VARNAME_GROUP_NAME] = $dagNameForGroupId[ $y[self::VARNAME_GROUP_ID  ] ];
+                    $y[self::VARNAME_GROUP_ID  ] = $group_id; //$this->getGroupIdForRecord($record);
+                    $y[self::VARNAME_GROUP_NAME] = $dagNameForGroupId[ $group_id ] ?? '';
                 }
             }
 
@@ -2232,11 +2258,20 @@ WHERE project_id=? AND log_entry_type=?
 
                 if ($export->export_data_delimiter === "\t"){
 
-                    $REDCapValue = Yes3Fn::sanitizeForTSV( $x['value'], $export->export_max_text_length, $export->export_ascii_text, $export->export_inoffensive_text );
+                    /**
+                     * TSV export
+                     * tabs always sanitized to spaces
+                     * export_inoffensive_text controls whether newlines sanitized to spaces
+                     */
+                    $REDCapValue = Yes3Fn::sanitizeForTSV( $x['value'], $export->export_max_text_length, $export->export_ascii_text, $export->export_inoffensive_text, $export->export_inoffensive_text );
                 }
                 else {
 
-                    $REDCapValue = Yes3Fn::sanitizeForCSV( $x['value'], $export->export_max_text_length, $export->export_ascii_text, $export->export_inoffensive_text );
+                    /**
+                     * CSV export
+                     * export_inoffensive_text controls whether tabs and newlines are sanitized to spaces (for now)
+                     */
+                    $REDCapValue = Yes3Fn::sanitizeForCSV( $x['value'], $export->export_max_text_length, $export->export_ascii_text, $export->export_inoffensive_text, $export->export_inoffensive_text, $export->export_inoffensive_text );
                 }
             }
 
@@ -2672,7 +2707,7 @@ WHERE project_id=? AND log_entry_type=?
         //$export_data_extension = $ddPackage['export_data_extension'];
         //$export_data_delimiter = $ddPackage['export_data_delimiter'];
 
-        $filename = $this->exportDataDictionaryFilename( $export->export_name, $export->export_data_extension, self::DESTINATION_DOWNLOAD );
+        $filename = $this->exportDataDictionaryFilename( $export->export_name, self::DESTINATION_DOWNLOAD );
 
         $ddPackage['export_data_dictionary'] = $this->tidyUpDDv2($ddPackage['export_data_dictionary'], true);
 
@@ -2717,7 +2752,7 @@ WHERE project_id=? AND log_entry_type=?
 
             $C++;
 
-            Yes3Fn::fputcsv($h, $x, $export->export_data_delimiter);
+            Yes3Fn::fputcsv($h, $x, ",");
         }
      
         fclose($h);
@@ -2863,7 +2898,7 @@ WHERE project_id=? AND log_entry_type=?
         //$export_name = $ddPackage['export_name'];
         //$export_data_extension = $ddPackage['export_data_extension'];
 
-        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($export->export_name, $export->export_data_extension, self::DESTINATION_DOWNLOAD);
+        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($export->export_name, self::DESTINATION_DOWNLOAD);
         $exportDataFilename = $this->exportDataFilename($export->export_name, $export->export_data_extension, self::DESTINATION_DOWNLOAD, NULL);
         $exportInfoFilename = $this->exportInfoFilename($export->export_name, self::DESTINATION_DOWNLOAD, NULL);
 
@@ -2995,10 +3030,10 @@ WHERE project_id=? AND log_entry_type=?
         return $this->exportFilename($export_name, "data", $export_data_extension, $target, $timestamp);
     }
 
-    public function exportDataDictionaryFilename( $export_name, $export_data_extension="csv", $target=self::DESTINATION_DOWNLOAD, $timestamp="")
+    public function exportDataDictionaryFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
     {
         //$this->determineExportFileType();
-        return $this->exportFilename($export_name, "dd", $export_data_extension, $target, $timestamp);
+        return $this->exportFilename($export_name, "dd", "csv", $target, $timestamp);
     }
 
     public function exportInfoFilename( $export_name, $target=self::DESTINATION_DOWNLOAD, $timestamp="")
@@ -5326,5 +5361,6 @@ WHERE project_id=? AND log_entry_type=?
 
         return "Sorry, the action '$action' is most abhorrent.";
     }
+    
 
 }
