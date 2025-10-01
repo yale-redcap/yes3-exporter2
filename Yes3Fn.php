@@ -1476,8 +1476,8 @@ class Yes3Fn {
     }
 
     /**
-     * formula from Records::getData
-     * verified as of REDCap v14
+     * legacy formula from Records::getData
+     * verified as of REDCap verified as of v15.5.13
      * 
      * function: hash_record
      * 
@@ -1486,12 +1486,80 @@ class Yes3Fn {
      * 
      * @return string
      */
-    public static function hash_record(string $record, string $project_salt): string
+    public static function hash_record_legacy(string $record, string $project_salt): string
     {
         global $salt; // global REDCap salt, determined at installation
 
         return md5($salt . $record . $project_salt);
     }
+
+    public static function hash_record(string $record, string $project_salt): string
+    {
+        // use legacy method if salt2 not set
+        if (!isset($GLOBALS['salt2']) || !is_string($GLOBALS['salt2']) || $GLOBALS['salt2'] === '') {
+            return self::hash_record_legacy($record, $project_salt);
+        }
+
+        if (!isset($GLOBALS['password_algo']) || !is_string($GLOBALS['password_algo']) || $GLOBALS['password_algo'] === '') {
+            throw new \RuntimeException ('hash_record: global "password_algo" not set');
+        }
+
+        if (!in_array($GLOBALS['password_algo'], hash_algos(), true)) {
+            throw new \RuntimeException ('hash_record: unsupported hash algorithm "' . $GLOBALS['password_algo'] . '"');
+        }
+
+        $hex = hash(
+            $GLOBALS['password_algo'],
+            $GLOBALS['salt2'] . $GLOBALS['salt'] . $record . $project_salt,
+            false
+        );
+
+        if ($hex === false) {
+            throw new \RuntimeException('hash_record: hashing failed');
+        }
+
+        return substr($hex, 0, 32); // match REDCap truncation
+    }
+ 
+	/**
+	 * DATE SHIFTING: Get number of days to shift for a record
+     * Code imported from REDCap's Records::get_shift_days
+     * verified as of v15.5.15
+	 */
+	public static function get_shift_days(string $idnumber, int $date_shift_max, string $project_salt): int
+	{
+		global $salt;
+
+        $dec = hexdec(substr(md5($salt . $idnumber . $project_salt), 10, 8));
+		// Set as integer between 0 and $date_shift_max
+		$days_to_shift = round($dec / pow(10,strlen($dec)) * $date_shift_max);
+		return $days_to_shift;
+	}
+
+	/**
+	 * DATE SHIFTING: Shift a date by providing the number of days to shift
+     * Code imported from REDCap's Records::shift_date_format
+     * verified as of v15.5.15
+	 */
+	public static function shift_date_format(string $date, int $days_to_shift): string
+	{
+		if ($date == "") return $date;
+
+        if ( strlen($date) < 10 ) return $date;
+
+		// Explode into date/time pieces (in case a datetime field)
+		list ($date, $time) = explode(' ', $date, 2);
+		// Separate date into components
+		$mm   = (int)substr($date, 5, 2);
+		$dd   = (int)substr($date, 8, 2);
+		$yyyy = (int)substr($date, 0, 4);
+		// Shift the date
+		$newdate = date("Y-m-d", mktime(0, 0, 0, $mm , $dd - $days_to_shift, $yyyy));
+		// Re-add time component (if applicable)
+		$newdate = trim("$newdate $time");
+		// Return new date/time
+		return $newdate;
+	}
 
     /**
      * Get the external module ID by its directory prefix

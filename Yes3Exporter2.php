@@ -18,12 +18,17 @@ use Exception;
 use REDCap;
 use ZipArchive;
 use Project;
+use Records;
 
 class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 {
     public $sysmsg = "";
     public $errmsg = "";
 
+    private $project_id = 0;
+    private $date_shift_max = 0;
+    private $project_salt = "";
+    
     public $EXTERNAL_MODULE_ID = 0;
 
     const EXPORTER_DOWNLOAD_COOKIE_NAME = "yes3-exporter-download";
@@ -147,71 +152,18 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         return "https://yale-redcap.github.io/yes3-exporter2-docs/getting-started/";
     }
 
-    /**
-     * Hash and Date shifting code from Record class
-     * verified as of REDCap 14.5.29
-     * Copied here to remove dependency on class def
-     */
-
-    /**
-     * formula from Records::getData
-     * 
-     * function: hash_record
-     * 
-     * @param mixed $record
-     * 
-     * @return string
-     */
-    private function hash_record($record)
+    private function get_project_props()
     {
-        global $salt;
-        $Proj = new Project( $this->getProjectId() );
-        $project_salt = $Proj->project['__SALT__'];
+        if ( $this->project_id > 0 ) return;
 
-        return md5($salt . $record . $project_salt);
+        $this->project_id = $this->getProjectId();
+
+        $Proj = new Project( $this->project_id );
+
+        $this->date_shift_max = (int)($Proj->project['date_shift_max'] ?? 0);
+
+        $this->project_salt = $Proj->project['__SALT__'] ?? '';
     }
-  
-	/**
-	 * DATE SHIFTING: Get number of days to shift for a record
-	 */
-	private function get_shift_days($idnumber)
-	{
-		global $salt;
-
-        $Proj = new Project( $this->getProjectId() );
-
-        $project_salt = $Proj->project['__SALT__'];
-
-        $date_shift_max = (int)($Proj->project['date_shift_max'] ?? 0);
-
-        $dec = hexdec(substr(md5($salt . $idnumber . $project_salt), 10, 8));
-		// Set as integer between 0 and $date_shift_max
-		$days_to_shift = round($dec / pow(10,strlen($dec)) * $date_shift_max);
-		return $days_to_shift;
-	}
-
-	/**
-	 * DATE SHIFTING: Shift a date by providing the number of days to shift
-	 */
-	private function shift_date_format($date, $days_to_shift)
-	{
-		if ($date == "") return $date;
-
-        if ( strlen($date) < 10 ) return $date;
-
-		// Explode into date/time pieces (in case a datetime field)
-		list ($date, $time) = explode(' ', $date, 2);
-		// Separate date into components
-		$mm   = (int)substr($date, 5, 2);
-		$dd   = (int)substr($date, 8, 2);
-		$yyyy = (int)substr($date, 0, 4);
-		// Shift the date
-		$newdate = date("Y-m-d", mktime(0, 0, 0, $mm , $dd - $days_to_shift, $yyyy));
-		// Re-add time component (if applicable)
-		$newdate = trim("$newdate $time");
-		// Return new date/time
-		return $newdate;
-	}
 
     /**
      * Build the export data dictionary
@@ -265,6 +217,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
          *      export_remove_dates
          *      export_shift_dates
          *      export_hash_recordid
+         *      export_hash_recordid_legacy
          *      export_uspec_json DEPRECATED
          *      export_items_json
          *      export_batch
@@ -557,6 +510,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             'export_no_tags' => $export->export_no_tags,
             'export_ascii_text' => $export->export_ascii_text,
             'export_hash_recordid' => $export->export_hash_recordid,
+            'export_hash_recordid_legacy' => $export->export_hash_recordid_legacy,
             'export_shift_dates' => $export->export_shift_dates,
             'export_event_list' => $export->export_event_list,
             'export_has_repeatables' => $export->export_has_repeatables,
@@ -772,12 +726,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         // human-readable timestamp
         $timestamp = date("Y-m-d H:i:s");
 
-        $export_props = get_object_vars($export);
-
-        unset($export_props['export_items']); // can be very large, so remove it from the info object
-        unset($export_props['export_order']); // not needed here
-        unset($export_props['export_event_list']); // not needed here
-        unset($export_props['export_target']); // deprecated
+        $export_props = $this->get_export_props($export);
 
         $info = [
             "host" => APP_PATH_WEBROOT_FULL,
@@ -988,6 +937,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
      */
     private function writeExportFiles( &$ddPackage, $destination="", &$bytesWritten=0, $support_package=false )
     {
+        // ensure project props are set (salt, days_shift_max, etc)
+        $this->get_project_props();
+
         /** @var Yes3Export $export */
         $export = $ddPackage['export'];
 
@@ -1355,26 +1307,17 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         //$this->logDebugMessage($this->getProjectId(), implode(",", $sqlParams), "writeExportDataFile: CritX Params");
 
         $records = [];
-        $all_numeric = true;
         foreach ( $this->recordGeneratorUnbuffered($sql, $sqlParams) as $x ){
 
             $records[] = [ 'record' => $x['record'], 'group_id' => $x['dag_id'] ];
-
-            if ( $all_numeric && !ctype_digit((string)$x['record']) ){
-
-                $all_numeric = false;
-            }
-         }
-        /*
-        if ( $all_numeric ){
-
-            sort($records, SORT_NUMERIC);
         }
-        else {
+    
+        // sort the records in natural case-insensitive order
+        usort($records, function($a, $b) {
 
-            sort($records, SORT_NATURAL | SORT_FLAG_CASE);
-        }
-        */
+            return strnatcasecmp($a['record'], $b['record']);
+        });
+        
         /**
          * More helper arrays, required by writeExportDataForRecord()
          */
@@ -1551,17 +1494,17 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $this->logExport(
             self::LOG_MESSAGE_FILES_WRITTEN,
-            $destination,
-            $export->export_uuid,
-            $export->export_name,
-            $path,
-            $export_data_dictionary_response['export_data_dictionary_filename'],
-            null,
-            $bytesWritten,
-            $K,
-            $R,
-            $export_data_dictionary_response['export_data_dictionary_rows'],
-            $export_specification
+            $export,
+            [
+                'destination' => $destination,
+                'filename_data' => $path,
+                'filename_data_dictionary' => $export_data_dictionary_response['export_data_dictionary_filename'],
+                'exported_bytes' => $bytesWritten,
+                'exported_items' => $K,
+                'exported_rows' => $R,
+                'exported_columns' => $C,
+                'data_dictionary_rows' => $export_data_dictionary_response['export_data_dictionary_rows']
+            ]
         );
 
         $export_summary_message =
@@ -1620,92 +1563,51 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         return nl2br( $this->escape($value) );
     }
 
-    private function logExport(
-        $message, 
-        $destination, 
-        $export_uuid, 
-        $export_name, 
-        $filename_data, 
-        $filename_data_dictionary, 
-        $filename_zip, 
-        $bytes, 
-        $items, 
-        $rows, 
-        $columns,
-        $export_specification = [],
-        $export_batch = 0,
-        $export_sascode = 0,
-        $export_sascode_libref = "",
-        $export_sascode_libref_path = "",
-        $export_sascode_dsname = "",
-        $export_sascode_ascii = 0,
-        $export_rcode = 0
-        )
+    private function get_export_props( Yes3Export $export )
     {
-        /**
-         * Pull out just the basics from the specification items. This structure is a mess...
-         */
+        $export_props = get_object_vars($export);
 
-        if ( $export_specification ){
+        unset($export_props['export_items']); // can be very large, so remove it from the info object
+        unset($export_props['export_order']); // not needed here
+        unset($export_props['export_event_list']); // not needed here
+        unset($export_props['export_target']); // deprecated
 
-            // uspec is deprecated, will be replaced by crosswalk
-            if ( isset($export_specification['export_uspec_json']) ){
+        return $export_props;
+    }
 
-                unset( $export_specification['export_uspec_json'] );
-            }
-
-            $xitems = [];
-
-            if ( isset($export_specification['export_items_json']) ){
-
-                if ( $this->is_json_decodable($export_specification['export_items_json']) ){
-
-                    $export_spec_items = json_decode( $export_specification['export_items_json'], true );
-
-                    foreach ( $export_spec_items as $export_spec_item ){
-
-                        // this is the structure we are working toward
-                        $xitems[] = [
-                            'redcap_object_type' => $export_spec_item['redcap_object_type'],
-                            'redcap_object_name' => ( $export_spec_item['redcap_object_type'] === "form" ) ? $export_spec_item['redcap_form_name'] : $export_spec_item['redcap_field_name'],
-                            'redcap_object_event_id' => $export_spec_item['redcap_event_id'],
-                            'redcap_object_event_name' => $this->getEventNameForEventId($export_spec_item['redcap_event_id'])
-                        ];
-                    }
-                }
-
-                $export_specification['export_items'] = $xitems;
-
-                unset($export_specification['export_items_json']);
-            }
-        }
+    private function logExport(
+        $message,
+        $export,
+        $customParams = []
+    ) {
 
         $uRights = $this->yes3UserRights();
 
-        $params = [
+        $basicParams = [
             'user_name' => $uRights['username'],
             'user_designer' => $uRights['isDesigner'],
             'user_dag' => $uRights['dag'],
             'log_entry_type' => self::EMLOG_TYPE_EXPORT_LOG_ENTRY,
-            'destination' => $destination,
-            'export_uuid' => $export_uuid,
-            'export_name' => $export_name,
-            'filename_data' => $filename_data,
-            'filename_data_dictionary' => $filename_data_dictionary,
-            'filename_zip' => $filename_zip,
-            'exported_bytes' => $bytes,
-            'exported_items' => $items,
-            'exported_rows' => $rows,
-            'exported_columns' => $columns,
-            'export_specification' => json_encode( $export_specification ),
-            'export_batch' => $export_batch,
-            'export_sascode' => $export_sascode,
-            'export_sascode_libref' => $export_sascode_libref,
-            'export_sascode_libref_path' => $export_sascode_libref_path,
-            'export_sascode_ascii' => $export_sascode_ascii,
-            'export_sascode_dsname' => $export_sascode_dsname,
-            'export_rcode' => $export_rcode
         ];
+
+        // extract the settings
+        if ( $export instanceof Yes3Export ){
+
+            $export_props = $this->get_export_props($export);
+
+            // remove blank values
+            foreach( $export_props as $k => $v ){
+                if ( empty($v) ){
+                    unset($export_props[$k]);
+                }
+            }
+        }
+        else {
+
+            $export_props = [];
+        }
+
+        $params = array_merge($basicParams, $customParams, $export_props);
 
         $log_id = $this->log(
             $message,
@@ -2123,12 +2025,19 @@ WHERE project_id=? AND log_entry_type=?
 
         if ( $export->export_shift_dates ){
 
-            $days_to_shift = $this->get_shift_days($record);
+            $days_to_shift = Yes3Fn::get_shift_days($record, $this->date_shift_max, $this->project_salt);
         }
 
         if ( $export->export_hash_recordid ){
 
-            $record = $this->hash_record($record);
+            if ( $export->export_hash_recordid_legacy ){
+
+                $record = Yes3Fn::hash_record_legacy($record, $this->project_salt);
+            }
+            else {
+
+                $record = Yes3Fn::hash_record($record, $this->project_salt);
+            }
         }
 
         $y = [];
@@ -2365,7 +2274,7 @@ WHERE project_id=? AND log_entry_type=?
 
                     if ( $this->isDateOrTimeType($dd[$field_index]['var_type']) && $days_to_shift > 0 ) {
 
-                        $y[ $dd[ $field_index]['var_name'] ] = $this->shift_date_format($REDCapValue, $days_to_shift);
+                        $y[ $dd[ $field_index]['var_name'] ] = Yes3Fn::shift_date_format($REDCapValue, $days_to_shift);
                     }
                     else {
 
@@ -2717,16 +2626,12 @@ WHERE project_id=? AND log_entry_type=?
 
         $this->logExport(
             self::LOG_MESSAGE_DD_DOWNLOADED,
-            self::DESTINATION_DOWNLOAD,
-            $export_uuid,
-            $export->export_name,
-            null,
-            $filename,
-            null,
-            null,
-            null,
-            null,
-            null
+            $export,
+            [
+                'destination' => self::DESTINATION_DOWNLOAD,
+                'filename_data_dictionary' => $filename,
+                'data_dictionary_rows' => $nFields
+            ]
         );
      
         $h = fopen('php://output', 'w');
@@ -2799,16 +2704,14 @@ WHERE project_id=? AND log_entry_type=?
 
         $this->logExport(
             self::LOG_MESSAGE_DATA_DOWNLOADED,
-            self::DESTINATION_DOWNLOAD,
-            $export_uuid,
-            $export->export_name,
-            $filename,
-            null,
-            null,
-            $size,
-            null,
-            null,
-            null
+            $export,
+            [
+                'destination' => self::DESTINATION_DOWNLOAD,
+                'filename_data' => $filename,
+                'exported_rows' => $xFileResponse['export_data_rows'] ?? 0,
+                'exported_columns' => $xFileResponse['export_data_columns'] ?? 0,
+                'exported_bytes' => $size
+            ]
         );
 
         $export_summary = "The data file for '{$export->export_name}' ({$size} bytes) was prepared for download.\n\nYour download should start soon, if it hasn't already.";
@@ -2976,16 +2879,12 @@ WHERE project_id=? AND log_entry_type=?
 
         $this->logExport(
             self::LOG_MESSAGE_ZIP_DOWNLOADED,
-            self::DESTINATION_DOWNLOAD,
-            $export_uuid,
-            $export->export_name,
-            null,
-            null,
-            $filename,
-            $size,
-            null,
-            null,
-            null
+            $export,
+            [
+                'destination' => self::DESTINATION_DOWNLOAD,
+                'zip_filename' => $filename,
+                'zip_filesize' => $size
+            ]
         );
 
         // Set headers for the binary file download
@@ -3453,6 +3352,7 @@ WHERE project_id=? AND log_entry_type=?
         , export_remove_dates
         , export_shift_dates
         , export_hash_recordid
+        , export_hash_recordid_legacy
         , export_items_json
         , export_batch
         , export_sascode
