@@ -97,6 +97,7 @@ function execRequest( $request ){
         , 'remove_or_restore_export'
         , 'update_export_table_settings'
         , 'validateexportfile'
+        , 'getexportnames'
     ];
 
     $fnIndex = array_search( strtolower($request), $function_registry );
@@ -353,6 +354,7 @@ function saveExportSpecification()
         , 'export_remove_dates' => ""
         , 'export_shift_dates' => ""
         , 'export_hash_recordid' => ""
+        , 'export_hash_recordid_legacy' => ""
         , 'export_items_json' => ""
         , 'export_batch' => ""
         , 'export_sascode' => ""
@@ -427,6 +429,15 @@ function getExportSpecification()
     else {
 
         $log_id = 0;
+    }
+
+    if ( isset($_POST['get_other_export_names']) ){
+
+        $get_other_export_names = (int) $_POST['get_other_export_names'];
+    }
+    else {
+
+        $get_other_export_names = 0;
     }
 
     //$module->logDebugMessage(0, "log_id={$log_id}, export_uuid={$export_uuid}", "getExportSpecification: params");
@@ -610,6 +621,52 @@ function getExportSpecificationList():string
             'exports_denied' => $exports_denied,
             'data' => $data
         ]);
+    }
+
+    return json_encode($data);
+}
+
+function getExportNames()
+{
+    global $module;
+
+    if ( isset($_POST['except_uuid']) ){
+
+        $except_uuid = $_POST['except_uuid'];
+    }
+    else {
+
+        $except_uuid = "";
+    }   
+
+    $sqlUUID = "
+    SELECT DISTINCT p01.`value` AS `export_uuid`
+    FROM redcap_external_modules_log x
+    INNER JOIN redcap_external_modules_log_parameters p01 ON p01.log_id=x.log_id AND p01.name='export_uuid'
+    WHERE x.external_module_id=? and x.project_id=? and x.message=?
+    ";
+
+    $params = [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_MSG_EXPORT_SPECIFICATION];
+
+    if ( $except_uuid ){
+
+        $sqlUUID .= " AND p01.value<>?";
+        $params[] = $except_uuid;
+    }
+
+    $UUIDs = $module->fetchRecords($sqlUUID, $params);
+
+    $data = [];
+
+    foreach($UUIDs as $u){
+
+        $s = $module->getExportSpecification($u['export_uuid']);
+
+        $data[] = [
+            'export_uuid' => $s['export_uuid'],
+            'export_name' => $s['export_name'] ?? "",
+            'removed' => $s['removed']
+        ];
     }
 
     return json_encode($data);

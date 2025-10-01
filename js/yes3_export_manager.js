@@ -1,6 +1,6 @@
 YES3.Functions.Page_refresh = function() {
 
-    FMAPR.loadSpecifications( 1 );
+    FMAPR.getExportNames( FMAPR.loadSpecifications );
 }
 
 YES3.Functions.Open_validator = function() {
@@ -167,7 +167,7 @@ FMAPR.exportTableAfterUpdateCallback = function( response ){
 
         YES3.hello('There was a problem updating the export table. Reloading the page.');
 
-        FMAPR.loadSpecifications( 1 );
+        FMAPR.getExportNames( FMAPR.loadSpecifications );
     }
 }
 
@@ -499,9 +499,11 @@ FMAPR.refreshSpecificationCallback = function( response ){
     FMAPR.postMessage(`Export specification <strong>${export_specification.export_name}</strong> has been refreshed.`);
 }
 
+//FMAPR.getExportNames( FMAPR.loadSpecifications );
+
 FMAPR.loadSpecifications = function( get_removed )
 {
-    get_removed = get_removed || 0;
+    get_removed = get_removed || 1;
 
     YES3.isBusy();
 
@@ -594,26 +596,10 @@ FMAPR.NewExport_closePanel = function()
     YES3.closePanel("yes3-fmapr-new-export-form");
 }
 
-FMAPR.exportNameAlreadyExists = function(export_name)
-{
-    let dupes = 0;
-
-    $('select#export_uuid option').each(function(){
-
-        if ( $(this).text().toLowerCase() === export_name.toLowerCase() ){
-
-            dupes++;
-            return false;
-        }
-    })
-
-    return dupes;  
-}
-
 FMAPR.NewExport_execute = function()
 {
     let new_export_uuid = YES3.uuidv4();
-    let new_export_name = $("input#new_export_name").val();
+    let new_export_name = $("input#new_export_name").val().trim();
     let new_export_layout = $("input[type=radio][name=new_export_layout]:checked").val();
 
     if ( !new_export_name || !new_export_layout ){
@@ -628,20 +614,9 @@ FMAPR.NewExport_execute = function()
         return false;
     }
 
-    let dupes = 0;
+    if ( FMAPR.dupeFilenameForExportName(new_export_name) ){
 
-    $('select#export_uuid option').each(function(){
-
-        if ( $(this).text().toLowerCase() === new_export_name.toLowerCase() ){
-
-            dupes++;
-            return false;
-        }
-    })
-
-    if ( FMAPR.exportNameAlreadyExists(new_export_name) ){
-
-        YES3.hello(`No can do: an export named '${new_export_name}' aleady exists.`);
+        YES3.hello(`No can do: the proposed export name '${new_export_name}' has a conflict with another export defined for this project.`);
         return false;
     }
     
@@ -674,7 +649,7 @@ FMAPR.saveExportSpecificationCallback = function( response ){
 
     FMAPR.postMessage( response );
 
-    FMAPR.loadSpecifications( 1 ); // include removed exports
+    FMAPR.getExportNames( FMAPR.loadSpecifications ); // reload the list of export names and the specifications
 }
 
 /*
@@ -824,7 +799,7 @@ FMAPR.removeTheIrrelevantElements = function()
  */
 $(document).on('yes3-fmapr.settings', function(){
 
-    FMAPR.loadSpecifications( 1 ); // include removed exports
+    FMAPR.getExportNames( FMAPR.loadSpecifications ); // reload the list of export names and the specifications
 
     $(window).resize( function(){
 

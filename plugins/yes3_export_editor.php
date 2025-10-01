@@ -855,7 +855,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                     Options for data compliance (de-identified and coded datasets)
                 </div>
 
-                <div class="yes3-fmapr yes3-flex-container">
+                <div class="yes3-fmapr yes3-flex-container-vtop">
 
                     <div class="yes3-flex-left">
                             
@@ -895,19 +895,32 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         
                         <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
                             <label class="yes3-checkmarkContainer">
-                                <input type="checkbox" name="export_shift_dates" data-setting="export_shift_dates" value="1" />
-                                <span class="yes3-checkmark"></span>Coded (shifted) dates
-                            </label>
-                        </div>
-                        
-                        <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
-                            <label class="yes3-checkmarkContainer">
                                 <input type="checkbox" name="export_hash_recordid" data-setting="export_hash_recordid" value="1" />
                                 <span class="yes3-checkmark"></span>Coded (hashed) record id values
                             </label>
                         </div> 
+                        
+                        <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
+                            <label class="yes3-checkmarkContainer">
+                                <input type="checkbox" name="export_shift_dates" data-setting="export_shift_dates" value="1" />
+                                <span class="yes3-checkmark"></span>Coded (shifted) dates
+                            </label>
+                        </div>
                                 
                     </div>
+
+                    
+                    <div class="yes3-flex-left">
+                        
+                        <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
+                            <label class="yes3-checkmarkContainer yes3-fmapr-if-hash-recordid">
+                                <input type="checkbox" name="export_hash_recordid_legacy" data-setting="export_hash_recordid_legacy" value="1" />
+                                <span class="yes3-checkmark"></span>Legacy hash
+                            </label>
+                        </div> 
+
+                    </div>
+
 
                 </div>
 

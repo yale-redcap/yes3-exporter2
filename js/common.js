@@ -546,6 +546,67 @@ FMAPR.cookieMonster = function() {
     }
 }
 
+FMAPR.sanitizeForFilename = function(input) {
+  if (typeof input !== "string") return "";
+
+  return input
+    .toLowerCase()                              // (1) convert to lowercase
+    .replace(/^[^a-z]+/, "")                    // (2) strip leading non-alpha
+    .replace(/[^a-z0-9 _:\.-]/g, "")            // (3) allow space, dash, underscore, digits, letters, . and :
+    .replace(/[ .:-]/g, "_")                    // (4) convert space, dash, period, colon -> underscore
+    .replace(/_+/g, "_")                        // (5) collapse multiple underscores
+    .replace(/[^a-z0-9]+$/, "");                // (6) strip trailing non-alphanumeric
+}
+
+/**
+ * Check if an export name already exists in the list of export specifications.
+ * 
+ * Name is rejected if the sanitized version of the name matches the sanitized version of an existing name,
+ * because we need to ensure unique filenames when exporting.
+ * 
+ * @param {*} export_name 
+ * @returns 
+ */
+FMAPR.dupeFilenameForExportName = function(export_name, except_uuid)
+{   
+    except_uuid = except_uuid || "";
+    
+    let thatName = FMAPR.sanitizeForFilename(export_name);
+
+    // iterate over FMAPR.allExportNames
+    for (let i=0; i<FMAPR.allExportNames.length; i++){
+
+        if ( FMAPR.allExportNames[i].export_uuid === except_uuid ){
+            continue;
+        }
+
+        let thisName = FMAPR.sanitizeForFilename(FMAPR.allExportNames[i].export_name);
+
+        if ( thisName === thatName ){
+
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+FMAPR.getExportNames = function( thenCall )
+{     
+    YES3.requestService( { 
+        "request": "getExportNames"
+    }, function( response ){
+
+        FMAPR.allExportNames = response || [];
+
+        if ( typeof thenCall === "function" ){
+
+            thenCall();
+        }
+
+    }, true );
+}
+
 $( function () {
 })
 

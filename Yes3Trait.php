@@ -83,6 +83,13 @@ trait Yes3Trait {
         return $this->getUser($this->getUsername());
     }
 
+    /**
+     * Returns a curated array of user rights and form export permissions
+     * 
+     * @param bool $designerHasExportRights If true, designers are treated as having full export rights
+     *                                      Note: currently this param is never set to true
+     * @return array
+     */
     public function yes3UserRights( $designerHasExportRights=false )
     {
         $User = $this->getUserObject();
@@ -113,10 +120,10 @@ trait Yes3Trait {
         $formPermString = str_replace("[", "", $user['data_entry']);
 
         $formPerms = explode("]", $formPermString);
-        $formPermissions = [];
+        $formPermissions = []; // view/edit permissions by form
         foreach( $formPerms as $formPerm){
 
-            // not sure why this is necessary, I guess belts and suspenders?
+            // apparently there can be empty entries
             if ( $formPerm ){
 
                 $formPermParts = explode(",", $formPerm);
@@ -124,7 +131,7 @@ trait Yes3Trait {
 
                 // for longitudinal projects, only include forms that are on the event grid
                 if ( !$longitudinal || $this->getREDCapEventsForForm($form_name) ){
-
+                    // designers can always edit
                     $formPermissions[ $form_name ] = ($isDesigner) ? 1 : (int) $formPermParts[1];
                 }
             }
@@ -140,7 +147,7 @@ trait Yes3Trait {
 
         $formExportPermissions = [];
 
-        $exporter = ( $designerHasExportRights ) ? $isDesigner : 0;
+        $exporter = ( $designerHasExportRights ) ? $isDesigner : 0; // designers can always export if flag is set
 
         if ( $isDesigner && $designerHasExportRights ){
 
@@ -157,8 +164,14 @@ trait Yes3Trait {
         // 'data_export_instruments' is a v12+ property
         if ( isset($user['data_export_instruments'])) {
 
-            //$this->logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
+            $this->logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
 
+            /**
+             * the data_export_instruments string looks like this:
+             * [form_name,export_code][form_name,export_code]...
+             *
+             * So we explode on "]" to get each stringified form tuple, then explode each of those on "," to get the form name and export code tuple.
+             */
             $formExportPermString = str_replace("[", "", $user['data_export_instruments']);
 
             $formExportPerms = explode("]", $formExportPermString);
@@ -169,6 +182,14 @@ trait Yes3Trait {
 
                     $formExportPermParts = explode(",", $formExportPerm);
 
+                    /**
+                     * REDCap Form export permission codes and their rank orders:
+                     * 
+                     * 0 - no access (rank order 0)
+                     * 1 - full access (rank order 3)
+                     * 2 - de-identified: no identifiers, dates or text fields (rank order 2)
+                     * 3 - no identifiers (rank order 1)
+                     */
                     $xPerm = (int)$formExportPermParts[1];
 
                     $form_name = $formExportPermParts[0];
@@ -179,12 +200,12 @@ trait Yes3Trait {
                         // set the simulated pre-v12-style 'export_tool' property to the highest-ranked permission we find
                         if ( $exportPermRank[$xPerm] > $exportPermRank[$export_tool] ){
 
-                            $export_tool = $xPerm;
+                            $export_tool = $xPerm; 
                         }
 
                         if ( $xPerm > 0 && $exporter === 0 ){
 
-                            $exporter = 1;
+                            $exporter = 1; // boolean: has any export permission on any form
                         }
                         
                         $formExportPermissions[ $form_name ] = $xPerm;
@@ -195,12 +216,12 @@ trait Yes3Trait {
         // pre-v12
         else {
 
-            // create the v12-style form export permission array, with each instrument having the global permission
+            // create the v12-style form export permission array from the form view/edit permissions, with each instrument having the export_tool permission
             foreach ( array_keys($formPermissions) as $instrument){
 
                 $formExportPermissions[$instrument] = $export_tool;
             }
-            $exporter = ( $export_tool > 0 ) ? 1 : 0;
+            $exporter = ( $export_tool > 0 ) ? 1 : 0; // boolean: has any export permission
         }
 
         /**
@@ -233,6 +254,9 @@ trait Yes3Trait {
         ];
     }
 
+    /**
+     * Returns the HTML, CSS and JS code required to run the specified page (libname)
+     */
     public function getCodeFor( string $libname, bool $includeHtml=false ):string
     {
         $s = "";
@@ -322,7 +346,7 @@ trait Yes3Trait {
     }
 
     /**
-     * V13, V14+ compatible method for getting the project_id
+     * V13, V14+ compatible method for getting the redcap data table for supplied project_id
      * 
      * @param string $project_id 
      * @return mixed 
@@ -341,23 +365,10 @@ trait Yes3Trait {
         return "redcap_data";
     }
 
-    // the framework getDAG crashes for longitudinal studies
-    public function getGroupIdForRecord($recordId, $pid=0){
-
-        if ( !$pid ){
-
-            $pid = $this->getProjectId();
-        }
-
-        if ( !$pid ){
-
-            return null;
-        }
-
-        $redcap_data = $this->getDataTable($pid);
-
-        return $this->fetchValue("select value from $redcap_data where project_id = ? and record = ? and field_name = ? limit 1", [$pid, $recordId, '__GROUPID__']);
-    }
+    /**
+     * record generators: buffered and unbuffered
+     * Note: unbuffered required faith that the global $rc_connection is available
+     */
 
     public function recordGenerator( $sql, $parameters = [] )
     {
@@ -377,14 +388,20 @@ trait Yes3Trait {
 
         try {
             while ($row = $result->fetch_assoc()) {
-
                 yield $row;
             }
+        } catch (\Throwable $e) {
+            // Handle exception (optional: log or rethrow)
+            throw $e;
         } finally {
+            // Free the result set; required for unbuffered queries
             if ($result) {$result->free();}
         }
     }
 
+    /**
+     * Fetch multiple records as an array of associative arrays
+     */
     public function fetchRecords($sql, $parameters = [])
     {
 
@@ -410,12 +427,18 @@ trait Yes3Trait {
 
     }
 
+    /**
+     * Fetch a single record as an associative array
+     */
     public function fetchRecord($sql, $parameters = [])
     {
 
         return $this->query($this->sql_limit_1($sql), $parameters)->fetch_assoc();
     }
 
+    /**
+     * Fetch a single value
+     */
     public function fetchValue($sql, $parameters = [])
     {
         return $this->query($this->sql_limit_1($sql), $parameters)->fetch_row()[0];

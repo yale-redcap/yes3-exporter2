@@ -34,8 +34,6 @@ FMAPR.userPermissions = {
     "design": false,
     "export": false,
 }
-// to prevent export name collisions (for future implementation)
-FMAPR.otherExportNames = ['_foo','_bar', '_baz'];
 
 // used to control whether columns are recounted when the spec is saved
 // currently set when an item row is added or removed
@@ -436,12 +434,6 @@ FMAPR.NewExport_closePanel = function()
     YES3.closePanel("yes3-fmapr-new-export-form");
 }
 
-FMAPR.exportNameAlreadyExists = function(export_name)
-{
-    // determin if the supplied name is already in FMAPR.exportNames
-    return FMAPR.otherExportNames.includes(export_name);
-}
-
 YES3.Functions.openDownloadForm = function()
 {
     let thePanel = YES3.openPanel("yes3-fmapr-download-panel");
@@ -796,6 +788,11 @@ FMAPR.getNewItemMode = function() {
     return mode;
 }
 
+FMAPR.getNewObjectType = function() {
+
+    return $("input[name=new_object_type]:checked").val() || "?";
+}
+
 FMAPR.renderNewItemOptionsSection = function( force ) {
 
     force = force || false;
@@ -842,10 +839,10 @@ FMAPR.renderNewItemOptionsSectionMultiple = function() {
 
     html += `<span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label"></span>:&nbsp;</span>`;
 
-    html += `<input type="button" id="yes3-fmapr-rapidentry-object-add-singleton" value="single form or field" onclick="FMAPR.addItemSingleton()" />`;
+    html += `<input type="button" id="yes3-fmapr-rapidentry-object-add-singleton" value="form or field" onclick="FMAPR.addItemSingleton()" />`;
 
     html += "<span class='yes3-semibold'>OR</span>";
-
+    /*
     html += `<input 
     type="button" 
     id="yes3-fmapr-rapidentry-object-add-something" 
@@ -855,7 +852,7 @@ FMAPR.renderNewItemOptionsSectionMultiple = function() {
     />`;
 
     html += "<span class='yes3-semibold'>OR</span>";
-
+    */
     html += `<input type="button" id="yes3-fmapr-rapidentry-object-add-everything" value="everything" onclick="FMAPR.addEverything()" />`;
     
     $section.append(html);
@@ -900,6 +897,8 @@ FMAPR.renderNewItemOptionsSectionSingleton = function() {
     html += `<input type="text" name="new_object_name" id="yes3-fmapr-rapidentry-object-name" placeholder="start typing or spacebar for all" />`;
 
     html += `<input type="button" id="yes3-fmapr-rapidentry-object-add" value="add to export" />`;
+
+    html += `<input type="button" id="yes3-fmapr-rapidentry-object-add-fields" value="append as fields" />`;
 
     html += `<input type="button" id="yes3-fmapr-rapidentry-object-cancel" value="cancel" />`;
 
@@ -1034,6 +1033,16 @@ FMAPR.setRapidEntryFormListeners = function()
             let object_type =$("input[type=radio][name=new_object_type]:checked").val();
 
             let object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
+
+            let $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
+
+            if ( object_type==="form" ){
+
+                $addAsFieldsButton.show();
+            }
+            else {
+                $addAsFieldsButton.hide();
+            }
 
             $("input#yes3-fmapr-rapidentry-object-name")
                 .val("")
@@ -1416,7 +1425,7 @@ FMAPR.saveExportSpecificationCallback = function( response ){
     }
 
     // reload the specification
-    FMAPR.loadSpecification();
+    FMAPR.getExportNames( FMAPR.loadSpecification );
 }
 
 /*** WAYBACK ***/
@@ -2544,14 +2553,26 @@ FMAPR.setNewItemModeLabel = function(){
 
     const $newItemActionLabel = $('span.yes3-fmapr-rapidentry-object-mode-label');
     const $newItemActionButton = $('input#yes3-fmapr-rapidentry-object-add');
+    const $newItemAddFieldsButton = $('input#yes3-fmapr-rapidentry-object-add-fields');
 
     const mode = FMAPR.getNewItemMode();
+
+    const objectType = FMAPR.getNewObjectType();
 
     $newItemActionLabel.text(mode.toUpperCase());
 
     if ( $newItemActionButton.length ){
 
-        $newItemActionButton.val(mode);
+        if ( objectType === "form") {
+
+            $newItemActionButton.val(mode+" as form");
+            $newItemAddFieldsButton.val(mode+" as fields").show();
+        }
+        else if ( objectType === "field") {
+
+            $newItemActionButton.val(mode+" field");
+            $newItemAddFieldsButton.hide();
+        }
     }
 }
 
@@ -5049,9 +5070,9 @@ FMAPR.setExportNameListener = function()
         // name has changed and exists in the specs list
         
         if ( new_export_name !== FMAPR.exportSpecification.export_name 
-            && FMAPR.exportNameAlreadyExists(new_export_name) ){
+            && FMAPR.dupeFilenameForExportName(new_export_name, FMAPR.exportSpecification.export_uuid) ){
 
-            YES3.hello(`No can do: the export name '${new_export_name}' already exists for this project.`);
+            YES3.hello(`No can do: the proposed export name '${new_export_name}' has a conflict with another export defined for this project.`);
             $(this).val(FMAPR.exportSpecification.export_name);
             return true;
         }
@@ -5120,6 +5141,17 @@ FMAPR.exportSettingsTableSkipper = function ()
             $(this).hide().addClass('yes3-fmapr-skipped-over');
         }
     });
+
+    let export_hash_recordid = $('input[name=export_hash_recordid]').is(':checked') ;
+
+    if ( export_hash_recordid ){
+        
+        $('.yes3-fmapr-if-hash-recordid').show();
+    }
+    else {
+
+        $('.yes3-fmapr-if-hash-recordid').hide();
+    }
 
     let export_sascode = $('input[name=export_sascode]').is(':checked') ;
 
@@ -5396,9 +5428,9 @@ FMAPR.loadloadEventSettingsCallback = function( response )
     FMAPR.event_settings = response;
 
     /**
-     * now we load the specification and prepare the editor
+     * now we load all the export names, for export_name uniqueness checking
      */
-     FMAPR.loadSpecification();
+    FMAPR.getExportNames( FMAPR.loadSpecification );
 }
 
 FMAPR.loadSpecification = function( log_id )

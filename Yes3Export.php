@@ -28,6 +28,7 @@ class Yes3Export {
     public $export_ascii_text = "";
     public $export_shift_dates = "";
     public $export_hash_recordid = "";
+    public $export_hash_recordid_legacy = "";
 
     public $export_remove_phi = "";
     public $export_remove_dates = "";
@@ -79,6 +80,7 @@ class Yes3Export {
         $this->export_ascii_text = $exportSettings['export_ascii_text'] ?? "0";
         $this->export_shift_dates = $exportSettings['export_shift_dates'] ?? "0";
         $this->export_hash_recordid = $exportSettings['export_hash_recordid'] ?? "0";
+        $this->export_hash_recordid_legacy = $exportSettings['export_hash_recordid_legacy'] ?? "0";
 
         $this->export_remove_phi = $exportSettings['export_remove_phi'] ?? "0";
         $this->export_remove_dates = $exportSettings['export_remove_dates'] ?? "0";
