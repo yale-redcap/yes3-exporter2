@@ -84,7 +84,9 @@ class Yes3SasCoder {
         $this->delimiter = $delimiter;
         $this->lrecl = (int) $lrecl;
 
-        $this->dd = Yes3Fn::csvFileToArray( $ddFilename, $delimiter );
+        // Note that the data dictionary is always an excel-friendly CSV file delinmited with commas
+        // (the input data file can be either comma- or tab-delimited)
+        $this->dd = Yes3Fn::csvFileToArray( $ddFilename, "," );
 
         if (!is_array($this->dd) || count($this->dd) == 0) {
 
