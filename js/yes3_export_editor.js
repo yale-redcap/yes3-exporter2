@@ -1122,6 +1122,26 @@ FMAPR.setRapidEntryFormListeners = function()
         })
     ;
 
+    $("input#yes3-fmapr-rapidentry-object-add-fields")
+        .off()
+        .on("click", function(){
+
+            let object_type =$("input[type=radio][name=new_object_type]:checked").val();
+            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
+            let object_name=$("input#yes3-fmapr-rapidentry-object-name").val();
+
+            FMAPR.addRapidEntryItem(object_type, object_name, object_event, true);
+
+            FMAPR.postMessage(`${object_type} '${object_name}' added to export.`, true);
+
+            // set the focus back to the name input
+            $("input#yes3-fmapr-rapidentry-object-name")
+                .val("")
+                .focus()
+            ;
+        })
+    ;
+
     $("input#yes3-fmapr-rapidentry-object-cancel")
         .off()
         .on("click", function(){
@@ -1134,7 +1154,9 @@ FMAPR.setRapidEntryFormListeners = function()
     $("input[type=radio][name=new_object_type]:checked").trigger("change");
 }
 
-FMAPR.addRapidEntryItem = function( object_type, object_name, object_event ){
+FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allFieldsForForm ){
+
+    allFieldsForForm = allFieldsForForm || false;
 
     console.log("FMAPR.addRapidEntryItem", object_type, object_name, object_event);
 
@@ -1161,7 +1183,14 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event ){
     }
     else if ( object_type === "form" ){
 
-        saveResult = FMAPR.exportItemEditorSave_form(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
+        if ( allFieldsForForm ) {
+
+            saveResult = FMAPR.exportItemEditorSave_fields(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
+
+        } else {
+
+            saveResult = FMAPR.exportItemEditorSave_form(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
+        }
     }
 
     //YES3.debugMessage("save result:", saveResult);

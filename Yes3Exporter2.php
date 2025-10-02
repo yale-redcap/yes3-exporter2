@@ -2801,7 +2801,8 @@ WHERE project_id=? AND log_entry_type=?
         //$export_name = $ddPackage['export_name'];
         //$export_data_extension = $ddPackage['export_data_extension'];
 
-        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($export->export_name, self::DESTINATION_DOWNLOAD);
+        // zip payload filenames are NOT timestamped, hence the NULL $timestamp arguments
+        $exportDataDictionaryFilename = $this->exportDataDictionaryFilename($export->export_name, self::DESTINATION_DOWNLOAD, NULL);
         $exportDataFilename = $this->exportDataFilename($export->export_name, $export->export_data_extension, self::DESTINATION_DOWNLOAD, NULL);
         $exportInfoFilename = $this->exportInfoFilename($export->export_name, self::DESTINATION_DOWNLOAD, NULL);
 
