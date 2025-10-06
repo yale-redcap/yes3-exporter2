@@ -2095,7 +2095,15 @@ WHERE project_id=? AND log_entry_type=?
            
             if ( $BOR ) {
 
+                // BE AWARE: this code is repeated in the EOR block below
                 if ( $y && $exportValues && $h !== false ){
+
+                    // tally the calculations (skip recordid field)
+                    for( $i=1; $i<count($dd); $i++ ){
+
+                        $REDCapValue = $y[$dd[$i]['var_name']] ?? '';
+                        $dd[$i] = $this->doValidationCalculations($dd[$i], $REDCapValue, false);
+                    }
 
                     $bytesWritten += $this->writeExportRecord($h, $y, $export->export_data_delimiter, $R, $C);
                     $K += $exportValues; // increment the global datum count
@@ -2283,12 +2291,18 @@ WHERE project_id=? AND log_entry_type=?
                 }
 
                 $exportValues++; // increment the count of values exported for this record (other than the recordid)
-
-                $dd[$field_index] = $this->doValidationCalculations($dd[$field_index], $REDCapValue);
             }
         }
 
+        // BE AWARE: this code is repeated in the BOR block above
         if ( $y && $exportValues && $h !== false){
+
+            // tally the calculations (skip recordid field)
+            for( $i=1; $i<count($dd); $i++ ){
+
+                $REDCapValue = $y[$dd[$i]['var_name']] ?? '';
+                $dd[$i] = $this->doValidationCalculations($dd[$i], $REDCapValue, false);
+            }
 
             $bytesWritten += $this->writeExportRecord($h, $y, $export->export_data_delimiter, $R, $C);
             $K += $exportValues; // increment the global datum count
@@ -2320,9 +2334,9 @@ WHERE project_id=? AND log_entry_type=?
             $d['min_length'] = $len;
         }
 
-        if ( $countOnly ){
+        if ( $countOnly || $d['var_type'] === "CHECKBOX" ){
 
-            return $d; // no further calculations if countOnly requested
+            return $d; // no further calculations if countOnly requested, or if this is a concatenated checkbox horror
         }
 
         $var_type = $d['var_type'];
@@ -4079,7 +4093,7 @@ WHERE project_id=? AND log_entry_type=?
 
                 $var_label = $fields['field_metadata'][$field_index]['field_label'];
                 $var_type = $this->REDCapFieldTypeToVarType($field_type, $field_validation);
-                $valueset = $fields['field_metadata'][$field_index]['field_valueset'];
+                $valueset = $fields['field_metadata'][$field_index]['field_valueset'] ?? [];
                 $event_name = $this->getEventName($event_id, $event_settings);
 
                 if ( $field_type === "checkbox" && $export->export_multiselect === "1" ) {
@@ -4104,6 +4118,40 @@ WHERE project_id=? AND log_entry_type=?
                         ],
                         $this->getRecordIdField());
                     }
+                }
+                else if ($field_type === "checkbox" && $export->export_multiselect === "2") {
+
+                    // multiselect as nominal with concatenated values
+                    /*
+                    $concat_valueset = [];
+                    foreach ($valueset as $option) {
+                        $concat_valueset[] = $option['value'];
+                    }
+                    $concat_value = implode(Yes3Fn::MULTISELECT_DELIM, $concat_valueset);
+                    */
+
+                    $export->addExportItem([
+                        'var_name' =>  Yes3Fn::sanitizeForObjectname($var_name),
+                        'var_label' =>  Yes3Fn::sanitizeForLabel($var_label),
+                        'var_type' => "CHECKBOX",
+                        /*
+                        'valueset' => [
+                            [
+                                'value' => Yes3Fn::sanitizeForText($concat_value, 0, true, false, true),
+                                'label' => "Multiple values: " . implode(", ", array_column($valueset, 'label'))
+                            ]
+                        ],
+                        */
+                        'valueset' => $valueset,
+                        'origin' => "redcap",
+                        'redcap_field_name' => $redcap_field_name,
+                        'redcap_events' => [ (int)$event_id ],
+                        'redcap_form_name' => $form_name,
+                        self::VARNAME_EVENT_ID => $event_id,
+                        self::VARNAME_EVENT_NAME => $event_name
+                    ],
+                    $this->getRecordIdField());
+
                 }
                 else {
                     $export->addExportItem([

@@ -2018,7 +2018,7 @@ th.yes3-halign-center, td.yes3-halign-center {
     white-space: nowrap;
     -ms-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    /*overflow: hidden;  ????*/
+    overflow: hidden;
  }
  
  table.yes3-dashboard th {
@@ -2226,12 +2226,22 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 }
 
 .yes3-bs-tooltip:not(.yes3-bs-tooltip-static) {
-   --bs-tooltip-bg: steelblue;
+   --bs-tooltip-bg: dodgerblue;
    --bs-tooltip-color: white;
 }
 
 .yes3-bs-tooltip.yes3-bs-tooltip-static {
+   --bs-tooltip-bg: purple;
+   --bs-tooltip-color: white;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-warning {
    --bs-tooltip-bg: darkorange;
+   --bs-tooltip-color: white;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-error {
+   --bs-tooltip-bg: red;
    --bs-tooltip-color: white;
 }
 

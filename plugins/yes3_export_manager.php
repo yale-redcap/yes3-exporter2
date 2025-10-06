@@ -101,16 +101,16 @@ $module->getCodeFor("yes3_export_manager", true);
 
             <!--i class="fas fa-refresh yes3-action-icon yes3-action-icon-controlpanel" action="Page_refresh" title="refresh this page"></i-->
 
-            <i class="fas fa-check yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-validator-only" action="Open_validator" title="open the validator"></i>
+            <i class="fas fa-check yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-validator-only yes3-tooltip-static" action="Open_validator" data-bs-toggle="tooltip" title="Open the validator" id="yes3-fmapr-validator-icon"></i>
 
-            <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="get some help"></i>
+            <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openPanel" data-bs-toggle="tooltip" title="Open a navigation help panel."></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" action="Help_openDocumentation" title="Open the YES3 Exporter2 online documentation"></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openDocumentation" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
 
-            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
-            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" action="Theme_light" title="Switch to the light theme"></i>
+            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only yes3-tooltip-static" action="Theme_dark" data-bs-toggle="tooltip" title="Give in to the dark side (dark theme)."></i>
+            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only yes3-tooltip-static" action="Theme_light" data-bs-toggle="tooltip" title="Switch to the light theme."></i>
 
-            <img class="yes3-square-logo yes3-logo" alt="YES3 Logo" title="More about YES3..." >
+            <img class="yes3-square-logo yes3-logo yes3-tooltip-static" alt="YES3 Logo" data-bs-toggle="tooltip" title="Open the Yale YES Portal website.">
 
         </div>
 
@@ -126,14 +126,14 @@ $module->getCodeFor("yes3_export_manager", true);
                     <tr>
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only yes3-tooltip-static" data-bs-toggle="tooltip" title="Refresh ALL specifications."><i class="fas fa-refresh refresh-all-rows" onclick="FMAPR.loadSpecifications( 1 );"></i></th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only yes3-tooltip-static" data-bs-toggle="tooltip" data-bs-html="true" title="Edit the selected export (<i class='fas fa-edit'></i>), or add a new export (<i class='fas fa-plus'></i>)">Edit/add</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static" data-bs-toggle="tooltip" title="download or export the selected export">Export</th>
-                        <th class="yes3-col-md yes3-header yes3-halign-left   yes3-required-column yes3-tooltip-static" id="foo" data-bs-placement="top-start" data-bs-toggle="tooltip" title="export name">Name</th>
-                        <th class="yes3-col-lg yes3-header yes3-halign-left   yes3-tooltip-static" data-bs-toggle="tooltip" title="export label">Label</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="export layout">Layout</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports yes3-tooltip-static" data-bs-toggle="tooltip" title="export included in daily batch (cron) job">Batch</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="column count">Columns</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static" data-bs-toggle="tooltip" title="Download the selected data dictionary and/or data, and/or if configured, export to the host file system.">Export</th>
+                        <th class="yes3-col-md yes3-header yes3-halign-left   yes3-required-column yes3-tooltip-static" id="foo" data-bs-placement="top-start" data-bs-toggle="tooltip" title="The export name, which is the basis for export file names.">Name</th>
+                        <th class="yes3-col-lg yes3-header yes3-halign-left   yes3-tooltip-static" data-bs-toggle="tooltip" title="A description of the export.">Label</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="Export layout: vertical or horizontal">Layout</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports yes3-tooltip-static" data-bs-toggle="tooltip" title="Indicates whether the export is included<br />in the daily batch (cron) job.">Batch</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="The column count for the selected export.">Columns</th>
                         <!--th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="validate this export, or import from an external datasheet">Val/Imp</th-->
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static yes3-designer-only" title="remove the export (can be restored later)">Remove</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static yes3-designer-only" data-bs-toggle="tooltip" title="Remove or restore the export.">Remove</th>
                     </tr>
                 </thead>
 
@@ -142,7 +142,7 @@ $module->getCodeFor("yes3_export_manager", true);
                 <tfoot id="yes3-fmapr-export-tfoot">
                     <tr class='yes3-designer-only'>
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column" title="dum de dum-dum">&nbsp</i></td>
-                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" title="click to add a new export specification"><i class="fas fa-plus" onclick="FMAPR.NewExport_openPanel()"></i></td>
+                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" data-bs-toggle="tooltip" title="Click to <strong>add a new export specification</strong>"><i class="fas fa-plus" onclick="FMAPR.NewExport_openPanel()"></i></td>
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column"></td>
                         <td class="yes3-col-md yes3-halign-left   yes3-required-column"><em>new export</em></td>
                         <td class="yes3-col-lg yes3-halign-left"></td>

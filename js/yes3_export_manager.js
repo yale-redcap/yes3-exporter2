@@ -42,14 +42,16 @@ FMAPR.whatIsItYesOrNo = function( whatIsIt ){
     return "no";
 }
 
-FMAPR.layoutLabel = function( layout, details ){
+/** labels for tooltips and table columns */
+
+FMAPR.tooltipForLayout = function( layout, details ){
 
     details = details || false;
 
     if ( details ) {
-        if ( layout === "v" ) return "vertical (one row per record[, event][, instance])";
-        if ( layout === "h" ) return "horizontal (one row per record[, instance])";
-        if ( layout === "r" ) return "repeating (DEPRECATED: equivalent to vertical with a single repeating form)";
+        if ( layout === "v" ) return "Export Layout: <strong>Vertical</strong><br />One row per record[, event][, instance]";
+        if ( layout === "h" ) return "Export Layout: <strong>Horizontal</strong><br />One row per record[, instance]";
+        if ( layout === "r" ) return "Export Layout: <strong>Repeating</strong><br />(DEPRECATED: equivalent to vertical with a single repeating form)";
     }
 
     if ( !layout ) return "?";
@@ -60,6 +62,35 @@ FMAPR.layoutLabel = function( layout, details ){
     return "?";
 }
 
+FMAPR.tooltipForExportName = function( export_name ){
+    return `Edit the export specification for '${export_name}'.`;
+}
+
+FMAPR.tooltipForDownload = function( export_name ){
+    return `Download the data dictionary, dataset or full zipped payload for <strong>'${export_name}'</strong> to your computer.`;
+}
+
+FMAPR.tooltipForRefresh = function( export_name ){
+    return `Refresh the export specification for <strong>'${export_name}'</strong>.`;
+}
+
+FMAPR.tooltipForExportToHost = function( export_name ){
+    return `Export the full payload for <strong>'${export_name}'</strong> to the host file system.`;
+}
+
+FMAPR.toolTipForTrashcan = function( export_name, removed ){
+
+    if ( removed ) {
+        return `Restore the export specification <strong>'${export_name}'</strong>.`;
+    }
+
+    return `Remove the export specification <strong>'${export_name}'</strong>.`;
+}
+
+FMAPR.toolTipForEditIcon = function( export_name ){
+    return `Edit the export specification for <strong>'${export_name}'</strong>.`;
+}
+
 /** tooltips */
 
 FMAPR.setStaticToolTips = function(){
@@ -67,32 +98,24 @@ FMAPR.setStaticToolTips = function(){
     const $pageControls = YES3.container().find('div.yes3-fmapr-controls');
     const $tableControls =FMAPR.exportTable().find('thead');
 
-    //YES3.setDefaultBsTooltipAttributes( $tableControls[0] );
-    //YES3.setDefaultBsTooltipAttributes( $pageControls[0] );
-
-    YES3.setBsTooltipListenersForElement ( $tableControls[0], true );
-    YES3.setBsTooltipListenersForElement ( $pageControls[0] , true );
+    YES3.setBsTooltipListenersForElement ( $tableControls[0] );
+    YES3.setBsTooltipListenersForElement ( $pageControls[0] );
 }
 
-FMAPR.setExportTableTooltips = function(){
+FMAPR.setDynamicToolTips = function(){
 
-    const $exportTableRows = FMAPR.exportTable().find('tbody tr');
     const $exportTableBody = FMAPR.exportTable().find('tbody');
-
-    $exportTableRows.each( function(i, row){
-
-        const $row = $(row);
-        const export_name = $row.find('td[data-name="export_name"]').text();
-        $row.find('i.fas.fa-refresh')
-            .attr('title', `Refresh the specification for export '${export_name}'`)
-            .attr('data-bs-toggle', 'tooltip')
-        ;
-    });
-
-    // tooltipy other elements that have a title attribute but not a data-bs-toggle attribute
-    YES3.setDefaultBsTooltipAttributes( $exportTableBody[0] );
+    const $tableFooter = FMAPR.exportTable().find('tfoot');
 
     YES3.setBsTooltipListenersForElement ( $exportTableBody[0] );
+    YES3.setBsTooltipListenersForElement ( $tableFooter[0] );
+}
+
+FMAPR.setToolTips = function(){
+
+    const $exportTableBody = FMAPR.exportTable().find('tbody');
+
+     YES3.setBsTooltipListenersForElement ( $exportTableBody[0] );
 }
 
 /* export table load/refresh */
@@ -129,7 +152,7 @@ FMAPR.refreshExportTable = function( response )
 
     FMAPR.renderExportVisibilityCell();
 
-    FMAPR.setExportTableTooltips();
+    FMAPR.setDynamicToolTips();
 
     //exportTableRowCount.html( `${response.exportTable.length} exports` );
 
@@ -220,21 +243,26 @@ FMAPR.exportTableRowHtml = function( data ){
     const trashAction = data.removed === "0" ? "1" : "0";
     const repeater = data.export_layout === "r" ? true : false;
     const repeater_title = "Edit this export specification to convert it to the Vertical layout";
+    
+    const layout_tooltip = FMAPR.tooltipForLayout(data.export_layout, true);
+    const edit_tooltip = (repeater) ? repeater_title : FMAPR.toolTipForEditIcon(data.export_name);
+    const refresh_tooltip = FMAPR.tooltipForRefresh(data.export_name);
+    const download_tooltip = FMAPR.tooltipForDownload(data.export_name);
+    const exporttohost_tooltip = FMAPR.tooltipForExportToHost(data.export_name);
 
     let rowHtml = `<tr id="yes3-fmapr-export-${data.log_id}" data-export_uuid="${data.export_uuid}" data-log_id="${data.log_id}" data-export_order="${data.export_order}" data-removed="${data.removed}" class="yes3-fmapr-export">`;
 
     if ( YES3.userRights.isDesigner ) {
-        
-        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column"><i class="fas fa-refresh" onclick="FMAPR.refreshSpecification('${data.export_uuid}')" title="Refresh this row"></i></td>`;
-        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column"><i class="fas fa-edit" onclick="FMAPR.editExport('${data.log_id}')" title="Edit this export specification"></i></td>`;
+
+        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column" data-bs-toggle="tooltip" title="${refresh_tooltip}"><i class="fas fa-refresh" onclick="FMAPR.refreshSpecification('${data.export_uuid}')" ></i></td>`;
+        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column" data-bs-toggle="tooltip" title="${edit_tooltip}"><i class="fas fa-edit" onclick="FMAPR.editExport('${data.log_id}')" ></i></td>`;
     }
 
     if ( data.permission_export ) {
         let cellHtml = "";
         if ( !repeater ) {
-            if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ) cellHtml += `<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>`;
-            if ( YES3.EMSettings['enable-host-filesystem-exports'] ) cellHtml += `<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>`;
-            //if ( YES3.EMSettings['enable-validator'] === 'Y' ) cellHtml += `&nbsp;<i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i>&nbsp;`;
+            if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ) cellHtml += `<i class="fas fa-download" data-bs-toggle="tooltip" title="${download_tooltip}" onclick="FMAPR.openDownloadForm('${data.log_id}')" ></i>`;
+            if ( YES3.EMSettings['enable-host-filesystem-exports'] ) cellHtml += `<i class="fas fa-file-export" data-bs-toggle="tooltip" title="${exporttohost_tooltip}" onclick="FMAPR.exportToHost('${data.log_id}')" ></i>`;
         }
         rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column yes3-icon-container">${cellHtml}</td>`;
     }
@@ -243,14 +271,12 @@ FMAPR.exportTableRowHtml = function( data ){
         //if ( data.error_messages && data.error_messages.length > 0 ) banClass = "yes3-error";
         //else if ( data.warning_messages && data.warning_messages.length > 0 ) banClass = "yes3-warning";
 
-        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column"><i class="fas fa-ban ${banClass}" onclick="FMAPR.reportWhyBanned('${data.log_id}')" title="Either you do not have permission to download or export this specification, or the specification is incomplete. Click for more information."></i></td>`;
+        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column"><i class="fas fa-ban yes3-warning" data-bs-toggle="tooltip" onclick="FMAPR.reportWhyBanned('${data.log_id}')" title="Either you do not have permission to download or export this specification, or the specification is incomplete. Click for more information."></i></td>`;
     }
-
-    const layout_tooltip = `Export layout: ${FMAPR.layoutLabel(data.export_layout, true)}`;
 
     rowHtml += `<td class="yes3-col-md yes3-halign-left yes3-required-column" data-name="export_name"  >${data.export_name}</td>`;
     rowHtml += `<td class="yes3-col-lg yes3-halign-left"                      data-name="export_label" >${data.export_label}</td>`;
-    rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="export_layout" title="${layout_tooltip}">${FMAPR.layoutLabel(data.export_layout)}</td>`;
+    rowHtml += `<td class="yes3-col-sm yes3-halign-center"  data-bs-toggle="tooltip" data-name="export_layout" title="${layout_tooltip}">${FMAPR.tooltipForLayout(data.export_layout)}</td>`;
     if ( YES3.EMSettings['enable-cron-batch-exports'] && YES3.EMSettings['enable-host-filesystem-exports'] ) rowHtml += `<td class="yes3-col-sm yes3-halign-center" data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="column_count" >${data.column_count}</td>`;
 
@@ -277,9 +303,11 @@ FMAPR.renderExportTrashcanCell = function( $tr ){
     const trashIcon = removed === "0" ? "far fa-trash-alt" : "fas fa-trash-restore-alt";
     const trashAction = removed === "0" ? "1" : "0";
 
-    YES3.debugMessage('renderExportTrashcanCell', log_id, removed, trashIcon, trashAction);
+    const tooltip = FMAPR.toolTipForTrashcan( $tr.find('td[data-name="export_name"]').text(), removed === "1" );
 
-    $tr.find('td.yes3-fmapr-trash-cell').html(`<i class="${trashIcon}" onclick="FMAPR.toggleRemovedState('${log_id}', '${trashAction}')"></i>`);
+    //YES3.debugMessage('renderExportTrashcanCell', log_id, removed, trashIcon, trashAction);
+
+    $tr.find('td.yes3-fmapr-trash-cell').html(`<i class="${trashIcon}" title="${tooltip}" data-bs-toggle="tooltip" onclick="FMAPR.toggleRemovedState('${log_id}', '${trashAction}')"></i>`);
 }
 
 FMAPR.renderExportVisibilityCell = function(){
@@ -291,11 +319,11 @@ FMAPR.renderExportVisibilityCell = function(){
 
     if ( removedExportCount > 0 && !FMAPR.SHOW_REMOVED ){
 
-        $visibilityCell.html(`<i class="fas fa-eye" title="show ${removedExportCount} removed export(s)" onclick="FMAPR.showRemovedExports(true)"></i>`);
+        $visibilityCell.html(`<i class="fas fa-eye" data-bs-toggle="tooltip" title="show ${removedExportCount} removed export(s)" onclick="FMAPR.showRemovedExports(true)"></i>`);
     }
     else if ( removedExportCount > 0 && FMAPR.SHOW_REMOVED ){
 
-        $visibilityCell.html(`<i class="fas fa-eye-slash" title="hide ${removedExportCount} removed export(s)" onclick="FMAPR.showRemovedExports(false)"></i>`);
+        $visibilityCell.html(`<i class="fas fa-eye-slash" data-bs-toggle="tooltip" title="hide ${removedExportCount} removed export(s)" onclick="FMAPR.showRemovedExports(false)"></i>`);
     }
     else {
 
@@ -308,6 +336,7 @@ FMAPR.showRemovedExports = function( show ){
     FMAPR.SHOW_REMOVED = show;
     FMAPR.renderExportTable();
     FMAPR.renderExportVisibilityCell();
+    FMAPR.setDynamicToolTips();
     if ( show ) FMAPR.postMessage(`The display now includes the removed export(s).`);
     else FMAPR.postMessage(`The display no longer includes the removed export(s).`);
 }
@@ -333,6 +362,9 @@ FMAPR.toggleRemovedState = function( log_id ){
 
     // renumber the export_order attribute of each row, and save the new order to the database
     FMAPR.exportTableAfterUpdate();
+
+    // set dynamic tooltips for all relevant elements
+    FMAPR.setDynamicToolTips();
 
     if ( removed === "1" ) FMAPR.postMessage(`Export removed but not deleted. Click <i class="fas fa-eye" title="show removed export(s)" onclick="FMAPR.showRemovedExports(true)"></i> to show removed exports.`);
     else FMAPR.postMessage(`Export restored.`);

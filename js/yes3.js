@@ -1008,6 +1008,8 @@ YES3.setBsTooltipListenersForElement = function( element ){
         let justify = "center";
 
         if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
+        if ( el.classList.contains('yes3-warning') ) thisClass += " yes3-bs-tooltip-warning";
+        if ( el.classList.contains('yes3-error') ) thisClass += " yes3-bs-tooltip-error";
 
         if ( el.classList.contains('yes3-halign-left') ) justify = "left";
         else if ( el.classList.contains('yes3-halign-right') ) justify = "right";
@@ -1017,6 +1019,7 @@ YES3.setBsTooltipListenersForElement = function( element ){
             boundary: 'viewport',
             placement: 'top',
             trigger: 'hover focus',
+            html: true,
             customClass: thisClass,
             offset: ({ placement, reference, popper }) => {
 
