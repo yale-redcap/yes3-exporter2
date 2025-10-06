@@ -124,16 +124,16 @@ $module->getCodeFor("yes3_export_manager", true);
 
                 <thead>
                     <tr>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only" title="refresh all rows"><i class="fas fa-refresh" onclick="FMAPR.loadSpecifications( 1 );"></i></th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only" title="edit the selected export, or add a new export">Edit/add</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column" title="download or export the selected export">Export</th>
-                        <th class="yes3-col-md yes3-header yes3-halign-left   yes3-required-column" title="export name">Name</th>
-                        <th class="yes3-col-lg yes3-header yes3-halign-left  " title="export label">Label</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center" title="export layout">Layout</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports" title="export included in daily batch (cron) job">Batch</th>
-                        <th class="yes3-col-sm yes3-header yes3-halign-center" title="column count">Columns</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only yes3-tooltip-static" data-bs-toggle="tooltip" title="Refresh ALL specifications."><i class="fas fa-refresh refresh-all-rows" onclick="FMAPR.loadSpecifications( 1 );"></i></th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only yes3-tooltip-static" data-bs-toggle="tooltip" data-bs-html="true" title="Edit the selected export (<i class='fas fa-edit'></i>), or add a new export (<i class='fas fa-plus'></i>)">Edit/add</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static" data-bs-toggle="tooltip" title="download or export the selected export">Export</th>
+                        <th class="yes3-col-md yes3-header yes3-halign-left   yes3-required-column yes3-tooltip-static" id="foo" data-bs-placement="top-start" data-bs-toggle="tooltip" title="export name">Name</th>
+                        <th class="yes3-col-lg yes3-header yes3-halign-left   yes3-tooltip-static" data-bs-toggle="tooltip" title="export label">Label</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="export layout">Layout</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports yes3-tooltip-static" data-bs-toggle="tooltip" title="export included in daily batch (cron) job">Batch</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="column count">Columns</th>
                         <!--th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="validate this export, or import from an external datasheet">Val/Imp</th-->
-                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-designer-only" title="remove the export (can be restored later)">Remove</th>
+                        <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static yes3-designer-only" title="remove the export (can be restored later)">Remove</th>
                     </tr>
                 </thead>
 

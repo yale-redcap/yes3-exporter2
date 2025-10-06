@@ -318,6 +318,16 @@ YES3.notBusy = function()
     YES3.getYes3ParentElement().css({'cursor': 'default'});
 }
 
+YES3.getYes3ContainerElement = function()
+{
+    return $("div#yes3-container");
+}
+
+YES3.getYes3ContainerParentElement = function()
+{
+    return $("div#yes3-container").parent();
+}
+
 YES3.getContextMenuElement = function()
 {
     return $("div#yes3-contextmenu-panel");
@@ -957,7 +967,6 @@ YES3.setJQueryStuff = function(){
     $(".yes3-draggable").draggable({"handle": ".yes3-panel-header-row, .yes3-panel-handle, .yes3-drag-handle"});
 }
 
-
 YES3.deBounce = function(func, delay) {
     delay = delay || 25;
     let timer;
@@ -967,6 +976,95 @@ YES3.deBounce = function(func, delay) {
             func.apply(this, args);
         }, delay);
     };
+}
+    
+/* == TOOL TIPS == */
+
+/**
+ * removes all bootstrap tooltips from elements within the supplied element
+ * 
+ * @param {} element 
+ * @returns 
+ */
+YES3.clearBsTooltipsForElement = function( element ){
+
+    if (!element) return;
+
+    // Dispose all tooltips on elements within the element
+    element.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+        bootstrap.Tooltip.getInstance(el).dispose();
+    });
+}
+
+YES3.setBsTooltipListenersForElement = function( element ){
+
+    if (!element) return;
+
+    //return;
+
+    element.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+
+        let thisClass = "yes3-bs-tooltip";
+        let justify = "center";
+
+        if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
+
+        if ( el.classList.contains('yes3-halign-left') ) justify = "left";
+        else if ( el.classList.contains('yes3-halign-right') ) justify = "right";
+
+        bootstrap.Tooltip.getOrCreateInstance(el, {
+            container: el.parentElement,
+            boundary: 'viewport',
+            placement: 'top',
+            trigger: 'hover focus',
+            customClass: thisClass,
+            offset: ({ placement, reference, popper }) => {
+
+                const refW = reference.width;
+                const popW = popper.width;
+                if (justify === "left") {
+                    // shift so the tooltip's LEFT edge aligns with the trigger's LEFT edge
+                    const skidding = (popW - refW) / 2;
+                    const distance = 8; // vertical gap
+                    return [skidding, distance];
+                }
+                return [0, 8];
+            },
+              popperConfig: cfg => ({
+                ...cfg,
+                modifiers: [
+                    ...cfg.modifiers,
+                    {
+                        name: 'shiftArrowLeft',
+                        enabled: true,
+                        phase: 'write',        // run after Popper’s 'arrow' modifier
+                        fn({ state }) {
+
+                            if ( !/^top/.test(state.placement) ) return;
+                            if ( justify !== "left" ) return;
+                            if ( !state.elements.arrow ) return;
+
+                            state.elements.arrow.style.left = '16px'; // reposition arrow to left edge of tooltip
+                            state.elements.arrow.style.transform = 'translate(0,0)'; // reset any previous adjustment (the mechanism Popper uses to position the arrow)
+                        }
+                    }
+                ]
+            })
+
+        });
+    });
+}
+
+YES3.setDefaultBsTooltipAttributes = function( element ){
+
+    if (!element) return;
+
+    // select child elements that have a title attribute but not a data-bs-toggle attribute
+    element.querySelectorAll('[title]:not([data-bs-toggle])').forEach(el => {
+
+        el.setAttribute('data-bs-toggle', 'tooltip');
+        el.setAttribute('data-bs-placement', 'top');
+    });
 }
 
 /*
