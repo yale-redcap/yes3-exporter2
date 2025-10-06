@@ -50,6 +50,11 @@ html {
    --yes3-item-gutter-width: 30px;
 }
 
+/* tooltip colors */
+
+
+/* === LIGHT AND DARK THEMES === */
+
 [data-theme="light"] {
 
     color-scheme: light;
@@ -2013,7 +2018,7 @@ th.yes3-halign-center, td.yes3-halign-center {
     white-space: nowrap;
     -ms-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    overflow: hidden;
+    /*overflow: hidden;  ????*/
  }
  
  table.yes3-dashboard th {
@@ -2202,3 +2207,71 @@ table.yes3-dashboard th:not(.yes3-th-title) {
    height: 500px;
    min-height: 300px !important;
 }
+
+/** tooltip **/
+.yes3-tooltip {
+    position: fixed;
+    padding: 10px;
+    background-color: var(--yes3-background-color) !important;
+    color: var(--yes3-link-color-warning) !important;
+    font-family: var(--yes3-font-family) !important;
+    font-weight: var(--yes3-font-weight-normal) !important;
+    font-size: var(--yes3-font-size) !important;
+    border: 2px solid var(--yes3-link-color-warning) !important;
+    border-radius: 12px;
+    white-space: nowrap;
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.yes3-bs-tooltip:not(.yes3-bs-tooltip-static) {
+   --bs-tooltip-bg: steelblue;
+   --bs-tooltip-color: white;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-static {
+   --bs-tooltip-bg: darkorange;
+   --bs-tooltip-color: white;
+}
+
+.yes3-bs-tooltip * {
+   color: white !important;
+}
+
+.yes3-bs-tooltip .tooltip-inner{
+    padding: 15px;
+    border-radius: 15px;
+    transition: opacity 0.5s;
+    max-width: 400px;
+}
+
+.yes3-bs-tooltip-left .tooltip-inner {
+   text-align: left !important;
+}
+
+.yes3-bs-tooltip-right .tooltip-inner {
+   text-align: right !important;
+}
+
+.yes3-bs-tooltip-center .tooltip-inner {
+   text-align: center !important;
+}
+
+/* == ICONS WITHIN TDs == */
+
+td.yes3-icon-container i:not(:first-child) {
+    margin-left: 5px;
+}
+
+/*
+.yes3-bs-tooltip.bs-tooltip-top .tooltip-arrow::before { border-top-color: var(--yes3-warning-color); }
+.yes3-bs-tooltip.bs-tooltip-right .tooltip-arrow::before { border-right-color: var(--yes3-warning-color); }
+
+
+
+.bs-tooltip-right .tooltip-arrow::before {
+   border-right-color: var(--yes3-warning-color) !important;
+}
+   */
+

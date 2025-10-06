@@ -60,15 +60,54 @@ FMAPR.layoutLabel = function( layout, details ){
     return "?";
 }
 
+/** tooltips */
+
+FMAPR.setStaticToolTips = function(){
+
+    const $pageControls = YES3.container().find('div.yes3-fmapr-controls');
+    const $tableControls =FMAPR.exportTable().find('thead');
+
+    //YES3.setDefaultBsTooltipAttributes( $tableControls[0] );
+    //YES3.setDefaultBsTooltipAttributes( $pageControls[0] );
+
+    YES3.setBsTooltipListenersForElement ( $tableControls[0], true );
+    YES3.setBsTooltipListenersForElement ( $pageControls[0] , true );
+}
+
+FMAPR.setExportTableTooltips = function(){
+
+    const $exportTableRows = FMAPR.exportTable().find('tbody tr');
+    const $exportTableBody = FMAPR.exportTable().find('tbody');
+
+    $exportTableRows.each( function(i, row){
+
+        const $row = $(row);
+        const export_name = $row.find('td[data-name="export_name"]').text();
+        $row.find('i.fas.fa-refresh')
+            .attr('title', `Refresh the specification for export '${export_name}'`)
+            .attr('data-bs-toggle', 'tooltip')
+        ;
+    });
+
+    // tooltipy other elements that have a title attribute but not a data-bs-toggle attribute
+    YES3.setDefaultBsTooltipAttributes( $exportTableBody[0] );
+
+    YES3.setBsTooltipListenersForElement ( $exportTableBody[0] );
+}
+
+/* export table load/refresh */
+
 FMAPR.refreshExportTable = function( response )
 {
     console.warn('refreshExportTable', response);
 
     if ( !YES3.userRights.isDesigner ) FMAPR.exportTable().find('.yes3-designer-only').remove();
     
-    let $exportTableBody = FMAPR.exportTable().find("tbody#yes3-fmapr-export-tbody");
+    let $exportTableBody = FMAPR.exportTable().find("tbody");
 
     let repeaters = 0;
+
+    YES3.clearBsTooltipsForElement( $exportTableBody[0] ); // remove any existing tooltips
 
     $exportTableBody.empty();
 
@@ -89,6 +128,8 @@ FMAPR.refreshExportTable = function( response )
     FMAPR.setExportTableSortHandler();
 
     FMAPR.renderExportVisibilityCell();
+
+    FMAPR.setExportTableTooltips();
 
     //exportTableRowCount.html( `${response.exportTable.length} exports` );
 
@@ -191,11 +232,11 @@ FMAPR.exportTableRowHtml = function( data ){
     if ( data.permission_export ) {
         let cellHtml = "";
         if ( !repeater ) {
-            if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ) cellHtml += `&nbsp;<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>&nbsp;`;
-            if ( YES3.EMSettings['enable-host-filesystem-exports'] ) cellHtml += `&nbsp;<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>&nbsp;`;
+            if ( !YES3.EMSettings['enable-host-filesystem-exports'] || YES3.EMSettings['enable-user-data-downloads'] ) cellHtml += `<i class="fas fa-download" onclick="FMAPR.openDownloadForm('${data.log_id}')" title="Download to your computer"></i>`;
+            if ( YES3.EMSettings['enable-host-filesystem-exports'] ) cellHtml += `<i class="fas fa-file-export" onclick="FMAPR.exportToHost('${data.log_id}')" title="Export to filesystem"></i>`;
             //if ( YES3.EMSettings['enable-validator'] === 'Y' ) cellHtml += `&nbsp;<i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i>&nbsp;`;
         }
-        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column">${cellHtml}</i></td>`;
+        rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column yes3-icon-container">${cellHtml}</td>`;
     }
     else {
         let banClass = "";
@@ -810,6 +851,8 @@ $(document).on('yes3-fmapr.settings', function(){
 $( function(){
 
     YES3.contentLoaded = false;
+
+    FMAPR.setStaticToolTips(); // tooltips that don't change
 
     FMAPR.removeTheIrrelevantElements();
 
