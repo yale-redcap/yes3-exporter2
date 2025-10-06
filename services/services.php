@@ -585,7 +585,7 @@ function getExportSpecificationList():string
             'log_id' => $s['log_id'],
             'export_uuid' => $s['export_uuid'],
             'export_name' => ( $s['export_name'] ) ? $module->escape($s['export_name']) : "noname-{$s['log_id']}",
-            'export_label' => ( $s['export_label'] ) ? $module->escape($s['export_label']) : "no label",
+            'export_label' => ( $s['export_label'] ) ? $module->escape($s['export_label']) : "",
             'export_layout' => $module->escape($s['export_layout']),
             'export_username' => ( $s['export_username'] ) ? $module->escape($s['export_username']) : "nobody",
             'permission_design' => $s['permission_design'],

@@ -164,7 +164,7 @@ trait Yes3Trait {
         // 'data_export_instruments' is a v12+ property
         if ( isset($user['data_export_instruments'])) {
 
-            $this->logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
+            //$this->logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
 
             /**
              * the data_export_instruments string looks like this:

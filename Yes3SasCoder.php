@@ -258,7 +258,7 @@ class Yes3SasCoder {
             $sas_var_len = 0;
             $sas_var_type = "NUM"; // default to numeric
 
-            if ( $row['valueset'] && $row['valueset'] != '' ) {
+            if ( $row['valueset'] && $row['valueset'] != '' && $dd_var_type != 'CHECKBOX' ) {
 
                 // if the variable has a valueset, we will use that to determine the type
                 $valueset = json_decode($row['valueset'], true);
@@ -279,7 +279,7 @@ class Yes3SasCoder {
                 }
             }
 
-            if ( $dd_var_type == 'TEXT' || $dd_var_type == 'NOMINAL') {
+            if ( $dd_var_type == 'TEXT' || $dd_var_type == 'NOMINAL' || $dd_var_type == 'CHECKBOX' ) {
                 $length ="\${$dd_max_len}";
                 $informat = "{$length}.";
             }
@@ -380,7 +380,7 @@ class Yes3SasCoder {
 
         foreach ($this->dd as $row) {
 
-            $hasValueset = isset($row['valueset']) && is_string($row['valueset']) && trim($row['valueset']) !== '';
+            $hasValueset = isset($row['valueset']) && is_string($row['valueset']) && trim($row['valueset']) !== '' && $row['var_type'] != 'CHECKBOX';
             
             $fmt_name = "";
 
