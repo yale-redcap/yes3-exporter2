@@ -977,8 +977,43 @@ YES3.deBounce = function(func, delay) {
         }, delay);
     };
 }
+
+YES3.isUserInput = function (element) {
+  if (!element || !(element instanceof HTMLElement)) return false;
+  const tag = element.tagName.toLowerCase();
+  if (tag === 'textarea') return true;
+  if (tag === 'input') return true; // consider all input types as user input
+  if (tag === 'select') return true; // consider select elements as user input
+  //if (tag === 'label') return true; // labels are assumed to be associated with user input
+  return false;
+}
     
-/* == TOOL TIPS == */
+/* == TOOL TIPS AND POPOVERS == */
+
+// --- safety helpers ---
+
+/**
+ * 
+ * Returns a function from the YES3.Functions namespace if it exists and is a function,
+ * otherwise returns null.
+ * 
+ * Function can be passed directly or by name.
+ * 
+ * @param {*} fnOrName 
+ * @returns 
+ */
+YES3.getYes3Function = function (fnOrName) {
+
+  // Allow passing a function directly (safest).
+  if (typeof fnOrName === 'function') return fnOrName;
+
+  // Or a simple identifier string (no dots, no parens).
+  if (typeof fnOrName !== 'string' || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(fnOrName)) return null;
+
+  const fn = YES3?.Functions?.[fnOrName];
+
+  return typeof fn === 'function' ? fn : null;
+}
 
 /**
  * removes all bootstrap tooltips from elements within the supplied element
@@ -996,6 +1031,103 @@ YES3.clearBsTooltipsForElement = function( element ){
     });
 }
 
+YES3.setPopoverListenersForElement = function (triggerSelector, content, moreHelpFnOrName /* optional */, opts = {}) {
+
+    const hasFnArg = moreHelpFnOrName != null;           // true if not null/undefined
+    const helpFn = hasFnArg ? YES3.getYes3Function(moreHelpFnOrName) : null;
+
+    //helpFn(); // test it
+
+    const triggerEl = document.querySelector(triggerSelector);
+
+    if (!triggerEl) return;
+
+    if (hasFnArg && !helpFn) return;
+
+    let thisClass = "yes3-bs-popover";
+
+    if (opts.className) thisClass += ` ${opts.className}`;
+    if (triggerEl.classList.contains('yes3-tooltip-static')) thisClass += " yes3-bs-tooltip-static";
+    if (triggerEl.classList.contains('yes3-warning')) thisClass += " yes3-bs-tooltip-warning";
+    if (triggerEl.classList.contains('yes3-error')) thisClass += " yes3-bs-tooltip-error";
+
+
+    const pop = bootstrap.Popover.getOrCreateInstance(triggerEl, {
+        html: true,
+        container: 'body',
+        trigger: opts.trigger || 'manual',
+        placement: opts.placement || 'right',
+        content: content,
+        customClass: thisClass
+    });
+
+    // Show/hide wiring (example: toggle on click)
+    triggerEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        pop.hide();
+    });
+
+    // Show on hover
+    triggerEl.addEventListener('mouseenter', () => {
+        pop.show();
+    });
+
+    // Close on outside click (optional)
+    document.addEventListener('click', (e) => {
+        const id = triggerEl.getAttribute('aria-describedby');
+        const tip = id && document.getElementById(id);
+        const inside = triggerEl.contains(e.target) || (tip && tip.contains(e.target));
+        if (!inside) pop.hide();
+    });
+
+    // Delegate clicks inside the popover to our help link
+    if (!helpFn) return pop;
+
+    let timer;
+
+    // When the popover is shown, attach a click listener to it
+    triggerEl.addEventListener('shown.bs.popover', () => {
+        const id = triggerEl.getAttribute('aria-describedby');
+        const tip = id && document.getElementById(id);
+        if (!tip) return;
+
+        //console.log('popover shown, attaching help listener');
+
+        clearTimeout(timer);
+        const inst = bootstrap.Popover.getInstance(triggerEl);
+        timer = setTimeout(() => inst.hide(), 10000); // hide after 10 seconds
+
+        const handler = (e) => {
+
+            //console.log('popover click event', e);
+
+            const a = e.target.closest('a.yes3-more-help');
+            if (!a) return;
+
+            //console.log('help link clicked in popover');
+
+            e.preventDefault();
+
+            try {
+                // call with YES3.Functions as "this" (if your functions use it)
+                //helpFn.call(YES3?.Functions ?? null);
+                helpFn();
+                e.stopPropagation();
+                pop.hide();
+            } catch (err) {
+                console.error('Help function threw:', err);
+            }
+
+        };
+
+        // keep one listener; if you recreate content, reattach
+        tip.addEventListener('click', handler);
+
+    });
+
+    return pop;
+}
+
 YES3.setBsTooltipListenersForElement = function( element ){
 
     if (!element) return;
@@ -1006,18 +1138,30 @@ YES3.setBsTooltipListenersForElement = function( element ){
 
         let thisClass = "yes3-bs-tooltip";
         let justify = "center";
+        let placement = "top";
 
         if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
         if ( el.classList.contains('yes3-warning') ) thisClass += " yes3-bs-tooltip-warning";
         if ( el.classList.contains('yes3-error') ) thisClass += " yes3-bs-tooltip-error";
 
-        if ( el.classList.contains('yes3-halign-left') ) justify = "left";
-        else if ( el.classList.contains('yes3-halign-right') ) justify = "right";
+        // control panel icons are placed to the left of the cursor
+        if ( el.classList.contains('yes3-action-icon-controlpanel') ) {
+            thisClass += " yes3-bs-tooltip-static"
+            placement = "left";
+        }
 
-        bootstrap.Tooltip.getOrCreateInstance(el, {
+        if ( el.classList.contains('yes3-halign-left') || YES3.isUserInput(el) ) {
+            justify = "left";
+            thisClass += " yes3-bs-tooltip-left";
+        } else if ( el.classList.contains('yes3-halign-right') ) {
+            justify = "right";
+            thisClass += " yes3-bs-tooltip-right";
+        }
+
+        const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
             container: el.parentElement,
             boundary: 'viewport',
-            placement: 'top',
+            placement: placement,
             trigger: 'hover focus',
             html: true,
             customClass: thisClass,
@@ -1054,6 +1198,11 @@ YES3.setBsTooltipListenersForElement = function( element ){
                 ]
             })
 
+        });
+
+        // close tooltip when element is clicked (eg. action icons)
+        el.addEventListener('click', () => {
+            tooltip.hide();
         });
     });
 }

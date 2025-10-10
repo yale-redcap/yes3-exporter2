@@ -703,20 +703,20 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <div class="yes3-flex-col-33 yes3-flex-hright">
 
-            <i class="far fa-save yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-save-control" id="yes3-fmapr-save-control" action="saveExportSpecification" title="Save the export specification."></i>
+            <i class="far fa-save yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-save-control" data-bs-toggle="tooltip" id="yes3-fmapr-save-control" action="saveExportSpecification" title="Save the export specification."></i>
 
-            <i class="fas fa-download yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-download-options" id="yes3-fmapr-download-control" action="download" title="Download."></i>
+            <i class="fas fa-download yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-download-options" data-bs-toggle="tooltip" id="yes3-fmapr-download-control" action="download" title="Download the data dictionary, datasheet, or full (zipped) payload to your computer."></i>
 
-            <i class="fas fa-file-export yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-export-options" id="yes3-fmapr-export-control" action="export" title="Export to file system."></i>
+            <i class="fas fa-file-export yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only yes3-display-when-clean yes3-fmapr-export-options" data-bs-toggle="tooltip" id="yes3-fmapr-export-control" action="export" title="Export the full payload to the host file system."></i>
             
-            <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only" action="Wayback_openForm" title="Restore the specification from a stored backup."></i>
+            <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only" data-bs-toggle="tooltip" action="Wayback_openForm" title="Restore the export specification from a stored backup."></i>
 
-            <i class="far fa-question yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="Get some help"></i>
- 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" action="Help_openDocumentation" title="Open the YES3 Exporter2 online documentation"></i>
+            <i class="far fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display navigation help for this page."></i>
 
-            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
-            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" action="Theme_light" title="Switch to the sunny side"></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openDocumentation" title="Open the YES3 Exporter2 online documentation"></i>
+
+            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" data-bs-toggle="tooltip" action="Theme_dark" title="Switch to the dark side"></i>
+            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" data-bs-toggle="tooltip" action="Theme_light" title="Switch to the sunny side"></i>
 
                 <!--img class="yes3-square-logo yes3-logo" alt="YES3 Logo" title="More about YES3..." /-->
 
@@ -801,7 +801,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                 </table>
 
                 <div class="yes3-fmapr-settings-section">
-                    Options for selecting records to export
+                    Options for selecting records
                     <i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_criterionValue" title="Guidance for entering the criterion value expression."></i>
                 </div>
 
@@ -910,7 +910,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                     </div>
 
                     
-                    <div class="yes3-flex-left">
+                    <!--div class="yes3-flex-left">
                         
                         <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
                             <label class="yes3-checkmarkContainer yes3-fmapr-if-hash-recordid">
@@ -919,13 +919,13 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                             </label>
                         </div> 
 
-                    </div>
+                    </div-->
 
 
                 </div>
 
                 <div class="yes3-fmapr-settings-section">
-                    Options for conditioning exported data and data dictionaries
+                    Options for conditioning exported data
                 </div>
 
                 <div class="yes3-fmapr yes3-flex-container">

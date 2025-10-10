@@ -2210,45 +2210,87 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 
 /** tooltip **/
 .yes3-tooltip {
-    position: fixed;
-    padding: 10px;
-    background-color: var(--yes3-background-color) !important;
-    color: var(--yes3-link-color-warning) !important;
-    font-family: var(--yes3-font-family) !important;
-    font-weight: var(--yes3-font-weight-normal) !important;
-    font-size: var(--yes3-font-size) !important;
-    border: 2px solid var(--yes3-link-color-warning) !important;
-    border-radius: 12px;
-    white-space: nowrap;
-    z-index: 10000;
-    opacity: 0;
-    transition: opacity 1s;
+   position: fixed;
+   padding: 10px;
+   background-color: var(--yes3-background-color) !important;
+   color: var(--yes3-link-color-warning) !important;
+   font-family: var(--yes3-font-family) !important;
+   font-weight: var(--yes3-font-weight-normal) !important;
+   font-size: var(--yes3-font-size) !important;
+   border: 2px solid var(--yes3-link-color-warning) !important;
+   border-radius: 12px;
+   white-space: nowrap;
+   z-index: 10000;
+   opacity: 0;
+   transition: opacity 1s;
 }
 
-.yes3-bs-tooltip:not(.yes3-bs-tooltip-static) {
-   --bs-tooltip-bg: dodgerblue;
-   --bs-tooltip-color: white;
+.popover.yes3-bs-popover {
+   max-width: 400px;
+   border-radius: 20px;
+   font-size: 0.9rem;
+   background-color: dodgerblue;   
+   border-radius: 20px;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-static {
-   --bs-tooltip-bg: purple;
-   --bs-tooltip-color: white;
+.popover.yes3-bs-popover, .popover.yes3-bs-popover .popover-body {
+
+   color: white;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-warning {
-   --bs-tooltip-bg: darkorange;
-   --bs-tooltip-color: white;
+.popover.yes3-bs-popover .popover-body a {
+   color:inherit;
+   font-size: inherit;
+   text-decoration: underline;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-error {
-   --bs-tooltip-bg: red;
-   --bs-tooltip-color: white;
+.popover.yes3-bs-popover > .popover-arrow::after {
+   border-top-color: dodgerblue; /* arrow fill color */
 }
 
+.popover.yes3-bs-popover.bs-popover-top > .popover-arrow::before {
+   border-top-color: dodgerblue; /* arrow border */
+}
+
+.popover.yes3-bs-popover > .popover-arrow {
+   /*
+   width: 1rem;
+   height: 1.25rem;
+   */
+}
+
+.yes3-bs-tooltip {
+   max-width: 400px;
+   opacity: 1 !important;
+   z-index: 10000 !important;
+   border-radius: 15px !important;
+   font-size: 0.9rem !important;
+}
+
+.yes3-bs-tooltip:not(.yes3-bs-tooltip-static):not(.yes3-bs-tooltip-error):not(.yes3-tooltip-warning) * {
+   --bs-tooltip-bg: dodgerblue !important;
+   --bs-tooltip-color: white !important;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-static * {
+   --bs-tooltip-bg: purple !important;
+   --bs-tooltip-color: white !important;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-warning * {
+   --bs-tooltip-bg: darkorange !important;
+   --bs-tooltip-color: white !important;
+}
+
+.yes3-bs-tooltip.yes3-bs-tooltip-error * {
+   --bs-tooltip-bg: red !important;
+   --bs-tooltip-color: white !important;
+}
+/*
 .yes3-bs-tooltip * {
    color: white !important;
 }
-
+*/
 .yes3-bs-tooltip .tooltip-inner{
     padding: 15px;
     border-radius: 15px;
@@ -2257,11 +2299,11 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 }
 
 .yes3-bs-tooltip-left .tooltip-inner {
-   text-align: left !important;
+   text-align: start !important;
 }
 
 .yes3-bs-tooltip-right .tooltip-inner {
-   text-align: right !important;
+   text-align: end !important;
 }
 
 .yes3-bs-tooltip-center .tooltip-inner {
