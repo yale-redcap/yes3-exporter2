@@ -883,9 +883,10 @@ class Yes3Fn {
         // --- 3) Optionally enforce ASCII-only (strip/replace any leftovers) ---
         if ($enforce) {
             if ($repl === '') {
-                // Drop anything not in ASCII printable range + common whitespace you already vetted
+                // Drop anything not in ASCII printable range + common whitespace already vetted
                 $out = preg_replace('/[^\x20-\x7E]/', '', $out);
             } else {
+                // Replace anything not in ASCII printable range + common whitespace already vetted
                 $out = preg_replace('/[^\x20-\x7E]/', $repl, $out);
             }
         }

@@ -163,7 +163,92 @@ FMAPR.openDocumentation = function(){
     window.open(YES3.documentationUrl, "_blank");
 }
 
+/*
+ * TOOLTIPS
+ */
 
+FMAPR.toolTips = [
+    { selector: "i[action=saveExportSpecification]", html: "Save the export specification. You must save the specification before you can download or export data." },
+    { selector: "i[action=download]", html: "Download the data dictionary, datasheet, or full (zipped) payload to your computer." },
+    { selector: "i[action=export]", html: "Export the full payload to the host file system." },
+    { selector: "i[action=Wayback_openForm]", html: "Restore the export specification from a stored backup." },
+    { selector: "i[action=Help_openPanel]", html: "Display navigation help for this page." },
+    { selector: "i[action=Help_openDocumentation]", html: "Open the YES3 Exporter2 online documentation." },
+    { selector: "i[action=Theme_dark]", html: "Give in to the Dark Side." },
+    { selector: "i[action=Theme_light]", html: "Return to the Sunny Side." },
+
+    { selector: "i[action=Help_multiselect]", html: "Checkbox fields can be exported as single columns that list all the selected values or multiple columns, one for each selected value. Click for more information." },
+    { selector: "i[action=Help_criterionValue]", html: "An export may include all records or selected records.<br />Click for guidance on selecting record subsets." },
+
+    { selector: "label[for=yes3-fmapr-export-selection-1]", html: "Include all records that you are allowed to access." },
+    { selector: "label[for=yes3-fmapr-export-selection-2]", html: "Include only records, from among those to which you have access, that meet specific criteria." },
+
+    { selector: "label[for=yes3-dashboard-option-settings]", html: "Edit the settings for this export specification." },
+    { selector: "label[for=yes3-dashboard-option-items]", html: "Add or remove items (fields and/or forms) for this export specification." },
+
+    { selector: "input[name=export_name]", html: "The export name is used to identify this export specification. It must be unique within the project, as it is the basis of exported file names." },
+    { selector: "textarea[name=export_label]", html: "The export label is an optional descriptive label for this export specification. It can be as long as you wish." },
+
+    { selector: "label[for=yes3-fmapr-export_multiselect-1]", html: "Export as multiple columns (one per option, each having 1=selected, blank=not selected values)." },
+    { selector: "label[for=yes3-fmapr-export_multiselect-2]", html: "Export as a single column (with all selected options listed in a single cell, separated by commas)." },
+
+    { selector: "input[name=export_criterion_field]", html: "Select the REDCap field that will be used to determine which records are included in the export.<br /><br />If you need to select records based on the values of multiple fields, we recommend using a calculated field to implement the selection logic." },
+    { selector: "select[name=export_criterion_event]", html: "Select the REDCap event for the criterion field that will be used to determine which records are included in the export.<br /><br />Once you have selected the criterion field, the available events will be listed here." },
+
+    { selector: "label:has(input[name=export_remove_phi])", html: "If checked, all fields tagged as PHI (Protected Health Information) in REDCap will be removed from the export." },
+    { selector: "label:has(input[name=export_remove_freetext])", html: "If checked, all 'free text' fields in REDCap will be removed from the export. These are text and notes/paragraph fields that allow for open-ended responses, as opposed to dates etc." },
+    { selector: "label:has(input[name=export_remove_dates])", html: "If checked, all date fields in REDCap will be removed from the export." },
+    { selector: "label:has(input[name=export_remove_largetext])", html: "If checked, all notes/paragraph text fields in REDCap will be removed from the export." },
+
+    { selector: "label:has(input[name=export_hash_recordid])", html: "If checked, the record ID field will be hashed (i.e., anonymized) in the export. The more recent hashing formula introduced in REDCap v15.5.13 will be used." },
+    { selector: "label:has(input[name=export_shift_dates])", html: "If checked, the dates in the export will be shifted using the same formula that REDCap uses (verified as of REDCap v15.5.15)" },
+
+    { selector: "label:has(input[name=export_inoffensive_text])", html: "If checked, all text values in the exported data will be stripped of unprintable control characters. These are ASCII characters 1-31 <strong>except</strong> for tab (ASCII 9) and newline (ASCII 10) characters, which are converted to spaces (ASCII 32)." },
+    { selector: "label:has(input[name=export_ascii_text])", html: "If checked, all text values in the exported data will be stripped of non-ASCII characters. An effort will be made to transform UTF8 characters into their ASCII equivalents (e.g., ≥ => '>='). Non-mappable UTF8 characters will be represented by question marks." },
+
+    { selector: "input[name=export_max_text_length]", html: "Specify the maximum length (in characters) for text values in the export. Any values exceeding this length will be truncated. Leave blank for no limit." },
+    { selector: "input[name=export_max_label_length]", html: "Specify the maximum length (in characters) for field labels in the exported data dictionary. Any field labels exceeding this length will be truncated. Leave blank for no limit." },
+
+];
+
+FMAPR.popovers = [
+    { selector: "input[name=export_criterion_value]", fn: 'Help_criterionValue', opts: {placement: 'top'}, html: `Enter the value(s) that the criterion field must match for a record to be included in the export.<br /><br />For guidance on specifying values, click <a class="yes3-more-help" href="#" data-action="yes3-more-help">here</a>.` },
+];
+
+/**
+ * function to set bootstrap tooltip properties on elements defined in FMAPR.toolTips
+ */
+FMAPR.setTooltipElementProperties = function(){
+
+    for (let i=0; i<FMAPR.toolTips.length; i++){
+        let t = FMAPR.toolTips[i];
+        $(t.selector).attr("data-bs-toggle", "tooltip")
+            .attr("data-bs-html", true)
+            .attr("title", t.html)
+        ;
+    }
+}
+
+FMAPR.enableTooltips = function() {
+
+    const container = document.getElementById("yes3-container"); 
+
+    FMAPR.setTooltipElementProperties();
+
+    YES3.setBsTooltipListenersForElement(container);
+}
+
+FMAPR.enablePopovers = function() {
+
+    for (let i=0; i<FMAPR.popovers.length; i++){
+        let p = FMAPR.popovers[i];
+        YES3.setPopoverListenersForElement(p.selector, p.html, p.fn, p.opts);
+    }
+}
+
+/*
+ * MESSAGES
+ */
 
 FMAPR.postWarningMessage = function( message )
 {
@@ -5436,6 +5521,16 @@ $(document).on('yes3-fmapr.settings', function(){
      * set the export items listeners
      */
     FMAPR.setExportItemEditorListeners();
+
+    /**
+     * enable tooltips
+     */
+    FMAPR.enableTooltips();
+
+    /**
+     * enable popovers
+     */
+    FMAPR.enablePopovers();
 
     /**
      * Start the AJAX chain by loading the event prefixes
