@@ -979,18 +979,40 @@ YES3.deBounce = function(func, delay) {
 }
 
 YES3.isUserInput = function (element) {
-  if (!element || !(element instanceof HTMLElement)) return false;
-  const tag = element.tagName.toLowerCase();
-  if (tag === 'textarea') return true;
-  if (tag === 'input') return true; // consider all input types as user input
-  if (tag === 'select') return true; // consider select elements as user input
-  //if (tag === 'label') return true; // labels are assumed to be associated with user input
-  return false;
+
+    if (!element || !(element instanceof HTMLElement)) return false;
+
+    const tag = element.tagName.toLowerCase();
+
+    if (tag === 'textarea') return true;
+    if (tag === 'input') return true; // consider all input types as user input
+    if (tag === 'select') return true; // consider select elements as user input
+
+    // Also consider elements that immediately follow an <input>
+    if (element.matches('input + span')) return true;
+    if (element.matches('input + label')) return true;
+
+    return false;
 }
     
 /* == TOOL TIPS AND POPOVERS == */
 
-// --- safety helpers ---
+YES3.enableTooltips = function( tooltipSpecs=[] ){
+
+    for (let i=0; i<tooltipSpecs.length; i++){
+        let t = tooltipSpecs[i];
+        YES3.setTooltipListenersForElement(t.selector, t.html, t.opts);
+    }
+}
+
+YES3.enablePopovers = function( popoverSpecs=[] ) {
+
+    for (let i=0; i<popoverSpecs.length; i++){
+        let p = popoverSpecs[i];
+        YES3.setPopoverListenersForElement(p.selector, p.html, p.fn, p.opts);
+    }
+}
+
 
 /**
  * 
@@ -1033,6 +1055,10 @@ YES3.clearBsTooltipsForElement = function( element ){
 
 YES3.setPopoverListenersForElement = function (triggerSelector, content, moreHelpFnOrName /* optional */, opts = {}) {
 
+    if (!triggerSelector || !content) return;
+
+    opts = opts || {};
+
     const hasFnArg = moreHelpFnOrName != null;           // true if not null/undefined
     const helpFn = hasFnArg ? YES3.getYes3Function(moreHelpFnOrName) : null;
 
@@ -1043,6 +1069,12 @@ YES3.setPopoverListenersForElement = function (triggerSelector, content, moreHel
     if (!triggerEl) return;
 
     if (hasFnArg && !helpFn) return;
+
+    // add a 'more information' link if we have a help function
+    if ( hasFnArg ) {
+
+        content += `<br /><br /><a class="yes3-more-help" href="#" data-action="yes3-more-help">Click here for more information.</a>`;
+    }
 
     let thisClass = "yes3-bs-popover";
 
@@ -1120,12 +1152,156 @@ YES3.setPopoverListenersForElement = function (triggerSelector, content, moreHel
 
         };
 
-        // keep one listener; if you recreate content, reattach
         tip.addEventListener('click', handler);
 
     });
 
     return pop;
+}
+
+YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts = {}) {
+    
+    const el = document.querySelector(triggerSelector);
+
+    if ( !el ) return;
+
+    if ( title ) el.setAttribute('title', title);
+    el.setAttribute('data-bs-toggle', 'tooltip');
+    el.setAttribute('data-bs-html', 'true');
+
+    let thisClass = "yes3-bs-tooltip";
+    let justify = "center";
+    let placement = opts.placement || "top";
+
+    if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
+    if ( el.classList.contains('yes3-warning') ) thisClass += " yes3-bs-tooltip-warning";
+    if ( el.classList.contains('yes3-error') ) thisClass += " yes3-bs-tooltip-error";
+
+    // control panel icons are placed to the left of the cursor
+    if ( el.classList.contains('yes3-action-icon-controlpanel') ) {
+        thisClass += " yes3-bs-tooltip-static"
+        placement = "left";
+    }
+
+    if ( placement === 'right' ){
+        
+        thisClass += " yes3-bs-tooltip-left";
+    }
+/*
+    if ( el.classList.contains('yes3-halign-left') || YES3.isUserInput(el) ) {
+        justify = "left";
+        thisClass += " yes3-bs-tooltip-left";
+    } else if ( el.classList.contains('yes3-halign-right') ) {
+        justify = "right";
+        thisClass += " yes3-bs-tooltip-right";
+    }
+*/
+    const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
+        //container: el.parentElement,
+        container: 'body',
+        boundary: 'viewport',
+        placement: placement,
+        trigger: 'hover focus',
+        html: true,
+        customClass: thisClass,
+        offset: ({ placement, reference, popper }) => {
+
+            const refW = reference.width;
+            const popW = popper.width;
+            if (justify === "left") {
+                // shift so the tooltip's LEFT edge aligns with the trigger's LEFT edge
+                const skidding = (popW - refW) / 2;
+                const distance = 8; // vertical gap
+                return [skidding, distance];
+            }
+            return [0, 8];
+        },
+            popperConfig: cfg => ({
+            ...cfg,
+            modifiers: [
+                ...cfg.modifiers,
+                {
+                    name: 'shiftArrowLeft',
+                    enabled: true,
+                    phase: 'write',        // run after Popper’s 'arrow' modifier
+                    fn({ state }) {
+
+                        if ( !/^top/.test(state.placement) ) return;
+                        if ( justify !== "left" ) return;
+                        if ( !state.elements.arrow ) return;
+
+                        state.elements.arrow.style.left = '16px'; // reposition arrow to left edge of tooltip
+                        state.elements.arrow.style.transform = 'translate(0,0)'; // reset any previous adjustment (the mechanism Popper uses to position the arrow)
+                    }
+                }
+            ]
+        })
+
+    });
+
+    // close tooltip when element is clicked (eg. action icons)
+    el.addEventListener('click', () => {
+        tooltip.hide();
+    });
+
+}
+
+YES3.setBsTooltipListenersForContainer = function( container ){
+
+    if (!container) return;
+
+    container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+
+        let thisClass = "yes3-bs-tooltip";
+        let placement = "top";
+
+        if ( el.classList.contains('yes3-bs-tooltip-placement-left') ) {
+            placement = "left";
+            thisClass += " yes3-bs-tooltip-right";
+        }
+
+        if ( el.classList.contains('yes3-bs-tooltip-placement-right') ) {
+            placement = "right";
+            thisClass += " yes3-bs-tooltip-left";
+        }
+
+        const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
+            container: 'body',
+            boundary: 'viewport',
+            placement: placement,
+            trigger: 'hover focus',
+            html: true,
+            customClass: thisClass,
+            
+            offset: ({ placement, reference, popper }) => {
+
+                if ( placement === 'top') {
+                    const refW = reference.width;
+                    const popW = popper.width;
+                    // shift so the tooltip's LEFT edge aligns with the trigger's LEFT edge
+                    const distance = 8; // vertical gap
+                    const skidding = (popW - refW) / 2;
+                    return [skidding, distance];
+                }
+
+                return [0, 8];
+            }
+
+        });
+
+        // close tooltip when element is clicked (eg. action icons)
+        el.addEventListener('click', () => {
+            tooltip.hide();
+        });
+
+        el.addEventListener('mousedown', (e) => {
+            if (e.button === 0 || e.button === 2) { 
+                // 0 = left, 2 = right
+                tooltip.hide();
+            }
+        });
+
+    });
 }
 
 YES3.setBsTooltipListenersForElement = function( element ){

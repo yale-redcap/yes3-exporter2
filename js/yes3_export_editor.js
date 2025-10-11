@@ -20,9 +20,33 @@ FMAPR.constrainedAutocompleteSource = [];
 FMAPR.tooltips = {
 
     "event_select": "After a REDCap field or form is selected, this drop-down will include all the REDCap events assigned to it.",
-    "row_selector": "Click to select single row; crtl-click to select multiple rows; shift-click to select range; right-click for cut/paste/delete menu",
+    "row_selector": "<h5>ROW SELECTOR</h5>" +
+    "<p>The row selector enables options for selecting, moving and deleting single or multiple rows.</p>" +
+    "<ul>" +
+    "<li><strong>Click</strong> in the row selector to select the row.</li>" +
+    "<ul><li>The selected row is highlighted.</li>" +
+    "<li>A single selected row can be dragged to a new position.</li></ul>" +
+    "<li>Press <strong>Ctrl-Click</strong> in the row selector to select multiple rows. Each selected row will remain highlighted.</li>" +
+    "<li>Press <strong>Shift-Click</strong> in the row selector to select a range of rows. All rows in the range will be highlighted.</li>" +
+    "</ul>" +
+    "<p>Once one or more rows are selected, the following actions are available:</p>" +
+    "<ol>" +
+    "<li>To cut the selection:</li>"+ 
+    "<ul><li>Press <strong>Ctrl+X</strong></li>"+
+    "<li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>"+
+    "</ul>" +
+    "<li>To paste the cut row(s):</li>"+
+    "<ul><li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>"+
+    "<li>Press <strong>Ctrl+V</strong>.</li>"+
+    "<li>The cut row(s) will be pasted above the selected row.</li></ul>" +
+    "<li>To clear the selection (deselect all rows):</li>"+
+    "<ul><li>Press <strong>Ctrl+Z</strong>.</li></ul>" +
+    "<li>To delete the selected rows:</li>" +
+    "<ul><li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu</li><li>Click <strong>delete</strong>.</li><li>There is no keyboard shortcut for this action.</li></ul>" +
+    "</ol>",
     "row_editor": "Click to edit this export item.",
-    "row_trashcan": "Click to remove this export item."
+    "row_trashcan": "Click to remove this export item.",
+    "row_event": "The REDCap event for this export item.",
 
 }
 
@@ -163,11 +187,31 @@ FMAPR.openDocumentation = function(){
     window.open(YES3.documentationUrl, "_blank");
 }
 
-/*
- * TOOLTIPS
+/** 
+ * TOOLTIP and POPOVER SPECIFICATIONS
+ * 
+ * BS/popper tooltips and popovers are styled to appear indistinguishable from each other, 
+ * but popovers will persist until the user clicks elsewhere.
+ * Popovers can therefore include UI content, including links.
+ * 
+ * These are used to set up Bootstrap/popper tooltips and popovers. 
+ * 
+ * Required tooltip structure (not positionally sensitive):
+ * { selector: "CSS selector", html: "HTML content"[, opts] }
+ * Implemented by: YES3.enableTooltips( tooltipSpecs )
+ * 
+ * Required popover structure:
+ * { selector: "CSS selector", html: "HTML content"[, opts][, Fn] }
+ * Implemented by: YES3.enablePopovers( popoverSpecs )
+ * 
+ * where 
+ * (1) opts is an optional object that that provides overriding options to the popover/tooltip, e.g. {placement: 'top'}
+ * (2) Fn is an optional "more help" function or function reference. If provided, a "more help" link will be added to the popover content.
+ *     Popovers only. Ignored for tooltips.
+ * 
  */
 
-FMAPR.toolTips = [
+FMAPR.tooltipSpecs = [
     { selector: "i[action=saveExportSpecification]", html: "Save the export specification. You must save the specification before you can download or export data." },
     { selector: "i[action=download]", html: "Download the data dictionary, datasheet, or full (zipped) payload to your computer." },
     { selector: "i[action=export]", html: "Export the full payload to the host file system." },
@@ -177,77 +221,62 @@ FMAPR.toolTips = [
     { selector: "i[action=Theme_dark]", html: "Give in to the Dark Side." },
     { selector: "i[action=Theme_light]", html: "Return to the Sunny Side." },
 
-    { selector: "i[action=Help_multiselect]", html: "Checkbox fields can be exported as single columns that list all the selected values or multiple columns, one for each selected value. Click for more information." },
-    { selector: "i[action=Help_criterionValue]", html: "An export may include all records or selected records.<br />Click for guidance on selecting record subsets." },
+    { selector: "input#yes3-dashboard-option-settings+label", html: "Edit the settings for this export specification." },
+    { selector: "input#yes3-dashboard-option-items+label", html: "Add or remove items (fields and/or forms) for this export specification." },
 
-    { selector: "label[for=yes3-fmapr-export-selection-1]", html: "Include all records that you are allowed to access." },
-    { selector: "label[for=yes3-fmapr-export-selection-2]", html: "Include only records, from among those to which you have access, that meet specific criteria." },
+    { selector: "i[action=Help_multiselect]", opts: { placement: 'right' }, html: "Checkbox fields can be exported as single columns that list all the selected values or multiple columns, one for each selected value. Click for more information." },
+    { selector: "i[action=Help_criterionValue]", opts: { placement: 'right' }, html: "An export may include all records or selected records.<br />Click for guidance on selecting record subsets." },
+    { selector: "i[action=Help_export_file_type]", opts: { placement: 'right' }, html: "Data may be exported as either comma-separated files (CSV) or as a tab-delimited text files (TSV). Click for more information." },
+    { selector: "i[action=Help_sascode]", opts: { placement: 'right' }, html: "Export payloads, either downloaded or written to the host file system, may include executable SAS code. Click for more information." },
+    
+    { selector: "input[name=export_batch]+span", opts: { placement: 'top' }, html: "If checked, this export will be included in the nightly batch cron job." },
 
-    { selector: "label[for=yes3-dashboard-option-settings]", html: "Edit the settings for this export specification." },
-    { selector: "label[for=yes3-dashboard-option-items]", html: "Add or remove items (fields and/or forms) for this export specification." },
+    { selector: "input#yes3-fmapr-export-selection-1+label", opts: { placement: 'top' }, html: "Include all records that you are allowed to access." },
+    { selector: "input#yes3-fmapr-export-selection-2+label", opts: { placement: 'top' }, html: "Include only records, from among those to which you have access, that meet specific criteria." },
 
-    { selector: "input[name=export_name]", html: "The export name is used to identify this export specification. It must be unique within the project, as it is the basis of exported file names." },
-    { selector: "textarea[name=export_label]", html: "The export label is an optional descriptive label for this export specification. It can be as long as you wish." },
+    { selector: "input[name=export_name]", opts: { placement: 'top' }, html: "The export name is used to identify this export specification. It must be unique within the project, as it is the basis of exported file names." },
+    { selector: "textarea[name=export_label]", opts: { placement: 'top' }, html: "The export label is an optional descriptive label for this export specification. It can be as long as you wish." },
 
-    { selector: "label[for=yes3-fmapr-export_multiselect-1]", html: "Export as multiple columns (one per option, each having 1=selected, blank=not selected values)." },
-    { selector: "label[for=yes3-fmapr-export_multiselect-2]", html: "Export as a single column (with all selected options listed in a single cell, separated by commas)." },
+    { selector: "input#yes3-fmapr-export_multiselect-1+label", opts: { placement: 'right' }, html: "Export as multiple columns (one per option, each having 1=selected, blank=not selected values)." },
+    { selector: "input#yes3-fmapr-export_multiselect-2+label", opts: { placement: 'right' }, html: "Export as a single column (with all selected options listed in a single cell, separated by commas)." },
 
-    { selector: "input[name=export_criterion_field]", html: "Select the REDCap field that will be used to determine which records are included in the export.<br /><br />If you need to select records based on the values of multiple fields, we recommend using a calculated field to implement the selection logic." },
-    { selector: "select[name=export_criterion_event]", html: "Select the REDCap event for the criterion field that will be used to determine which records are included in the export.<br /><br />Once you have selected the criterion field, the available events will be listed here." },
+    { selector: "input[name=export_criterion_field]", opts: { placement: 'right' }, html: "Select the REDCap field that will be used to determine which records are included in the export.<br /><br />If you need to select records based on the values of multiple fields, we recommend using a calculated field to implement the selection logic.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for selecting records</strong> for more information." },
+    { selector: "select[name=export_criterion_event]", opts: { placement: 'right' }, html: "Select the REDCap event for the criterion field that will be used to determine which records are included in the export.<br /><br />Once you have selected the criterion field, the available events will be listed here.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for selecting records</strong> for more information." },
+    { selector: "input[name=export_criterion_value]", opts: { placement: 'right' }, html: "Enter the value(s) that the criterion field must match for a record to be included in the export.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for selecting records</strong> for more information." },
 
-    { selector: "label:has(input[name=export_remove_phi])", html: "If checked, all fields tagged as PHI (Protected Health Information) in REDCap will be removed from the export." },
-    { selector: "label:has(input[name=export_remove_freetext])", html: "If checked, all 'free text' fields in REDCap will be removed from the export. These are text and notes/paragraph fields that allow for open-ended responses, as opposed to dates etc." },
-    { selector: "label:has(input[name=export_remove_dates])", html: "If checked, all date fields in REDCap will be removed from the export." },
-    { selector: "label:has(input[name=export_remove_largetext])", html: "If checked, all notes/paragraph text fields in REDCap will be removed from the export." },
+    { selector: "input[name=export_remove_phi]+span", opts: { placement: 'top' }, html: "If checked, all fields tagged as PHI (Protected Health Information) in REDCap will be removed from the export." },
+    { selector: "input[name=export_remove_freetext]+span", opts: { placement: 'top' }, html: "If checked, all 'free text' fields in REDCap will be removed from the export. These are text and notes/paragraph fields that allow for open-ended responses, as opposed to dates etc." },
+    { selector: "input[name=export_remove_dates]+span", opts: { placement: 'top' }, html: "If checked, all date fields in REDCap will be removed from the export." },
+    { selector: "input[name=export_remove_largetext]+span", opts: { placement: 'top' }, html: "If checked, all notes/paragraph text fields in REDCap will be removed from the export." },
 
-    { selector: "label:has(input[name=export_hash_recordid])", html: "If checked, the record ID field will be hashed (i.e., anonymized) in the export. The more recent hashing formula introduced in REDCap v15.5.13 will be used." },
-    { selector: "label:has(input[name=export_shift_dates])", html: "If checked, the dates in the export will be shifted using the same formula that REDCap uses (verified as of REDCap v15.5.15)" },
+    { selector: "input[name=export_hash_recordid]+span", opts: { placement: 'top' }, html: "If checked, the record ID field will be hashed (i.e., anonymized) in the export. The more recent hashing formula introduced in REDCap v15.5.13 will be used." },
+    { selector: "input[name=export_shift_dates]+span", opts: { placement: 'top' }, html: "If checked, the dates in the export will be shifted using the same formula that REDCap uses (verified as of REDCap v15.5.15)" },
 
-    { selector: "label:has(input[name=export_inoffensive_text])", html: "If checked, all text values in the exported data will be stripped of unprintable control characters. These are ASCII characters 1-31 <strong>except</strong> for tab (ASCII 9) and newline (ASCII 10) characters, which are converted to spaces (ASCII 32)." },
-    { selector: "label:has(input[name=export_ascii_text])", html: "If checked, all text values in the exported data will be stripped of non-ASCII characters. An effort will be made to transform UTF8 characters into their ASCII equivalents (e.g., ≥ => '>='). Non-mappable UTF8 characters will be represented by question marks." },
+    { selector: "input[name=export_inoffensive_text]+span", opts: { placement: 'top' }, html: "If checked, all text values in the exported data will be stripped of unprintable control characters. These are ASCII characters 1-31 <strong>except</strong> for tab (ASCII 9) and newline (ASCII 10) characters, which are converted to spaces (ASCII 32)." },
+    { selector: "input[name=export_ascii_text]+span", opts: { placement: 'top' }, html: "If checked, all text values in the exported data will be stripped of non-ASCII characters. An effort will be made to transform UTF8 characters into their ASCII equivalents (e.g., ≥ => '>='). Non-mappable UTF8 characters will be represented by question marks." },
 
-    { selector: "input[name=export_max_text_length]", html: "Specify the maximum length (in characters) for text values in the export. Any values exceeding this length will be truncated. Leave blank for no limit." },
-    { selector: "input[name=export_max_label_length]", html: "Specify the maximum length (in characters) for field labels in the exported data dictionary. Any field labels exceeding this length will be truncated. Leave blank for no limit." },
+    { selector: "input[name=export_max_text_length]", opts: { placement: 'right' }, html: "Specify the maximum length (in characters) for text values in the export. Any values exceeding this length will be truncated. Leave blank for no limit." },
+    { selector: "input[name=export_max_label_length]", opts: { placement: 'right' }, html: "Specify the maximum length (in characters) for field labels in the exported data dictionary. Any field labels exceeding this length will be truncated. Leave blank for no limit." },
+
+    { selector: "label[for=yes3-fmapr-export_file_type-csv]", fn: 'Help_export_file_type', opts: {placement: 'top'}, html: "Export data as comma-separated values (CSV).<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Export File Type</strong> for more information." },
+    { selector: "label[for=yes3-fmapr-export_file_type-tsv]", fn: 'Help_export_file_type', opts: {placement: 'top'}, html: "Export data as tab-separated values (TSV).<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Export File Type</strong> for more information." },
+
+    { selector: "input[name=export_sascode]+span", opts: { placement: 'top' }, html: "If checked, executable SAS code will be included in full export payloads, either downloaded or written to the host file system.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+    { selector: "input[name=export_sascode_ascii]+span", opts: { placement: 'top' }, html: "If checked, executable SAS code will use ASCII encoding for variable and format labels.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+    { selector: "input[name=export_sascode_libref]", opts: { placement: 'right' }, html: "Enter the library reference name for the exported SAS code. This is a 1-8 character string that typically stands in for the project name.<br><br>Example 'lvbtr'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+    { selector: "input[name=export_sascode_libref_path]", opts: { placement: 'right' }, html: "Enter the full path for the exported SAS dataset and format library. This is a file location that must exist for the code to run.<br><br>Example: 'C:\Users\criwebtools\livebetter\sascode'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+    { selector: "input[name=export_sascode_dsname]", opts: { placement: 'right' }, html: "Enter the name for the SAS dataset to be created by this export. <br><br>Example: 'patient_screen'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
 
 ];
 
-FMAPR.popovers = [
-    { selector: "input[name=export_criterion_value]", fn: 'Help_criterionValue', opts: {placement: 'top'}, html: `Enter the value(s) that the criterion field must match for a record to be included in the export.<br /><br />For guidance on specifying values, click <a class="yes3-more-help" href="#" data-action="yes3-more-help">here</a>.` },
-];
+FMAPR.moreHelpLink = `<a class="yes3-more-help" href="#" data-action="yes3-more-help">Click here for more information.</a>`;
 
+FMAPR.popoverSpecs = [
+                
+]
+ 
 /**
- * function to set bootstrap tooltip properties on elements defined in FMAPR.toolTips
- */
-FMAPR.setTooltipElementProperties = function(){
-
-    for (let i=0; i<FMAPR.toolTips.length; i++){
-        let t = FMAPR.toolTips[i];
-        $(t.selector).attr("data-bs-toggle", "tooltip")
-            .attr("data-bs-html", true)
-            .attr("title", t.html)
-        ;
-    }
-}
-
-FMAPR.enableTooltips = function() {
-
-    const container = document.getElementById("yes3-container"); 
-
-    FMAPR.setTooltipElementProperties();
-
-    YES3.setBsTooltipListenersForElement(container);
-}
-
-FMAPR.enablePopovers = function() {
-
-    for (let i=0; i<FMAPR.popovers.length; i++){
-        let p = FMAPR.popovers[i];
-        YES3.setPopoverListenersForElement(p.selector, p.html, p.fn, p.opts);
-    }
-}
-
-/*
- * MESSAGES
+* MESSAGES
  */
 
 FMAPR.postWarningMessage = function( message )
@@ -673,7 +702,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     let form_label = "all forms";
     let object_type = "form";
     let object_repeating_class = "yes3-non-repeating";
-    let object_repeating_class_title = "This is a NON-REPEATING form";
+    let object_repeating_class_title = "This export item is a NON-REPEATING form";
 
     if ( YES3.isEmpty( theRowBeforeWhich ) ){
         theRowBeforeWhich = FMAPR.getNewFieldRow();
@@ -704,7 +733,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
 
             object_type = "form R";
             object_repeating_class = "yes3-repeating";
-            object_repeating_class_title = "This is a REPEATING form";
+            object_repeating_class_title = "This export item is a REPEATING form";
         }
     }
 
@@ -721,14 +750,14 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     //let eventSelectHtml  = FMAPR.getElementEventHtml( yes3_fmapr_data_element_name, 'redcap');
 
     let html = `<tr class='yes3-fmapr-redcap-form yes3-fmapr-data-element ${object_repeating_class} yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap form" id="${rowId}" data-element_origin="redcap" data-object_type="form" data-object_name="${form_name}" data-object_event="${event}">`;
-    html += `<td class='yes3-fmapr-row-number' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
-    html += `<td class='yes3-fmapr-redcap-object-type' title='${object_repeating_class_title}'>${object_type}</td>`;
+    html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
+    html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+    html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event'  data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' title="REDcap form">${form_label}</td>`;
-    html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
+    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="REDcap form name">${form_label}</td>`;
+    html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
     html += "</tr>";
 
     if ( batch ){
@@ -741,7 +770,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
 
 FMAPR.injectREDCapObjectHtmlV2 = function(theRowBeforeWhich, yes3_fmapr_data_element_name, html)
 {
-    let fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+    let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
 
     if ( YES3.isEmpty( theRowBeforeWhich ) ){
         theRowBeforeWhich = null; //FMAPR.getExportRapidEntryEditor();
@@ -752,7 +781,7 @@ FMAPR.injectREDCapObjectHtmlV2 = function(theRowBeforeWhich, yes3_fmapr_data_ele
         $( html ).insertBefore( theRowBeforeWhich );
     }
     else {
-        fmaprBody.append( html );
+        $fmaprBody.append( html );
     }
 
     let elementRow = $(`tr.yes3-fmapr-data-element[data-yes3_fmapr_data_element_name='${yes3_fmapr_data_element_name}']`);
@@ -1382,7 +1411,7 @@ FMAPR.addREDCapForm = function( form_name, event, theRowBeforeWhich )
         return false;
     }
      
-    let fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+    let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
 
     let yes3_fmapr_data_element_name = FMAPR.RawREDCapDataElementName(0);
 
@@ -1407,7 +1436,7 @@ FMAPR.addREDCapForm = function( form_name, event, theRowBeforeWhich )
      * If there is no "row before" the table has no rows so we append.
      */
     if ( $.isEmptyObject(theRowBeforeWhich) ){
-        fmaprBody.append( html );
+        $fmaprBody.append( html );
     }
     else {
         $( html ).insertAfter( theRowBeforeWhich );
@@ -3389,6 +3418,9 @@ FMAPR.REDCapFieldContextMenuContent = function( rowId, field_name, element_name,
         return "";
     }
 
+    // hide all tooltips
+    $('.yes3-tooltip').hide();
+
     let theRow = $(`tr#${rowId}`);
 
     let theNexRow = theRow.next('tr');
@@ -3422,7 +3454,7 @@ FMAPR.REDCapFieldContextMenuContent = function( rowId, field_name, element_name,
 
             html += `<tr class='yes3-command-disabled'><td>cut selection</td><td>ctrl+x</td></tr>`;
         }
-        html += `<tr class='yes3-command-disabled'><td>paste selection</td><td>ctrl+v</td></tr>`;
+        html += `<tr class='yes3-command-disabled'><td>paste cut rows</td><td>ctrl+v</td></tr>`;
         html += `<tr><td><a href="javascript:FMAPR.contextMenuRemoveRowSelections();">delete selection</a></td><td>&nbsp;</td></tr>`;
         html += `<tr><td><a href="javascript:FMAPR.contextMenuClearRowSelections();">clear selection</a></td><td>ctrl+z</td></tr>`;
     }
@@ -4506,7 +4538,11 @@ FMAPR.populateExportItemRowsV2 = function( specification )
         return false;
     }
 
-    let fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+    const fmaprBody = document.querySelector('table.yes3-fmapr-specification tbody');
+    const $fmaprBody = $(fmaprBody);
+
+    // clear any existing tooltip objects
+    YES3.clearBsTooltipsForElement( fmaprBody );
 
     html = "";
 
@@ -4540,8 +4576,12 @@ FMAPR.populateExportItemRowsV2 = function( specification )
         }
     }
 
-    fmaprBody.append(html);
+    $fmaprBody.append(html);
+
     FMAPR.setRowSelectorListenersV2();
+
+    // set the tooltip handlers
+    YES3.setBsTooltipListenersForContainer( fmaprBody );
 }
 
 /**
@@ -4640,7 +4680,7 @@ FMAPR.editExistingExportItem = function( yes3_fmapr_data_element_name )
         .trigger('change')
     ;
 
-    theForm.find(`[name='redcap_${object_type}']`).val(object_name);
+    theForm.find(`[name='redcap_${object_type}']`).val(object_name).trigger('change');
 }
 
 FMAPR.closeItemEditorForm = function()
@@ -4995,7 +5035,7 @@ FMAPR.exportItemEditorSave_fields = function(object_name, object_event, theRowBe
     let fields = [];
     let html = "";
 
-    let fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+    let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
 
     if ( object_name===ALL_OF_THEM ) {
 
@@ -5037,7 +5077,7 @@ FMAPR.exportItemEditorSave_fields = function(object_name, object_event, theRowBe
         $( html ).insertBefore( theRowBeforeWhich );
     }
     else {
-        fmaprBody.append( html );
+       $fmaprBody.append( html );
     }
 
     FMAPR.setRowSelectorListenersV2();
@@ -5525,12 +5565,14 @@ $(document).on('yes3-fmapr.settings', function(){
     /**
      * enable tooltips
      */
-    FMAPR.enableTooltips();
+    //FMAPR.enableTooltips();
+    YES3.enableTooltips( FMAPR.tooltipSpecs );
 
     /**
      * enable popovers
      */
-    FMAPR.enablePopovers();
+    //FMAPR.enablePopovers();
+    YES3.enablePopovers( FMAPR.popoverSpecs );
 
     /**
      * Start the AJAX chain by loading the event prefixes
