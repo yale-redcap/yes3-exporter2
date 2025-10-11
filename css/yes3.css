@@ -2209,6 +2209,7 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 }
 
 /** tooltip **/
+/*
 .yes3-tooltip {
    position: fixed;
    padding: 10px;
@@ -2224,9 +2225,10 @@ table.yes3-dashboard th:not(.yes3-th-title) {
    opacity: 0;
    transition: opacity 1s;
 }
+   */
 
 .popover.yes3-bs-popover {
-   max-width: 400px;
+   max-width: 600px;
    border-radius: 20px;
    font-size: 0.9rem;
    background-color: dodgerblue;   
@@ -2259,30 +2261,40 @@ table.yes3-dashboard th:not(.yes3-th-title) {
    */
 }
 
-.yes3-bs-tooltip {
-   max-width: 400px;
-   opacity: 1 !important;
-   z-index: 10000 !important;
-   border-radius: 15px !important;
-   font-size: 0.9rem !important;
+.tooltip-arrow {
+   display: none !important;
 }
 
-.yes3-bs-tooltip:not(.yes3-bs-tooltip-static):not(.yes3-bs-tooltip-error):not(.yes3-tooltip-warning) * {
+.tooltip.yes3-bs-tooltip {
+   max-width: 500px;
+   z-index: 10000 !important;
+}
+
+.tooltip.yes3-bs-tooltip.fade {
+   opacity: 0;
+   transition: none;
+}
+
+.tooltip.yes3-bs-tooltip.show {
+   opacity: 1;
+}
+
+.tooltip.yes3-bs-tooltip:not(.yes3-bs-tooltip-static):not(.yes3-bs-tooltip-error):not(.yes3-tooltip-warning) * {
    --bs-tooltip-bg: dodgerblue !important;
    --bs-tooltip-color: white !important;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-static * {
+.tooltip.yes3-bs-tooltip.yes3-bs-tooltip-static * {
    --bs-tooltip-bg: purple !important;
    --bs-tooltip-color: white !important;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-warning * {
+.tooltip.yes3-bs-tooltip.yes3-bs-tooltip-warning * {
    --bs-tooltip-bg: darkorange !important;
    --bs-tooltip-color: white !important;
 }
 
-.yes3-bs-tooltip.yes3-bs-tooltip-error * {
+.tooltip.yes3-bs-tooltip.yes3-bs-tooltip-error * {
    --bs-tooltip-bg: red !important;
    --bs-tooltip-color: white !important;
 }
@@ -2291,22 +2303,22 @@ table.yes3-dashboard th:not(.yes3-th-title) {
    color: white !important;
 }
 */
-.yes3-bs-tooltip .tooltip-inner{
+.tooltip.yes3-bs-tooltip .tooltip-inner{
     padding: 15px;
     border-radius: 15px;
-    transition: opacity 0.5s;
-    max-width: 400px;
+    transition: none;
+    max-width: 600px;
 }
 
-.yes3-bs-tooltip-left .tooltip-inner {
+.tooltip.yes3-bs-tooltip-left .tooltip-inner {
    text-align: start !important;
 }
 
-.yes3-bs-tooltip-right .tooltip-inner {
+.tooltip.yes3-bs-tooltip-right .tooltip-inner {
    text-align: end !important;
 }
 
-.yes3-bs-tooltip-center .tooltip-inner {
+.tooltip.yes3-bs-tooltip-center .tooltip-inner {
    text-align: center !important;
 }
 
