@@ -1960,8 +1960,8 @@ div#niayes3-study-info {
  
  table.yes3-dashboard thead {
    background-color: var(--yes3-th-background-color);
-   border-top: 1px solid var(--yes3-th-border-color);
-   border-bottom: 1px solid var(--yes3-th-border-color);
+   /*border-top: 1px solid var(--yes3-th-border-color);*/
+   border-bottom: 2px solid var(--yes3-color);
    border-left: 0;
    border-right: 0;
    width: 100%;

@@ -162,6 +162,11 @@ YES3.Functions.Help_sascode = function()
     let thePanel = YES3.openPanel("yes3-fmapr-sascode-help-panel", true);
 }
 
+YES3.Functions.Help_rowselector = function()
+{
+    let thePanel = YES3.openPanel("yes3-fmapr-row-selector-help-panel", true);
+}
+
 YES3.Functions.Help_export_file_type = function()
 {
     let thePanel = YES3.openPanel("yes3-fmapr-export-file-type-help-panel", true);
@@ -799,24 +804,6 @@ FMAPR.setObjectInsertMode = function( theRowBeforeWhich )
         return "insert"
     };
     return "append";
-}
-
-FMAPR.itemTableHeaderHtml = function()
-{
-    return '';
-    
-    let html = `<tr id="yes3-fmapr-dummy-row">`;
-    html += `<td class='yes3-fmapr-row-number'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-type'>&nbsp;</td>`;
-    if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event'>&nbsp;</td>`;
-    }
-    html += `<td class='yes3-fmapr-redcap-object-name'>&nbsp;</td>`;
-    html += `<td class='yes3-gutter-right-top'>&nbsp;</td>`;
-    html += "</tr>";
-
-    return html;
 }
 
 FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
@@ -4093,7 +4080,8 @@ FMAPR.dashboardOptionHandler = function()
 
     let optionTitle = {
         "settings": "",
-        "items": `<span class="yes3-fmapr-nonempty" title="click on any 'pencil' icon to edit the associated export item">click&nbsp;<i class="far fa-edit yes3-fmapr-item-editor"></i>&nbsp;to edit</span>`,
+        "items": "",
+        //"items": `<span class="yes3-fmapr-nonempty" title="click on any 'pencil' icon to edit the associated export item">click&nbsp;<i class="far fa-edit yes3-fmapr-item-editor"></i>&nbsp;to edit</span>`,
     }
     
     $('div.yes3-dashboard-title').html( optionTitle[yes3_dashboard_option] );
@@ -4195,12 +4183,12 @@ FMAPR.populateSpecificationTables = function( specification )
         // settingsAreDirty will be true if any settings were blank and set to default values
         const settingsAreDirty = FMAPR.populateSettingsTable( specification );
 
-        FMAPR.emptyExportItemsTable();
         /**
          * Use the save function to audit the settings just loaded, and mark any blank or bad entries
          * (no save request will be issued)
          */        
         YES3.Functions.saveExportSpecification(true);
+
         FMAPR.populateExportItemsTable( specification );
         
     //} catch(e) {
@@ -4478,17 +4466,53 @@ FMAPR.setDefaultOptionValue = function( setting_name, defaultOptionSelection )
 
 FMAPR.emptyExportItemsTable = function()
 {
-    let tbl = FMAPR.getExportItemsTable();
-    tbl.find('tbody').empty().append(FMAPR.itemTableHeaderHtml());
+    const $fmaprTable = FMAPR.getExportItemsTable();
+    const fmaprTable = $fmaprTable.get(0); // DOM object
+    const $fmaprHead  = $fmaprTable.find('thead');
+    const $fmaprBody  = $fmaprTable.find('tbody');
+
+    // clear any existing tooltip objects
+    YES3.clearBsTooltipsForElement( fmaprTable );
+
+    // empty the head and body
+    // use jQuery empty() rather than html("") to avoid orphaned jQuery-assigned event handlers
+    $fmaprHead.empty();
+    $fmaprBody.empty();
+}
+
+FMAPR.populateExportItemsTableHead = function(){
+
+    const table = FMAPR.getExportItemsTable().get(0); // DOM object
+    const $tbody = FMAPR.getExportItemsTable().find('tbody');
+    const $thead = FMAPR.getExportItemsTable().find('thead');
+
+    let html = '';
+
+    const ncols = YES3.getTableColumnCount( table );
+
+    if ( ncols === 0 ){
+
+        html = `<tr><th>Click the <strong>form or field</strong> below to start adding items to this export specification, or the <strong>everything</strong> button to add all fields.</th></tr>`;
+
+        $thead.append(html);
+
+        return html;
+    }
+
+    $thead.append(html);
+
+    return html;
 }
 
 FMAPR.populateExportItemsTable = function( specification )
 {
-    let tbl = FMAPR.getExportItemsTable();
-
     FMAPR.markAsBuildInProgress();
 
+    FMAPR.emptyExportItemsTable(); // empties the table and clears any tooltips
+
     FMAPR.populateExportItemRowsV2( specification );
+
+    FMAPR.populateExportItemsTableHead(); // must be after rows are added, because head depends on layout
 
     FMAPR.setRepeatLayoutConstraints();
 
@@ -4514,7 +4538,6 @@ FMAPR.populateExportItemRowsV2 = function( specification )
 {
     let items = null;
     let item = null;
-    let tbl = FMAPR.getExportItemsTable();
     let row = null;
     let itemREDCapField = null;
     let itemREDCapValue = null;
@@ -4538,11 +4561,9 @@ FMAPR.populateExportItemRowsV2 = function( specification )
         return false;
     }
 
-    const fmaprBody = document.querySelector('table.yes3-fmapr-specification tbody');
-    const $fmaprBody = $(fmaprBody);
-
-    // clear any existing tooltip objects
-    YES3.clearBsTooltipsForElement( fmaprBody );
+    const $fmaprTable = FMAPR.getExportItemsTable();
+    const $fmaprHead = $fmaprTable.find('thead');
+    const $fmaprBody = $fmaprTable.find('tbody');
 
     html = "";
 

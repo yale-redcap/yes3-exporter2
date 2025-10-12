@@ -1395,6 +1395,21 @@ YES3.setDefaultBsTooltipAttributes = function( element ){
     });
 }
 
+YES3.getTableColumnCount = function(table) {
+  let maxCols = 0;
+
+  for (const row of table.rows) {
+    let count = 0;
+    for (const cell of row.cells) {
+      const span = parseInt(cell.getAttribute('colspan') || 1, 10);
+      count += span;
+    }
+    maxCols = Math.max(maxCols, count);
+  }
+
+  return maxCols;
+}
+
 /*
 * the approved alternative to $(document).ready()
 */
