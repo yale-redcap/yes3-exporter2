@@ -1201,8 +1201,9 @@ YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts
         container: 'body',
         boundary: 'viewport',
         placement: placement,
-        trigger: 'hover focus',
+        trigger: 'hover',
         html: true,
+        delay: { "show": 1000, "hide": 0 },
         customClass: thisClass,
         offset: ({ placement, reference, popper }) => {
 
@@ -1269,7 +1270,8 @@ YES3.setBsTooltipListenersForContainer = function( container ){
             container: 'body',
             boundary: 'viewport',
             placement: placement,
-            trigger: 'hover focus',
+            trigger: 'hover',
+            delay: { "show": 1000, "hide": 0 },
             html: true,
             customClass: thisClass,
             
@@ -1338,7 +1340,8 @@ YES3.setBsTooltipListenersForElement = function( element ){
             container: el.parentElement,
             boundary: 'viewport',
             placement: placement,
-            trigger: 'hover focus',
+            trigger: 'hover',
+            delay: { "show": 1000, "hide": 0 },
             html: true,
             customClass: thisClass,
             offset: ({ placement, reference, popper }) => {
@@ -1393,6 +1396,21 @@ YES3.setDefaultBsTooltipAttributes = function( element ){
         el.setAttribute('data-bs-toggle', 'tooltip');
         el.setAttribute('data-bs-placement', 'top');
     });
+}
+
+YES3.getTableColumnCount = function(table) {
+  let maxCols = 0;
+
+  for (const row of table.rows) {
+    let count = 0;
+    for (const cell of row.cells) {
+      const span = parseInt(cell.getAttribute('colspan') || 1, 10);
+      count += span;
+    }
+    maxCols = Math.max(maxCols, count);
+  }
+
+  return maxCols;
 }
 
 /*

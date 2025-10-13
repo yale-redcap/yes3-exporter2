@@ -976,6 +976,14 @@ th.yes3-text-center, td.yes3-text-center {
     text-align: center;
 }
 
+th.yes3-text-right, td.yes3-text-right {
+    text-align: right;
+}
+
+th.yes3-text-left, td.yes3-text-left {
+    text-align: left;
+}
+
  a:focus, i:focus, a:hover, i:hover {
     outline: none !important;
  }
@@ -1114,6 +1122,25 @@ div.yes3-information p {
    /* font-weight: var(--yes3-font-weight); ; */
     font-size: var(--yes3-font-size);
 }
+
+div.yes3-information ul, div.yes3-information ol {
+    color: var(--yes3-information-color);
+   /*font-family: var(--yes3-font-family);*/
+   /* font-weight: var(--yes3-font-weight); ; */
+    font-size: var(--yes3-font-size);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+div.yes3-information li {
+    color: var(--yes3-information-color);
+   /*font-family: var(--yes3-font-family);*/
+   /* font-weight: var(--yes3-font-weight); ; */
+    font-size: var(--yes3-font-size);
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: calc(2 * var(--yes3-padding));
+} 
 
 .yes3-information-em {
     /*color: var(--yes3-information-em-color) !important;*/
@@ -1379,7 +1406,7 @@ div.yes3-max-headroom {
 
  .yes3-panel ol li:not(:first-child) {
 
-   margin-top: 8px;
+   margin-top: 4px;
  }
  
  .yes3-panel a:hover {
@@ -1960,8 +1987,8 @@ div#niayes3-study-info {
  
  table.yes3-dashboard thead {
    background-color: var(--yes3-th-background-color);
-   border-top: 1px solid var(--yes3-th-border-color);
-   border-bottom: 1px solid var(--yes3-th-border-color);
+   /*border-top: 1px solid var(--yes3-th-border-color);*/
+   border-bottom: 2px solid var(--yes3-color);
    border-left: 0;
    border-right: 0;
    width: 100%;

@@ -211,6 +211,91 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
    
 </div>
 
+<!--- ITEM ROW SELECTOR HELP -->
+
+<div id="yes3-fmapr-row-selector-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
+
+    <div class="yes3-panel-header-row">
+        <div class="yes3-panel-row-left">
+            The export item row selector
+        </div>
+        <div class="yes3-panel-row-right">
+            <a href='javascript: YES3.closePanel("yes3-fmapr-row-selector-help-panel")'><i class="fas fa-times fa-2x"></i></a>
+        </div>
+    </div>
+
+    <div class="yes3-information yes3-scrolling-container yes3-full-width yes3-default-panel-height">
+
+        <p><em>Note: you may leave this information panel open while working with the export item list.</em></p>
+
+        <h6>The row selector is the narrow column to the left of the export item list.
+        <br />It is used to select one or more rows for cutting, pasting, dragging or deleting.</h6>
+
+        <ol>
+            <li>To select a single row:
+                <ul>
+                    <li>Click in the row selector of the desired row.</li>
+                    <li>The selected row will be highlighted.</li>
+                </ul>
+            </li>
+            <li>To select a contiguous range of rows:
+                <ul>
+                    <li>Click in the row selector of the first row in the range.</li>
+                    <li>Then, while holding down the <strong>Shift</strong> key, click in the row selector of the last row in the range.</li>
+                    <li>All rows in the range will be highlighted.</li>
+                </ul>
+            </li>
+            <li>To select multiple non-contiguous rows:
+                <ul>
+                    <li>Click in the row selector of the first desired row.</li>
+                    <li>Then, while holding down the <strong>Ctrl</strong> key (or <strong>Cmd</strong> key on a Mac), click in the row selector of each additional desired row.</li>
+                    <li>All selected rows will be highlighted.</li>
+                </ul>
+            </li>
+        </ol>
+
+        <h6>Once one or more rows are selected, the following actions are available:</h6>
+
+        <ol>
+            <li>To drag a single selected row to a new location:
+                <ul>
+                    <li>Click and hold in the row selector of the desired row.</li>
+                    <li>Drag the row to the new location and release the mouse button.</li>
+                </ul>
+            </li>
+            <li>To cut the selected row(s):
+                <ul>
+                    <li>Press <strong>Ctrl&#8594;X</strong>.</li>
+                    <li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>
+                </ul>
+            </li>
+
+            <li>To paste the cut row(s):
+                <ul>
+                <li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>
+                <li>Press <strong>Ctrl&#8594;V</strong>.</li>
+                <li>The cut row(s) will be pasted above the selected row.</li>
+                </ul>
+            </li>
+
+            <li>To delete the selected rows:
+                <ul>
+                <li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu.</li>
+                <li>Click <strong>delete</strong>.</li>
+                <li>Note: there is no keyboard shortcut for this action.</li>
+                </ul>
+            </li>
+
+            <li>To clear the selection (deselect all rows):
+                <ul>
+                <li>Press <strong>Ctrl&#8594;Z</strong>.</li>
+                </ul>
+            </li>
+        </ol>
+
+    </div>
+</div>
+
 <!-- FORM INSERTION HELP -->
 
 <div id="yes3-fmapr-form-insertion-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
@@ -1103,14 +1188,14 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
     <div class="yes3-container yes3-fmapr yes3-divider yes3-designer-only-xxx yes3-editor" id="yes3-fmapr-wrapper">
 
         <table class='yes3-fmapr yes3-fmapr-specification yes3-fmapr-item yes3-scrollable yes3-dashboard' id='yes3-fmapr-export-items-table'>
-            
-            <!--thead>
+
+            <thead id='yes3-fmapr-export-items-thead'>
 
                 <tr>
                     <th class='yes3-header colspan="6" yes3-th-title'>&nbsp;&nbsp;Forms and Fields to Export (click <i class="far fa-edit yes3-fmapr-item-editor"></i> to edit)</th>
                 </tr>
                 
-            </thead-->
+            </thead>
 
             <tbody id='yes3-fmapr-export-items-tbody'>
 

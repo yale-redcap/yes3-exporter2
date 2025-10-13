@@ -20,30 +20,7 @@ FMAPR.constrainedAutocompleteSource = [];
 FMAPR.tooltips = {
 
     "event_select": "After a REDCap field or form is selected, this drop-down will include all the REDCap events assigned to it.",
-    "row_selector": "<h5>ROW SELECTOR</h5>" +
-    "<p>The row selector enables options for selecting, moving and deleting single or multiple rows.</p>" +
-    "<ul>" +
-    "<li><strong>Click</strong> in the row selector to select the row.</li>" +
-    "<ul><li>The selected row is highlighted.</li>" +
-    "<li>A single selected row can be dragged to a new position.</li></ul>" +
-    "<li>Press <strong>Ctrl-Click</strong> in the row selector to select multiple rows. Each selected row will remain highlighted.</li>" +
-    "<li>Press <strong>Shift-Click</strong> in the row selector to select a range of rows. All rows in the range will be highlighted.</li>" +
-    "</ul>" +
-    "<p>Once one or more rows are selected, the following actions are available:</p>" +
-    "<ol>" +
-    "<li>To cut the selection:</li>"+ 
-    "<ul><li>Press <strong>Ctrl+X</strong></li>"+
-    "<li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>"+
-    "</ul>" +
-    "<li>To paste the cut row(s):</li>"+
-    "<ul><li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>"+
-    "<li>Press <strong>Ctrl+V</strong>.</li>"+
-    "<li>The cut row(s) will be pasted above the selected row.</li></ul>" +
-    "<li>To clear the selection (deselect all rows):</li>"+
-    "<ul><li>Press <strong>Ctrl+Z</strong>.</li></ul>" +
-    "<li>To delete the selected rows:</li>" +
-    "<ul><li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu</li><li>Click <strong>delete</strong>.</li><li>There is no keyboard shortcut for this action.</li></ul>" +
-    "</ol>",
+    "row_selector": `Row selector: click the <i class="far fa-question-circle"></i> icon directly above in the header for usage.`,
     "row_editor": "Click to edit this export item.",
     "row_trashcan": "Click to remove this export item.",
     "row_event": "The REDCap event for this export item.",
@@ -160,6 +137,11 @@ YES3.Functions.Help_criterionValue = function()
 YES3.Functions.Help_sascode = function()
 {
     let thePanel = YES3.openPanel("yes3-fmapr-sascode-help-panel", true);
+}
+
+YES3.Functions.Help_rowselector = function()
+{
+    let thePanel = YES3.openPanel("yes3-fmapr-row-selector-help-panel", true);
 }
 
 YES3.Functions.Help_export_file_type = function()
@@ -754,7 +736,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event'  data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
     html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="REDcap form name">${form_label}</td>`;
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
@@ -801,24 +783,6 @@ FMAPR.setObjectInsertMode = function( theRowBeforeWhich )
     return "append";
 }
 
-FMAPR.itemTableHeaderHtml = function()
-{
-    return '';
-    
-    let html = `<tr id="yes3-fmapr-dummy-row">`;
-    html += `<td class='yes3-fmapr-row-number'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-type'>&nbsp;</td>`;
-    if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event'>&nbsp;</td>`;
-    }
-    html += `<td class='yes3-fmapr-redcap-object-name'>&nbsp;</td>`;
-    html += `<td class='yes3-gutter-right-top'>&nbsp;</td>`;
-    html += "</tr>";
-
-    return html;
-}
-
 FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
 {   
     //theRowBeforeWhich = theRowBeforeWhich || FMAPR.getNewFieldRow();
@@ -859,14 +823,14 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
     let rowId = FMAPR.dataElementRowId(yes3_fmapr_data_element_name);
 
     let html = `<tr class='yes3-fmapr-redcap-field ${object_repeating_class} yes3-fmapr-data-element yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap field" id="${rowId}" data-element_origin="redcap" data-object_type="field" data-object_name="${field_name}" data-object_event="${event}">`;
-    html += `<td class='yes3-fmapr-row-number' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
-    html += `<td class='yes3-fmapr-redcap-object-type' title='${object_repeating_class_title}'>${object_type}</td>`;
+    html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
+    html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+    html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' title="REDcap field">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
-    html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan' title='${FMAPR.tooltips.row_trashcan}'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
+    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="REDcap field name">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
+    html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += "</tr>";
 
     if ( batch ){
@@ -1876,7 +1840,8 @@ FMAPR.resizeExportItemsTable = function()
 
     const $newItemsSection = FMAPR.getExportNewItemOptionsSection();
 
-    const $fmaprTableBody = $fmaprTable.find('tbody').first();
+    const $fmaprTableBody = $fmaprTable.find('tbody');
+    const $fmaprTableHeader = $fmaprTable.find('thead');
 
     const windowHeight = $(window).innerHeight();
 
@@ -1912,16 +1877,44 @@ FMAPR.resizeExportItemsTable = function()
 
     $fmaprWrapper.css({'height': tableWrapperHeight+'px'});
 
-    $fmaprTable.find('td.yes3-fmapr-row-number').css({'width': rowNumberWidth+'px', 'min-width': rowNumberWidth+'px', 'max-width': rowNumberWidth+'px'});
-    $fmaprTable.find('td.yes3-fmapr-editor-link').css({'width': editorLinkWidth+'px', 'min-width': editorLinkWidth+'px', 'max-width': editorLinkWidth+'px'});
-    $fmaprTable.find('td.yes3-fmapr-redcap-object-type').css({'width': objectTypeWidth+'px', 'min-width': objectTypeWidth+'px', 'max-width': objectTypeWidth+'px'});
+    let c = 5; // the default number of columns
+
+    let thWidths = [rowNumberWidth, editorLinkWidth, objectTypeWidth];
+
+    $fmaprTable.find('.yes3-fmapr-row-number').css({'width': rowNumberWidth+'px', 'min-width': rowNumberWidth+'px', 'max-width': rowNumberWidth+'px'});
+    $fmaprTable.find('.yes3-fmapr-redcap-object-editor').css({'width': editorLinkWidth+'px', 'min-width': editorLinkWidth+'px', 'max-width': editorLinkWidth+'px'});
+    $fmaprTable.find('.yes3-fmapr-redcap-object-type').css({'width': objectTypeWidth+'px', 'min-width': objectTypeWidth+'px', 'max-width': objectTypeWidth+'px'});
 
     if ( FMAPR.project.is_longitudinal ){
-        $fmaprTable.find('td.yes3-fmapr-redcap-object-event').css({'width': objectEventNameWidth+'px', 'min-width': objectEventNameWidth+'px', 'max-width': objectEventNameWidth+'px'});
+        c++; // one more column for event
+        thWidths.push(objectEventNameWidth);
+        $fmaprTable.find('.yes3-fmapr-redcap-object-event').css({'width': objectEventNameWidth+'px', 'min-width': objectEventNameWidth+'px', 'max-width': objectEventNameWidth+'px'});
     }
 
-    $fmaprTable.find('td.yes3-fmapr-redcap-object-name').css({'width': objectNameWidth+'px', 'min-width': objectNameWidth+'px', 'max-width': objectNameWidth+'px'});
-    $fmaprTable.find('td.yes3-fmapr-trashcan').css({'width': trashcanWidth+'px', 'min-width': trashcanWidth+'px', 'max-width': trashcanWidth+'px'});
+    thWidths.push(objectNameWidth);
+    thWidths.push(trashcanWidth);
+
+    $fmaprTable.find('.yes3-fmapr-redcap-object-name').css({'width': objectNameWidth+'px', 'min-width': objectNameWidth+'px', 'max-width': objectNameWidth+'px'});
+    $fmaprTable.find('.yes3-fmapr-trashcan').css({'width': trashcanWidth+'px', 'min-width': trashcanWidth+'px', 'max-width': trashcanWidth+'px'});
+/*
+    // set the header column widths
+    $fmaprTableHeader.find('th').each( function(i){
+        $(this).css({'width': thWidths[i]+'px', 'min-width': thWidths[i]+'px', 'max-width': thWidths[i]+'px'});
+
+        // center align th 0 and 1 (row selector, editor icon)
+        if ( i===0 || i===1 ){
+            $(this).css('text-align', 'center');
+        }
+
+        // right align the trashcan
+        else if ( i===c-1 ){
+            $(this).css('text-align', 'right');
+        }
+
+        $(this).css({'width': thWidths[i]+'px', 'min-width': thWidths[i]+'px', 'max-width': thWidths[i]+'px'});
+    });
+*/
+
 }
 
 FMAPR.resizeExportSettingsContainer = function(){
@@ -4093,7 +4086,8 @@ FMAPR.dashboardOptionHandler = function()
 
     let optionTitle = {
         "settings": "",
-        "items": `<span class="yes3-fmapr-nonempty" title="click on any 'pencil' icon to edit the associated export item">click&nbsp;<i class="far fa-edit yes3-fmapr-item-editor"></i>&nbsp;to edit</span>`,
+        "items": "",
+        //"items": `<span class="yes3-fmapr-nonempty" title="click on any 'pencil' icon to edit the associated export item">click&nbsp;<i class="far fa-edit yes3-fmapr-item-editor"></i>&nbsp;to edit</span>`,
     }
     
     $('div.yes3-dashboard-title').html( optionTitle[yes3_dashboard_option] );
@@ -4195,12 +4189,12 @@ FMAPR.populateSpecificationTables = function( specification )
         // settingsAreDirty will be true if any settings were blank and set to default values
         const settingsAreDirty = FMAPR.populateSettingsTable( specification );
 
-        FMAPR.emptyExportItemsTable();
         /**
          * Use the save function to audit the settings just loaded, and mark any blank or bad entries
          * (no save request will be issued)
          */        
         YES3.Functions.saveExportSpecification(true);
+
         FMAPR.populateExportItemsTable( specification );
         
     //} catch(e) {
@@ -4478,17 +4472,81 @@ FMAPR.setDefaultOptionValue = function( setting_name, defaultOptionSelection )
 
 FMAPR.emptyExportItemsTable = function()
 {
-    let tbl = FMAPR.getExportItemsTable();
-    tbl.find('tbody').empty().append(FMAPR.itemTableHeaderHtml());
+    const $fmaprTable = FMAPR.getExportItemsTable();
+    const fmaprTable = $fmaprTable.get(0); // DOM object
+    const $fmaprHead  = $fmaprTable.find('thead');
+    const $fmaprBody  = $fmaprTable.find('tbody');
+
+    // clear any existing tooltip objects
+    YES3.clearBsTooltipsForElement( fmaprTable );
+
+    // empty the head and body
+    // use jQuery empty() rather than html("") to avoid orphaned jQuery-assigned event handlers
+    $fmaprHead.empty();
+    $fmaprBody.empty();
+}
+
+FMAPR.populateExportItemsTableHead = function(){
+
+    const table = FMAPR.getExportItemsTable().get(0); // DOM object
+    const $tbody = FMAPR.getExportItemsTable().find('tbody');
+    const $thead = FMAPR.getExportItemsTable().find('thead');
+
+    let html = '';
+
+    const ncols = YES3.getTableColumnCount( table );
+
+    if ( ncols === 0 ){
+
+        html = `<tr><th>Click the <strong>form or field</strong> below to start adding items to this export specification, or the <strong>everything</strong> button to add all fields.</th></tr>`;
+
+        $thead.append(html);
+
+        return html;
+    }
+
+    html = '<tr>';
+
+    // row number column
+    html += '<th class="yes3-fmapr-row-number yes3-text-center" style="opacity: 1.0"><i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_rowselector"></i></th>';
+
+    // object editor link column
+    //html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center"><i class="far fa-edit"></i></th>';
+    html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center">&nbsp;</th>';
+
+    // object type column
+    html += '<th class="yes3-fmapr-redcap-object-type yes3-text-left">Type</th>';
+
+    if ( FMAPR.project.is_longitudinal ){
+        // event column
+        html += '<th class="yes3-fmapr-redcap-object-event yes3-text-left">Event name</th>';
+    }
+
+    // object name column
+    html += '<th class="yes3-fmapr-redcap-object-name yes3-text-left">Form or field name</th>';
+
+    // trashcan column
+    //html += '<th class="yes3-fmapr-trashcan yes3-text-right"><i class="far fa-trash-alt"></i></th>';
+    html += '<th class="yes3-fmapr-trashcan yes3-text-right">&nbsp;</th>';
+
+    html += '</tr>';
+
+    $thead.append(html);
+
+    console.log("FMAPR.populateExportItemsTableHead: ncols=", ncols, html);
+
+    return html;
 }
 
 FMAPR.populateExportItemsTable = function( specification )
 {
-    let tbl = FMAPR.getExportItemsTable();
-
     FMAPR.markAsBuildInProgress();
 
+    FMAPR.emptyExportItemsTable(); // empties the table and clears any tooltips
+
     FMAPR.populateExportItemRowsV2( specification );
+
+    FMAPR.populateExportItemsTableHead(); // must be after rows are added, because head depends on layout
 
     FMAPR.setRepeatLayoutConstraints();
 
@@ -4514,7 +4572,6 @@ FMAPR.populateExportItemRowsV2 = function( specification )
 {
     let items = null;
     let item = null;
-    let tbl = FMAPR.getExportItemsTable();
     let row = null;
     let itemREDCapField = null;
     let itemREDCapValue = null;
@@ -4538,11 +4595,10 @@ FMAPR.populateExportItemRowsV2 = function( specification )
         return false;
     }
 
-    const fmaprBody = document.querySelector('table.yes3-fmapr-specification tbody');
-    const $fmaprBody = $(fmaprBody);
-
-    // clear any existing tooltip objects
-    YES3.clearBsTooltipsForElement( fmaprBody );
+    const $fmaprTable = FMAPR.getExportItemsTable();
+    const $fmaprHead = $fmaprTable.find('thead');
+    const $fmaprBody = $fmaprTable.find('tbody');
+    const fmaprBody = $fmaprBody.get(0); // DOM object
 
     html = "";
 
