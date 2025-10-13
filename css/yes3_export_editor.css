@@ -147,9 +147,16 @@ td.yes3-fmapr-row-number {
     vertical-align: middle !important;
     text-align: center !important;
 
-    font-size: 0.8rem !important;
+}
+
+td.yes3-fmapr-row-number i {
 
     opacity: 0.5 !important;
+    font-size: 0.8rem !important;
+}
+
+th.yes3-fmapr-row-number i {
+    color: var(--yes3-th-color) !important;
 }
 
 td.yes3-fmapr-redcap-object-editor {
@@ -331,6 +338,10 @@ table.yes3-fmapr td.yes3-site-basis, table.yes3-fmapr th.yes3-site-basis {
 
 table#yes3-fmapr-export-items-table {
     display: none;
+}
+
+table#yes3-fmapr-export-items-table th{
+    padding: 5px;
 }
  
  

@@ -224,56 +224,73 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
         </div>
     </div>
 
-    <div class='yes3-panel-row'>
-        The row selector is the narrow column to the left of the export item list.
-        It is used to select one or more rows for cutting, pasting, dragging or deleting.
-    </div>
+    <div class="yes3-information yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-    <div class="yes3-information ">
-        <ul>
-        <li><strong>Click</strong> in the row selector to select the row.
-            <ul>
-            <li>The selected row is highlighted.</li>
-            <li>A single selected row can be dragged to a new position.</li>
-            </ul>
-        </li>
+        <p><em>Note: you may leave this information panel open while working with the export item list.</em></p>
 
-        <li>Press <strong>Ctrl-Click</strong> in the row selector to select multiple rows. Each selected row will remain highlighted.</li>
-
-        <li>Press <strong>Shift-Click</strong> in the row selector to select a range of rows. All rows in the range will be highlighted.</li>
-        </ul>
-
-        <p>Once one or more rows are selected, the following actions are available:</p>
+        <h6>The row selector is the narrow column to the left of the export item list.
+        <br />It is used to select one or more rows for cutting, pasting, dragging or deleting.</h6>
 
         <ol>
-        <li>To cut the selection:
-            <ul>
-            <li>Press <strong>Ctrl+X</strong>.</li>
-            <li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>
-            </ul>
-        </li>
+            <li>To select a single row:
+                <ul>
+                    <li>Click in the row selector of the desired row.</li>
+                    <li>The selected row will be highlighted.</li>
+                </ul>
+            </li>
+            <li>To select a contiguous range of rows:
+                <ul>
+                    <li>Click in the row selector of the first row in the range.</li>
+                    <li>Then, while holding down the <strong>Shift</strong> key, click in the row selector of the last row in the range.</li>
+                    <li>All rows in the range will be highlighted.</li>
+                </ul>
+            </li>
+            <li>To select multiple non-contiguous rows:
+                <ul>
+                    <li>Click in the row selector of the first desired row.</li>
+                    <li>Then, while holding down the <strong>Ctrl</strong> key (or <strong>Cmd</strong> key on a Mac), click in the row selector of each additional desired row.</li>
+                    <li>All selected rows will be highlighted.</li>
+                </ul>
+            </li>
+        </ol>
 
-        <li>To paste the cut row(s):
-            <ul>
-            <li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>
-            <li>Press <strong>Ctrl+V</strong>.</li>
-            <li>The cut row(s) will be pasted above the selected row.</li>
-            </ul>
-        </li>
+        <h6>Once one or more rows are selected, the following actions are available:</h6>
 
-        <li>To clear the selection (deselect all rows):
-            <ul>
-            <li>Press <strong>Ctrl+Z</strong>.</li>
-            </ul>
-        </li>
+        <ol>
+            <li>To drag a single selected row to a new location:
+                <ul>
+                    <li>Click and hold in the row selector of the desired row.</li>
+                    <li>Drag the row to the new location and release the mouse button.</li>
+                </ul>
+            </li>
+            <li>To cut the selected row(s):
+                <ul>
+                    <li>Press <strong>Ctrl&#8594;X</strong>.</li>
+                    <li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>
+                </ul>
+            </li>
 
-        <li>To delete the selected rows:
-            <ul>
-            <li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu.</li>
-            <li>Click <strong>delete</strong>.</li>
-            <li>There is no keyboard shortcut for this action.</li>
-            </ul>
-        </li>
+            <li>To paste the cut row(s):
+                <ul>
+                <li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>
+                <li>Press <strong>Ctrl&#8594;V</strong>.</li>
+                <li>The cut row(s) will be pasted above the selected row.</li>
+                </ul>
+            </li>
+
+            <li>To delete the selected rows:
+                <ul>
+                <li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu.</li>
+                <li>Click <strong>delete</strong>.</li>
+                <li>Note: there is no keyboard shortcut for this action.</li>
+                </ul>
+            </li>
+
+            <li>To clear the selection (deselect all rows):
+                <ul>
+                <li>Press <strong>Ctrl&#8594;Z</strong>.</li>
+                </ul>
+            </li>
         </ol>
 
     </div>
