@@ -163,8 +163,8 @@ class Yes3SasCoder {
         $summary .= "   Project ID: " . $this->project_id . "\n";
         $summary .= "   Project Name: ". $this->info['project_title'] . "\n";
         $summary .= "   SAS dataset name: ". $this->dataset_name . "\n";
-        $summary .= "   Export UUID: ". $this->info['export_uuid'] . "\n";
-        $summary .= "   Export Name: ". $this->info['export_name'] . "\n";
+        $summary .= "   Export UUID: ". $this->info['export_properties']['export_uuid'] . "\n";
+        $summary .= "   Export Name: ". $this->info['export_properties']['export_name'] . "\n";
         $summary .= "   Export Timestamp: ". $this->info['timestamp'] . "\n";
         $summary .= "   Data Dictionary Field Count: " . $this->dd_rowcount . "\n";
         $summary .= "   Copyright (c) 2025 by CRI Web Tools LLC\n";
@@ -186,7 +186,7 @@ class Yes3SasCoder {
 
         $header = $this->summaryComment();
 
-        $header .= "\nTITLE1 '{$this->info['export_name']} input program';\n";
+        $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} input program';\n";
 
         $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
         $header .= "\nOPTIONS PS=55 LS=72;\n";
@@ -439,7 +439,7 @@ class Yes3SasCoder {
 
         $header = $this->summaryComment();
 
-        $header .= "\nTITLE1 '{$this->info['export_name']} format library creation program';\n";
+        $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} format library creation program';\n";
 
         $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
         $header .= "\nOPTIONS PS=55 LS=72;\n";
@@ -535,7 +535,7 @@ class Yes3SasCoder {
 
         $header = $this->summaryComment();
 
-        $header .= "\nTITLE1 '{$this->info['export_name']} format assignments program';\n";
+        $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} format assignments program';\n";
 
         $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
         $header .= "\nOPTIONS PS=55 LS=72;\n";

@@ -1183,7 +1183,7 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
             $("input#yes3-fmapr-rapidentry-object-name")
                 .val("")
                 .autocomplete({
-                    source: ( object_type==="field" ) ? FMAPR.getFieldAutoCompleteSource(object_event) : FMAPR.getFormAutoCompleteSource(object_event, true),
+                    source: ( object_type==="field" ) ? FMAPR.getFieldAutoCompleteSource(object_event) : FMAPR.getFormAutoCompleteSource(object_event, false),
                     minLength: 1,
                     position: { my: "left top", at: "left bottom", collision: "flipfit" },
                     select: function(event, ui) {
@@ -1561,6 +1561,8 @@ YES3.Functions.saveExportSpecification = function(auditOnly)
         YES3.hello("WARNING: at least one error was detected (a required entry is blank, an invalid entry etc). You must fix the indicated error(s) before you may save the export specification.");
 
         FMAPR.postMessage("You must fix the indicated error(s) before adding fields or saving.", true);
+
+        FMAPR.markAsDirty("Please fix the indicated error(s) before saving.");
 
         return true;
     }
@@ -2286,6 +2288,15 @@ FMAPR.getFieldAutoCompleteSource = function(event)
 
     //YES3.debugMessage("getFieldAutoCompleteSource", acSource);
 
+    // if acsource is non empty, add an 'all fields' option
+    if ( acSource.length > 1 ){
+
+        acSource.unshift({
+            "value": ALL_OF_THEM,
+            "label": "ALL FIELDS"
+        });
+    }
+
     return acSource;
 }
 
@@ -2352,12 +2363,11 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
 
         acSource.unshift({
             "value": ALL_OF_THEM,
-            "label": "all forms"
+            "label": "ALL FORMS"
         });
-    
     }
 
-    //YES3.debugMessage("getFormAutoCompleteSource", acSource);
+    console.warn("getFormAutoCompleteSource", acSource);
 
     return acSource;
 }

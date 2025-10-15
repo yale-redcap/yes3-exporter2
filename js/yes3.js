@@ -56,6 +56,9 @@ String.prototype.toSASName = function() {
     sanitized = '_' + sanitized;
   }
 
+  // reduce multiple underscores to single
+  sanitized = sanitized.replace(/_+/g, '_');
+
   return sanitized.slice(0, 32);
 };
 
@@ -996,7 +999,7 @@ YES3.isUserInput = function (element) {
 }
     
 /* == TOOL TIPS AND POPOVERS == */
-
+/*
 YES3.enableTooltips = function( tooltipSpecs=[] ){
 
     for (let i=0; i<tooltipSpecs.length; i++){
@@ -1004,7 +1007,7 @@ YES3.enableTooltips = function( tooltipSpecs=[] ){
         YES3.setTooltipListenersForElement(t.selector, t.html, t.opts);
     }
 }
-
+*/
 YES3.setBsTooltipPropertiesFromSpecs = function( tooltipSpecs=[] ){
 
     for (let i=0; i<tooltipSpecs.length; i++){
@@ -1057,7 +1060,8 @@ YES3.clearBsTooltipsForContainer = function( container ){
 
     // Dispose all tooltips on elements within the element
     container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-        bootstrap.Tooltip.getInstance(el).dispose();
+        const tooltip = bootstrap.Tooltip.getInstance(el);
+        if (tooltip) tooltip.dispose();
     });
 }
 
@@ -1190,7 +1194,7 @@ YES3.setBsTooltipPropertiesForElement = function (triggerSelector, title = '', o
     el.setAttribute('data-bs-html', 'true');
     el.setAttribute('data-bs-placement', placement);
 }
-
+/*
 YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts = {}) {
     
     const el = document.querySelector(triggerSelector);
@@ -1219,15 +1223,6 @@ YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts
         
         thisClass += " yes3-bs-tooltip-left";
     }
-/*
-    if ( el.classList.contains('yes3-halign-left') || YES3.isUserInput(el) ) {
-        justify = "left";
-        thisClass += " yes3-bs-tooltip-left";
-    } else if ( el.classList.contains('yes3-halign-right') ) {
-        justify = "right";
-        thisClass += " yes3-bs-tooltip-right";
-    }
-*/
     const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
         //container: el.parentElement,
         container: 'body',
@@ -1278,10 +1273,13 @@ YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts
     });
 
 }
+*/
 
 YES3.setBsTooltipListenersForContainer = function( container ){
 
     if (!container) return;
+
+    YES3.clearBsTooltipsForContainer( container );
 
     container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
 

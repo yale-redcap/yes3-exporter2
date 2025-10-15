@@ -84,14 +84,9 @@
                 "url":  "plugins/yes3_export_manager.php"
             },
             {
-                "name": "YES3 Exporter II Mount Test",
+                "name": "YES3 Exporter II Filesystem Test",
                 "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_mount_test.php"
-            },
-            {
-                "name": "YES3 Exporter II Workshop",
-                "icon": "fas fa-gear",
-                "url":  "plugins/workshop.php"
             }
         ]
     },
@@ -188,7 +183,7 @@
         {
             "key": "toast-the-host",
             "type" : "descriptive",
-            "name": "<h5>HOST FILE SYSTEM EXPORTS</h5><p>YES3 Exporter II can export to the host file system, n.b. to automounts pointing to secure institutional file shares. This will require services from your REDCap host system administrator, and the blessing of your Information Security Officer.</p>"
+            "name": "<h5>HOST FILE SYSTEM EXPORTS</h5><p>YES3 Exporter II can export to the host file system. This will require services from your REDCap host system administrator, and the blessing of your Information Security Officer.</p>"
         },
         {
             "key": "enable-host-filesystem-exports",
@@ -245,17 +240,6 @@
             }
         },
         {
-            "key":   "filetype-header",
-            "type" : "descriptive",
-            "name":  "<h5>EXPORT FILE TYPE</h5><p>By default, the export file type is tab-separated-values (TSV). If you like, you can change the export file type to comma-separated-values (CSV) instead. Note that TSV is generally more 'bullet proof' when it comes to handling special characters and line breaks, and is especially recommended for SAS datamarts.</p>"
-        },
-        {
-            "key": "export-filetype-csv",
-            "name": "Export files in CSV format",
-            "type": "checkbox",
-            "required": false
-        },
-        {
             "key":   "sascode-header",
             "type" : "descriptive",
             "name":  "<h5>SAS CODE DEFAULTS</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These defaults may be overriden for any given export specification.</p>"
@@ -271,16 +255,6 @@
             "name": "SAS library path (full path to the directory where the SAS <b>datasets</b> and <b>format libraries</b> will be written). Note for Windows users: You must escape backslashes in file paths, e.g. (Z:\\\\mypath\\\\sascode) instead of (Z:\\mypath\\sascode)",
             "required": false,
             "type": "textarea"
-        },
-        {
-            "key": "enable-validator-header",
-            "type" : "descriptive",
-            "name": "<h5>EXPORT VALIDATOR</h5><p>YES3 Exporter II includes a built-in export validator, that will compare any exported datasheet with the source REDCap data. The validator will check for and report discrepancies in order to ensure data integrity.</p><p>The validator can also be used to report any changes to REDCap data since the datasheet was exported.</p><p>The export validator is available on the YES3 Exporter II Manager.</p>"
-        },
-        {
-            "key": "enable-validator",
-            "name": "Enable the export validator",
-            "type": "checkbox"
         },
         {
             "key":   "backup-retention-header",

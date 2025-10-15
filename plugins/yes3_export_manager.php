@@ -309,7 +309,8 @@ $module->getCodeFor("yes3_export_manager", true);
             $('.yes3-fmapr-filesystem-exports').remove();
         }
 
-        if ( !YES3.EMSettings['enable-validator'] ) {
+        // BETA export validator is only available internally
+        if ( YES3.username !== 'criwebtools' ) {
 
             $('.yes3-fmapr-validator-only').remove();
         }
