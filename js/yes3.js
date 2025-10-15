@@ -1005,6 +1005,14 @@ YES3.enableTooltips = function( tooltipSpecs=[] ){
     }
 }
 
+YES3.setBsTooltipPropertiesFromSpecs = function( tooltipSpecs=[] ){
+
+    for (let i=0; i<tooltipSpecs.length; i++){
+        let t = tooltipSpecs[i];
+        YES3.setBsTooltipPropertiesForElement(t.selector, t.html, t.opts);
+    }
+}
+
 YES3.enablePopovers = function( popoverSpecs=[] ) {
 
     for (let i=0; i<popoverSpecs.length; i++){
@@ -1043,12 +1051,12 @@ YES3.getYes3Function = function (fnOrName) {
  * @param {} element 
  * @returns 
  */
-YES3.clearBsTooltipsForElement = function( element ){
+YES3.clearBsTooltipsForContainer = function( container ){
 
-    if (!element) return;
+    if (!container) return;
 
     // Dispose all tooltips on elements within the element
-    element.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
+    container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
         bootstrap.Tooltip.getInstance(el).dispose();
     });
 }
@@ -1159,6 +1167,30 @@ YES3.setPopoverListenersForElement = function (triggerSelector, content, moreHel
     return pop;
 }
 
+YES3.setBsTooltipPropertiesForElement = function (triggerSelector, title = '', opts = {}) {
+   
+    const el = document.querySelector(triggerSelector);
+
+    if ( !el ) return;
+
+    if ( !title ) return;
+
+    let placement = "top";
+
+    // always assign placement from opts if supplied
+    if ( opts.placement ) {
+        placement = opts.placement;
+    }
+    // support for the old way of specifying placement via class
+    else if ( el.classList.contains('yes3-bs-tooltip-placement-left') ) placement = "left";
+    else if ( el.classList.contains('yes3-bs-tooltip-placement-right') ) placement = "right";
+
+    el.setAttribute('title', title);
+    el.setAttribute('data-bs-toggle', 'tooltip');
+    el.setAttribute('data-bs-html', 'true');
+    el.setAttribute('data-bs-placement', placement);
+}
+
 YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts = {}) {
     
     const el = document.querySelector(triggerSelector);
@@ -1254,16 +1286,16 @@ YES3.setBsTooltipListenersForContainer = function( container ){
     container.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
 
         let thisClass = "yes3-bs-tooltip";
-        let placement = "top";
+        let placement = el.getAttribute('data-bs-placement') || "top";
 
-        if ( el.classList.contains('yes3-bs-tooltip-placement-left') ) {
-            placement = "left";
+        if ( placement === 'left' ) {
             thisClass += " yes3-bs-tooltip-right";
         }
-
-        if ( el.classList.contains('yes3-bs-tooltip-placement-right') ) {
-            placement = "right";
+        else if ( placement === 'right' ) {
             thisClass += " yes3-bs-tooltip-left";
+        }
+        else {
+            thisClass += " yes3-bs-tooltip-left"; // default to left-aligned
         }
 
         const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
@@ -1305,7 +1337,7 @@ YES3.setBsTooltipListenersForContainer = function( container ){
 
     });
 }
-
+/*
 YES3.setBsTooltipListenersForElement = function( element ){
 
     if (!element) return;
@@ -1397,6 +1429,7 @@ YES3.setDefaultBsTooltipAttributes = function( element ){
         el.setAttribute('data-bs-placement', 'top');
     });
 }
+*/
 
 YES3.getTableColumnCount = function(table) {
   let maxCols = 0;

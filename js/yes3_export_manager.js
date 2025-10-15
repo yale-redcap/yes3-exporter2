@@ -67,7 +67,7 @@ FMAPR.tooltipForExportName = function( export_name ){
 }
 
 FMAPR.tooltipForDownload = function( export_name ){
-    return `Download the data dictionary, dataset or full zipped payload for <strong>'${export_name}'</strong> to your computer.`;
+    return `Download the data dictionary, dataset or full zipped payload for <strong>'${export_name}'</strong> to your computer.<br><br>The full payload includes the data dictionary (excel-friendly csv), the datasheet (csv or tsv), the export information file (json) and, if requested, generated SAS code`;
 }
 
 FMAPR.tooltipForRefresh = function( export_name ){
@@ -75,7 +75,7 @@ FMAPR.tooltipForRefresh = function( export_name ){
 }
 
 FMAPR.tooltipForExportToHost = function( export_name ){
-    return `Export the full payload for <strong>'${export_name}'</strong> to the host file system.`;
+    return `Export the full payload for <strong>'${export_name}'</strong> to the host file system.<br><br>The full payload includes the data dictionary (excel-friendly csv), the datasheet (csv or tsv), the export information file (json) and, if requested, generated SAS code`;
 }
 
 FMAPR.toolTipForTrashcan = function( export_name, removed ){
@@ -98,8 +98,8 @@ FMAPR.setStaticToolTips = function(){
     const $pageControls = YES3.container().find('div.yes3-fmapr-controls');
     const $tableControls =FMAPR.exportTable().find('thead');
 
-    YES3.setBsTooltipListenersForElement ( $tableControls[0] );
-    YES3.setBsTooltipListenersForElement ( $pageControls[0] );
+    YES3.setBsTooltipListenersForContainer ( $tableControls[0] );
+    YES3.setBsTooltipListenersForContainer ( $pageControls[0] );
 }
 
 FMAPR.setDynamicToolTips = function(){
@@ -107,15 +107,15 @@ FMAPR.setDynamicToolTips = function(){
     const $exportTableBody = FMAPR.exportTable().find('tbody');
     const $tableFooter = FMAPR.exportTable().find('tfoot');
 
-    YES3.setBsTooltipListenersForElement ( $exportTableBody[0] );
-    YES3.setBsTooltipListenersForElement ( $tableFooter[0] );
+    YES3.setBsTooltipListenersForContainer ( $exportTableBody[0] );
+    YES3.setBsTooltipListenersForContainer ( $tableFooter[0] );
 }
 
 FMAPR.setToolTips = function(){
 
     const $exportTableBody = FMAPR.exportTable().find('tbody');
 
-     YES3.setBsTooltipListenersForElement ( $exportTableBody[0] );
+     YES3.setBsTooltipListenersForContainer ( $exportTableBody[0] );
 }
 
 /* export table load/refresh */
@@ -130,7 +130,7 @@ FMAPR.refreshExportTable = function( response )
 
     let repeaters = 0;
 
-    YES3.clearBsTooltipsForElement( $exportTableBody[0] ); // remove any existing tooltips
+    YES3.clearBsTooltipsForContainer( $exportTableBody[0] ); // remove any existing tooltips
 
     $exportTableBody.empty();
 
