@@ -560,6 +560,9 @@ FMAPR.refreshSpecificationCallback = function( response ){
 
     FMAPR.renderExportVisibilityCell();
 
+    // regenerate tooltips
+    FMAPR.setDynamicToolTips();
+
     // resize in case of enfarglement
     $(window).trigger('resize');
 
