@@ -194,9 +194,10 @@ FMAPR.openDocumentation = function(){
  */
 
 FMAPR.tooltipSpecs = [
+
     { selector: "i[action=saveExportSpecification]", html: "Save the export specification. You must save the specification before you can download or export data." },
-    { selector: "i[action=download]", html: "Download the data dictionary, datasheet, or full (zipped) payload to your computer." },
-    { selector: "i[action=export]", html: "Export the full payload to the host file system." },
+    { selector: "i[action=download]", html: "Download the data dictionary, datasheet, or the full (zipped) payload to your computer. The full payload includes the data dictionary (excel-friendly csv), the datasheet (csv or tsv), the export information file (json) and, if requested, generated SAS code." },
+    { selector: "i[action=export]", html: "Export the full payload to the host file system. The full payload includes the data dictionary (excel-friendly csv), the datasheet (csv or tsv), the export information file (json) and, if requested, generated SAS code." },
     { selector: "i[action=Wayback_openForm]", html: "Restore the export specification from a stored backup." },
     { selector: "i[action=Help_openPanel]", html: "Display navigation help for this page." },
     { selector: "i[action=Help_openDocumentation]", html: "Open the YES3 Exporter2 online documentation." },
@@ -248,6 +249,24 @@ FMAPR.tooltipSpecs = [
     { selector: "input[name=export_sascode_libref]", opts: { placement: 'right' }, html: "Enter the library reference name for the exported SAS code. This is a 1-8 character string that typically stands in for the project name.<br><br>Example 'lvbtr'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
     { selector: "input[name=export_sascode_libref_path]", opts: { placement: 'right' }, html: "Enter the full path for the exported SAS dataset and format library. This is a file location that must exist for the code to run.<br><br>Example: 'C:\Users\criwebtools\livebetter\sascode'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
     { selector: "input[name=export_sascode_dsname]", opts: { placement: 'right' }, html: "Enter the name for the SAS dataset to be created by this export. <br><br>Example: 'patient_screen'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+
+];
+
+FMAPR.newItemOptionsTooltipSpecs = [
+    
+    { selector: "input#yes3-fmapr-rapidentry-object-add-singleton", html: "Add a form or field to the export specification." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-everything", html: "Add ALL forms (and their fields), across all arms and events if applicatble, to the export specification." },
+    { selector: "select#yes3-fmapr-rapidentry-object-event", html: "Select an event (or all events) for the form or field to be added to this export specification." },
+    { selector: "input#yes3-fmapr-rapidentry-object-name.yes3-object-field", html: "<p>Select the field to be added to this export specification.</p><p>If you have selected an event for this export specification item, only fields on forms assigned to that event will be selectable.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable fields.</p>" },
+    { selector: "input#yes3-fmapr-rapidentry-object-name.yes3-object-form", html: "<p>Select the form to be added to this export specification.</p><p>If you have selected an event for this export specification item, only forms assigned to that event will be selectable.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable forms.</p>" },
+    { selector: "label[for=yes3-fmapr-rapidentry-object-type-form]", html: "<p>Add a form to the export specification. All fields on the form will be included.</p><p>You will have the option of adding each field as a separate export item, which can be useful if you want to remove a small number of fields, or change the order.</p>" },
+    { selector: "label[for=yes3-fmapr-rapidentry-object-type-field]", html: "Add a single field to the export specification." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add[value='append as form']", html: "Append the selected form to the export specification, as a single export item." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add[value='append field']", html: "Append the selected field to the export specification." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-fields", html: "Append each field in the selected form to the export specification, as a separate export item." },
+    { selector: "input#yes3-fmapr-rapidentry-object-cancel", html: "Cancel adding a new item to the export specification." },
+    { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-append", html: "<h6>APPEND MODE</h6><p>You are appending an item to the end of the export specification.</p><p>If you would like to insert an item into a specific location, first select the existing item row <em>above which</em> you want to insert the new item.</p>" },
+    { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-insert", html: "<h6>INSERT MODE</h6><p>You are inserting an item into the export specification, above the selected item.</p><p>If you would like to append an item to the end of the export specification, clear the item selection by pressing <strong>Ctrl&rarr;Z.</strong></p>" },
 
 ];
 
@@ -871,6 +890,20 @@ FMAPR.getNewObjectType = function() {
     return $("input[name=new_object_type]:checked").val() || "?";
 }
 
+FMAPR.setBsToolTipsForNewItemOptions = function() {
+
+    const section = FMAPR.getExportNewItemOptionsSection()[0]; // raw DOM element
+
+    // clear any existing tooltips in this section
+    YES3.clearBsTooltipsForContainer( section );
+
+    // set tooltip properties for this section
+    YES3.setBsTooltipPropertiesFromSpecs( FMAPR.newItemOptionsTooltipSpecs, section );
+
+    // enable tooltips for this section
+    YES3.setBsTooltipListenersForContainer( section );
+}
+
 FMAPR.renderNewItemOptionsSection = function( force ) {
 
     force = force || false;
@@ -910,7 +943,7 @@ FMAPR.renderNewItemOptionsSectionMultiple = function() {
 
         $section.html(html);
 
-        //FMAPR.setRapidEntryFormListeners();
+        // there are no listeners to set (the two buttons are bound to JS functions), so just return
 
         return;
     } 
@@ -937,6 +970,9 @@ FMAPR.renderNewItemOptionsSectionMultiple = function() {
 
     // set the mode label that we just added to the UI
     FMAPR.setNewItemModeLabel();
+
+    // tooltips
+    FMAPR.setBsToolTipsForNewItemOptions();
 }
 
 FMAPR.addItemSingleton = function(){
@@ -947,8 +983,10 @@ FMAPR.addItemSingleton = function(){
 FMAPR.renderNewItemOptionsSectionSingleton = function() {
 
     const $section = FMAPR.getExportNewItemOptionsSection();
+    const section = $section[0]; // raw DOM element
 
-    const sectionHeight = $section.outerHeight();
+    // clear tooltips in this section
+    YES3.clearBsTooltipsForContainer( section );
 
     $section.empty().removeClass("yes3-fmapr-multiple").addClass("yes3-fmapr-singleton"); // clear the section and add the singleton class
 
@@ -982,10 +1020,13 @@ FMAPR.renderNewItemOptionsSectionSingleton = function() {
 
     $section.append(html);
 
-    FMAPR.setRapidEntryFormListeners();
+    FMAPR.setNewItemOptionsSingletonListeners();
 
     // set the mode label that we just added to the UI
     FMAPR.setNewItemModeLabel();
+
+    // set tooltips in this section
+    FMAPR.setBsToolTipsForNewItemOptions();
 }
 
 /*
@@ -1096,23 +1137,33 @@ FMAPR.ensureNewItemRowAtEndV2 = function()
 
     fmaprBody.append(html);
 
-    FMAPR.setRapidEntryFormListeners();
+    FMAPR.setNewItemOptionsSingletonListeners();
 
     $("select#yes3-fmapr-rapidentry-object-type").trigger("change");
 }
 */
 
-FMAPR.setRapidEntryFormListeners = function()
+FMAPR.setNewItemOptionsSingletonListeners = function()
 {
     $("input[type=radio][name=new_object_type], select#yes3-fmapr-rapidentry-object-event")
         .off()
         .on("change", function(){
 
-            let object_type =$("input[type=radio][name=new_object_type]:checked").val();
+            const object_type =$("input[type=radio][name=new_object_type]:checked").val();
 
-            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
+            const object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
 
-            let $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
+            const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
+
+            const objectTypeClass = ( object_type==="field" ) ? "yes3-object-field" : "yes3-object-form";
+
+            const $nameInput = $("input#yes3-fmapr-rapidentry-object-name");
+
+            // the 'object class' is used to style the input differently for fields vs forms
+            $nameInput
+                .removeClass("yes3-object-field yes3-object-form")
+                .addClass( objectTypeClass )
+            ;
 
             if ( object_type==="form" ){
 
@@ -1121,6 +1172,13 @@ FMAPR.setRapidEntryFormListeners = function()
             else {
                 $addAsFieldsButton.hide();
             }
+
+            FMAPR.setNewItemModeLabel(); // update the mode label to reflect the object type
+
+
+
+            // update the tooltip for the mode label
+            FMAPR.setBsToolTipsForNewItemOptions();
 
             $("input#yes3-fmapr-rapidentry-object-name")
                 .val("")
@@ -2691,11 +2749,15 @@ FMAPR.setNewItemModeLabel = function(){
     const $newItemActionButton = $('input#yes3-fmapr-rapidentry-object-add');
     const $newItemAddFieldsButton = $('input#yes3-fmapr-rapidentry-object-add-fields');
 
-    const mode = FMAPR.getNewItemMode();
+    const mode = FMAPR.getNewItemMode().toUpperCase();
 
     const objectType = FMAPR.getNewObjectType();
 
-    $newItemActionLabel.text(mode.toUpperCase());
+    const modeClass = ( mode === "APPEND" ) ? "yes3-fmapr-mode-append" : "yes3-fmapr-mode-insert";
+
+    $newItemActionLabel.text(mode);
+
+    $newItemActionLabel.removeClass("yes3-fmapr-mode-append yes3-fmapr-mode-insert").addClass(modeClass);
 
     if ( $newItemActionButton.length ){
 
@@ -2710,6 +2772,8 @@ FMAPR.setNewItemModeLabel = function(){
             $newItemAddFieldsButton.hide();
         }
     }
+
+    FMAPR.setBsToolTipsForNewItemOptions(); // a tooltip is attached to the label
 }
 
 FMAPR.clearSelectionRangeBoundaries = function() {
@@ -4478,7 +4542,7 @@ FMAPR.emptyExportItemsTable = function()
     const $fmaprBody  = $fmaprTable.find('tbody');
 
     // clear any existing tooltip objects
-    YES3.clearBsTooltipsForElement( fmaprTable );
+    YES3.clearBsTooltipsForContainer( fmaprTable );
 
     // empty the head and body
     // use jQuery empty() rather than html("") to avoid orphaned jQuery-assigned event handlers
@@ -4636,7 +4700,7 @@ FMAPR.populateExportItemRowsV2 = function( specification )
 
     FMAPR.setRowSelectorListenersV2();
 
-    // set the tooltip handlers
+    // set the html-defined tooltip handlers
     YES3.setBsTooltipListenersForContainer( fmaprBody );
 }
 
@@ -5593,6 +5657,7 @@ FMAPR.highlightRemovedIfSelected = function(){
     }
 }
 
+
 $(window).on('resize', YES3.deBounce(function() {
 
     FMAPR.resizeExportItemsTable();
@@ -5622,13 +5687,14 @@ $(document).on('yes3-fmapr.settings', function(){
      * enable tooltips
      */
     //FMAPR.enableTooltips();
-    YES3.enableTooltips( FMAPR.tooltipSpecs );
+    YES3.setBsTooltipPropertiesFromSpecs( FMAPR.tooltipSpecs );
+    YES3.setBsTooltipListenersForContainer( document.querySelector('#yes3-container') );
 
     /**
      * enable popovers
      */
     //FMAPR.enablePopovers();
-    YES3.enablePopovers( FMAPR.popoverSpecs );
+    //YES3.enablePopovers( FMAPR.popoverSpecs );
 
     /**
      * Start the AJAX chain by loading the event prefixes
