@@ -4845,6 +4845,54 @@ WHERE project_id=? AND log_entry_type=?
         return (string) count( $elements );
     }
 
+    /* ==== FILESYSTEM WRITE TEST ==== */
+
+    public function testFilesystemWrite( $testPath=null )
+    {
+
+        if ( $testPath === null ) $testPath = trim($this->getProjectSetting('export-target-folder'));
+
+        if ( !$testPath ){
+
+            return Yes3Fn::failString("No path is provided. Check the EM configuration.");
+        }
+
+        $filename = "yes3_exporter_test_" . Yes3Fn::compactTimestamp() . ".txt";
+
+        // append the directory separator to the mount path if it is not already there
+        if (substr($testPath, -1) !== DIRECTORY_SEPARATOR) {
+            $testPath .= DIRECTORY_SEPARATOR;
+        }
+        
+        // path to the file to be created
+        $file_path = $testPath . $filename;
+
+        $file_content = "This is a test file created by the Yes3 Exporter2 External Module on " . date('Y-m-d H:i:s');
+
+        $file_content .= "\nProject: " . $this->getProject()->getTitle() . " ( pid " . $this->getProjectId() . " )";
+
+        $file_content .= "\nUser: " . $this->getUser()->getUsername() . "\n";
+
+        // write the content to the file and store the result in a variable
+        $write_result = file_put_contents($file_path, $file_content);
+
+        if ($write_result === false) {
+
+            return Yes3Fn::failString("Failed to write to file: $file_path.\nPlease check the path and permissions.");
+        } else {
+
+            // delete the test file after writing
+            unlink($file_path);
+
+            // confirm deletion
+            if (file_exists($file_path)) {
+                return Yes3Fn::failString("The test file was written but could not be deleted: $file_path.\nPlease check permissions.");
+            }
+
+            return Yes3Fn::successString("Wrote $write_result bytes to file: $file_path.\nThe test file was successfully deleted.");
+        }
+    }
+
     /* ==== IMPORT EXPORTER I SETTINGS ==== */
 
     public function transferLegacyEnvironment() {
@@ -5307,9 +5355,13 @@ WHERE project_id=? AND log_entry_type=?
 
             return $this->handleNoLegacyTransfer();
         }
+        elseif ( $action === 'test-filesystem-write' ) {
 
-        return "Sorry, the action '$action' is most abhorrent.";
+            return $this->testFilesystemWrite();
+        }
+        else {
+
+            return "Sorry, the action '$action' is most abhorrent.";
+        }
     }
-    
-
 }

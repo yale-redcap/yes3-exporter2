@@ -5902,6 +5902,9 @@ $( function () {
 
     YES3.isBusy(); // will be cleared by the loadspecification callback
 
+    // set the static, html-defined tooltip handlers
+    YES3.setBsTooltipListenersForContainer( document.body );
+
     FMAPR.removeTheIrrelevantElements(); // remove irrelevant UI elements, depending on EM settings
 
     YES3.RegisterApplicationNameSpace('FMAPR');
@@ -5913,6 +5916,10 @@ $( function () {
     FMAPR.setSpecialKeyListeners();
 
     YES3.contentLoaded = false;
+
+    YES3.RegisterApplicationNameSpace('FMAPR_Editor');
+
+    YES3.Functions.Help_openPanel( true );
 
     /**
      * located in common.js:

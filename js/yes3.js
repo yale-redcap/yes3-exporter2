@@ -160,15 +160,23 @@ String.prototype.isValidFilename = function()
 
 YES3.Functions.Open_docPage = function(){
 
-    // attempt to open the documentation page in a new window 
-    const newWindow = window.open(YES3.documentationUrl, "Yes3DocPage", "height=800, width=800, left=10,top=10,resizable=yes,scrollbars=yes,toolbar=yes,menubar=yes,location=no,directories=no,status=yes");
+    // adopt the same dims as the browser window, but max 1300x800
+    const w = Math.min(window.innerWidth, 1300);
+    const h = Math.min(window.innerHeight, 800);
+
+    // attempt to open the documentation page in a new window
+    const newWindow = window.open(
+        YES3.documentationUrl,
+        "Yes3DocPage",
+        `height=${h},width=${w},left=10,top=10`
+    );
 
     // if blocked, open in a new tab
     if (!newWindow) {
         window.open(YES3.documentationUrl, "_blank");
     }
 }
- 
+
  /*
   * replaces REDCap's escapeHtml which crashes (in this context anyway)
   * probably deprecated, since we added this function to the string prototype
@@ -626,7 +634,11 @@ YES3.Functions.Help_openPanel = function( onlyIfNotGotIt )
 {
     onlyIfNotGotIt = onlyIfNotGotIt || false;
 
-    if ( onlyIfNotGotIt && YES3.Help_hasGotIt() ){
+    const gotIt = YES3.Help_hasGotIt();
+
+    const $gotItCheckbox = $('input[name="yes3-got-it"]');
+
+    if ( onlyIfNotGotIt && gotIt ){
 
         return true;
     }
@@ -657,6 +669,8 @@ YES3.Functions.Help_openPanel = function( onlyIfNotGotIt )
         $('div#yes3-help-panel .yes3-expanded').show();
         $('div#yes3-help-panel .yes3-collapsed').show();
     }
+
+    $gotItCheckbox.prop('checked', gotIt);
 }
  
 YES3.Help_closePanel = function()
@@ -666,7 +680,9 @@ YES3.Help_closePanel = function()
 
 YES3.Help_setGotIt = function()
 {
-    localStorage.setItem(`Yes3HelpGotIt_${YES3.applicationNameSpace}`, 'got-it');
+    const gotIt = $('input[name="yes3-got-it"]').is(":checked") ? 'got-it' : 'not-yet';
+    
+    localStorage.setItem(`Yes3HelpGotIt_${YES3.applicationNameSpace}`, gotIt);
 }
 
 YES3.Help_hasGotIt = function()

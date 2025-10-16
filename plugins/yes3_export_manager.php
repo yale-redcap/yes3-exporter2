@@ -60,25 +60,171 @@ $module->getCodeFor("yes3_export_manager", true);
 
     <div class="yes3-panel-header-row">
         <div class="yes3-panel-row-left" id="yes3-help-panel-title">
-            Here's some help
+            Getting Started with the Export Manager
         </div>
         <div class="yes3-panel-row-right">
             <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
-    <div class="yes3-panel-row" style="margin-top: 20px !important">
-    </div>
+    <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-    <div class='yes3-panel-row yes3-information'>
+        <div class="yes3-panel-row">
+            <h5>Overview</h5>
+            <p>
+                The Exporter Manager is a tool for adding, removing and editing <em>export specification</em>.
+                An export specification defines the data to be exported from your project, as well as the format of the exported data.
+            </p>
+            <p>
+                This Getting Started panel provides an overview of the Export Manager interface, with particular attention to inline and online help resources.
+                You may leave this panel open while working with the Export Manager, or close it and refer to it later as needed.
+            </p>
+            <h5>How help is organized</h5>
+            <p>
+                The YES3 Exporter II Export Manager has a 2-tiered help system:
+            </p>
+            <ol>
+                <li><strong>tooltips</strong>: explanations of interface elements (action icons, below), available by hovering over them for 1 second or more with the mouse pointer.</li>
+                <li><strong>online help</strong>: user and technical guide available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
+            </ol>
 
-        <div class='yes3-panel-row'>
-            You may leave this help panel open as you use the Yes3 Exporter. 
-            Grab it on the top row to drag it out of the way.
+            <div class='yes3-panel-row'>
+                <h5>Action icons</h5>
+                <p>
+                All of the Export Manager features are accessed through clicking on 'action icons'.
+                Each action icon is displayed below, along with the feature it invokes.
+                </p>
+                <p>
+                    Every action item has a tooltip that appears when you hover over the icon (for 1 second or more) with your mouse pointer.
+                </p>
+            </div>
+
+            <table>
+                <tbody>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-question yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Open this Getting Started panel.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Open the YES3 Exporter online documentation (it will open into a new tab in your browser).
+                        </td>
+                    </tr>
+                                
+                    <tr class="yes3-light-theme-only">
+                        <td>
+                            <i class="fas fa-moon yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Switch to dark theme.
+                        </td>
+                    </tr>   
+
+                    <tr class="yes3-dark-theme-only">
+                        <td>
+                            <i class="fas fa-sun yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Switch to light theme.
+                        </td>
+                    </tr>  
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-refresh yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Refresh the export specification summarized in the specific row. Be sure to click the refresh icon after making changes to an export specification in the Exporter II Editor.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-edit yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Edit the export specification summarized in the specific row.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-plus yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            (displayed at the bottom of the table) Add a new export specification.
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-file-export yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Export data dictionary and datasheet to the file system (if configured; requires super user and IT support).
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-download yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Download the data dictionary and/or datasheet.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="far fa-trash-alt yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Remove the export specification. The export specification is not deleted, but is hidden from view and excluded from exports. You can restore a removed export specification by clicking on the 'show removed' icon ( <i class="fas fa-eye yes3-action-icon yes3-nohandler"></i> ) at the bottom of the table, then clicking the 'restore' icon ( <i class="fas fa-trash-restore yes3-action-icon yes3-nohandler"></i> ) in the row of the export specification to be restored.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-eye yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            (displayed at the bottom of the table) Show removed export specifications.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-eye-slash yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            (displayed at the bottom of the table) Hide removed export specifications.
+                        </td>
+                    </tr>
+
+                    
+                </tbody>
+            </table>
         </div>
 
-    </div>
+    </div> <!-- yes3-scrolling-container -->
 
+    <div class='yes3-panel-got-it' id='yes3-help-panel-got-it'>
+        <label class="yes3-checkmarkContainer  yes3-semibold">
+        <input type="checkbox" name="yes3-got-it" value="1" onclick="YES3.Help_setGotIt()">
+        <span class="yes3-checkmark" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="If checked, this 'getting started' panel will not be automatically displayed when the editor is opened. Uncheck to re-enable automatic display."></span>
+        Do NOT display this panel automatically when the Export Manager is opened.
+        </label>
+    </div>
+   
 </div>
 
 <div class="yes3-container" id="yes3-container" style="padding-right: 20px;">
@@ -105,7 +251,7 @@ $module->getCodeFor("yes3_export_manager", true);
 
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openPanel" data-bs-toggle="tooltip" title="Open a navigation help panel."></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openDocumentation" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Open_docPage" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only yes3-tooltip-static" action="Theme_dark" data-bs-toggle="tooltip" title="Give in to the dark side (dark theme)."></i>
             <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only yes3-tooltip-static" action="Theme_light" data-bs-toggle="tooltip" title="Switch to the light theme."></i>
@@ -150,7 +296,7 @@ $module->getCodeFor("yes3_export_manager", true);
                         <td class="yes3-col-sm yes3-halign-left yes3-fmapr-batch-exports"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
                         <!--<th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="who you lookin at?"></th>-->
-                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" id="yes3-fmapr-visibility-control" title="click to show removed exports, which can then be restored">
+                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" id="yes3-fmapr-visibility-control">
                             show xx<br>removed
                         </td>
                     </tr>
