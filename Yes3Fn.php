@@ -95,7 +95,31 @@ class Yes3Fn {
         return $escaped;
     }
 
+    
+    /**
+     * Encodes a number in base 36 (0-9, a-z)
+     * 
+     * @param mixed $num 
+     * @return string 
+     */
+    public static function base36Encode($num) {
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+        $base = strlen($chars);
+        $encoded = '';
 
+        while ($num > 0) {
+            $remainder = $num % $base;
+            $num = intval($num / $base);
+            $encoded = $chars[$remainder] . $encoded;
+        }
+
+        return $encoded;
+    }
+
+    public static function compactTimestamp() {
+        $currentTimestamp = time();
+        return self::base36Encode($currentTimestamp);
+    }
 
    public static function query($sql, $parameters = [])
    {

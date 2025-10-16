@@ -144,7 +144,7 @@ FMAPR.populateSetupEventTable = function()
         event_name = FMAPR.event_settings[e].event_name;
         event_prefix = FMAPR.event_settings[e].event_prefix;
 
-        html += `<tr id='event-${event_id}'><td data-setting='event_name'>${event_name}</td><td><input type='text' class='yes3-input-integer' data-setting='event_prefix' value='${event_prefix}' /></td></tr>`;
+        html += `<tr id='event-${event_id}'><td data-setting='event_name'>${event_name}</td><td><input type='text' class='yes3-input-integer yes3-monospace' data-setting='event_prefix' value='${event_prefix}' /></td></tr>`;
     }
 
     FMAPR.eventPrefixesTable().find('tbody').empty().append(html);
@@ -271,6 +271,13 @@ $( function () {
      * but is required by FMAPR.displayActionIconsAndInputs (located in FMAPR.yes3_fieldmapper_common.js)
      */
     FMAPR.mapperLoaded = true;
+    
+    // set the static, html-defined tooltip handlers
+    YES3.setBsTooltipListenersForContainer( document.body );
+
+    YES3.RegisterApplicationNameSpace('FMAPR_Prefix_Editor');
+
+    YES3.Functions.Help_openPanel( true );
 
 
     /**

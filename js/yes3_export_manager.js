@@ -887,9 +887,16 @@ $( function(){
 
     YES3.contentLoaded = false;
 
-    FMAPR.setStaticToolTips(); // tooltips that don't change
+    // set the static, html-defined tooltip handlers
+    YES3.setBsTooltipListenersForContainer( document.body );
+
+    FMAPR.setStaticToolTips(); // manager tooltips that don't change
 
     FMAPR.removeTheIrrelevantElements();
+    
+    YES3.RegisterApplicationNameSpace('FMAPR_Manager');
+
+    YES3.Functions.Help_openPanel( true );
 
     //YES3.displayActionIcons();
 

@@ -37,9 +37,13 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/ui/1.14.0/jquery-ui.min.js" integrity="sha256-Fb0zP4jE3JHqu+IBB9YktLcSjI1Zc6J2b6gTjB0LpoM=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/ae9d1ced7d.js" crossorigin="anonymous"></script>    
+
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"-->
+
     <link rel="icon" type="image/x-icon" href="<?= $module->getUrl('favicon.ico')?>">
 
 </head>
@@ -96,118 +100,162 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
     <div class="yes3-panel-header-row">
         <div class="yes3-panel-row-left" id="yes3-help-panel-title">
-            Here's some help
+            Getting Started with the Export Editor
         </div>
         <div class="yes3-panel-row-right">
             <a href="javascript: YES3.Help_closePanel()"><i class="fas fa-times fa-2x"></i></a>
         </div>
     </div>
 
-    <div class='yes3-panel-row'>
-        Access to YES3 Export Editor features is through clicking on 'action icons'.
-        Each action icon is listed below, along with the feature it invokes.
+    <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
+
+        <div class="yes3-panel-row">
+            <h5>Overview</h5>
+            <p>
+                The Exporter Editor is a tool for designing and editing an <em>export specification</em>.
+                An export specification defines the data to be exported from your project, as well as the format of the exported data.
+            </p>
+            <p>
+                This Getting Started panel provides an overview of the Export Editor interface, with particular attention to inline and online help resources.
+                You may leave this panel open while working with the Export Editor, or close it and refer to it later as needed.
+            </p>
+            <h5>How help is organized</h5>
+            <p>
+                The YES3 Exporter supports a 3-tiered help system:
+            </p>
+            <ol>
+                <li><strong>tooltips</strong>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
+                <li><strong>inline help</strong>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons (  <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i> ).</li>
+                <li><strong>online help</strong>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
+            </ol>
+
+            <div class='yes3-panel-row'>
+                <h5>Action icons</h5>
+                <p>
+                Many features are accessed through clicking on 'action icons'.
+                Each action icon is displayed below, along with the feature it invokes.
+                </p>
+            </div>
+
+            <table>
+                <tbody>
+
+                    <tr>
+                        <td>
+                            <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Display a topic-specific inline help panel (see above).
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="far fa-save yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Save the export specification (no unsaved changes).
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="far fa-save yes3-action-icon yes3-dirty yes3-nohandler"></i>
+                        </td>
+                        <td>
+                        Save the export specification (unsaved changes detected).
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-download yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Download the data dictionary and/or datasheet.
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-file-export yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Export data dictionary and datasheet to the file system (if configured; requires super user and IT support).
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <i class="fas fa-undo yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Restore the export specification to a prior version.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-question yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Open this Getting Started panel.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Open the YES3 Exporter online documentation (it will open into a new tab in your browser).
+                        </td>
+                    </tr>
+                                
+                    <tr class="yes3-light-theme-only--xxx">
+                        <td>
+                            <i class="fas fa-moon yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Switch to dark theme.
+                        </td>
+                    </tr>   
+                    
+                    <tr class="yes3-dark-theme-only--xxx">
+                        <td>
+                            <i class="fas fa-sun yes3-action-icon yes3-nohandler"></i>
+                        </td>
+                        <td>
+                            Switch to light theme.
+                        </td>
+                    </tr>   
+                    
+                </tbody>
+            </table>
+        </div>
+
+        <div class='yes3-panel-row'>
+    
+            <h5>Edit mode</h5>
+            <p>
+                The Export Editor has two editing modes: <strong>Settings</strong> and <strong>Items</strong>.
+                The edit mode is set by the EDIT MODE radio buttons at the top left of the Export Editor panel.
+            </p>
+            <p>
+                Export <strong>Settings</strong> mode allows you to configure the export options, while <strong>Items</strong> mode lets you manage the specific items to be exported.
+            </p>
+            <p>You may switch between edit modes freely as you work.</p>
+        </div>
+
+    </div> <!-- yes3-scrolling-container -->
+
+    <div class='yes3-panel-got-it' id='yes3-help-panel-got-it'>
+        <label class="yes3-checkmarkContainer  yes3-semibold">
+        <input type="checkbox" name="yes3-got-it" value="1" onclick="YES3.Help_setGotIt()">
+        <span class="yes3-checkmark" data-bs-toggle="tooltip" data-bs-html="true" data-bs-placement="top" title="If checked, this 'getting started' panel will not be automatically displayed when the editor is opened. Uncheck to re-enable automatic display."></span>
+        Do NOT display this panel automatically when the Export Editor is opened.
+        </label>
     </div>
-
-   <div class="yes3-panel-row yes3-duck" >
-        <table>
-            <tbody>
-                
-                <tr>
-                    <td>
-                        <i class="far fa-save yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Save the export specification (no unsaved changes).
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <i class="far fa-save yes3-action-icon yes3-dirty yes3-nohandler"></i>
-                    </td>
-                    <td>
-                    Save the export specification (unsaved changes detected).
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <i class="fas fa-undo yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Restore the export specification to a prior version.
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <i class="fas fa-download yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Download the data dictionary and/or datasheet.
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td>
-                        <i class="fas fa-file-export yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Export data dictionary and datasheet to the file system (if configured; requires super user and IT support).
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Display a topic-specific help panel.
-                    </td>
-                </tr>
-
-                <tr>
-                    <td>
-                        <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Open the YES3 Exporter online documentation (it will open into a new tab in your browser).
-                    </td>
-                </tr>
-                            
-                <tr class="yes3-light-theme-only--xxx">
-                    <td>
-                        <i class="fas fa-moon yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Switch to dark theme.
-                    </td>
-                </tr>   
-                
-                <tr class="yes3-dark-theme-only--xxx">
-                    <td>
-                        <i class="fas fa-sun yes3-action-icon yes3-nohandler"></i>
-                    </td>
-                    <td>
-                        Switch to light theme.
-                    </td>
-                </tr>   
-                
-            </tbody>
-        </table>
-   </div>
-
-   <div class='yes3-panel-row'>
-        <h5>EDIT MODE</h5>
-        <p>
-            The Export Editor has two editing modes: <strong>Settings</strong> and <strong>Items</strong>.
-            The edit mode is set by the EDIT MODE radio buttons at the top left of the Export Editor panel.
-        </p>
-        <p>
-            Export <strong>Settings</strong> mode allows you to configure the export options, while <strong>Items</strong> mode lets you manage the specific items to be exported.
-        </p>
-        <p>You may switch between edit modes freely as you work.</p>
-   </div>
    
 </div>
 
@@ -796,9 +844,9 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             
             <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-loaded yes3-designer-only" data-bs-toggle="tooltip" action="Wayback_openForm" title="Restore the export specification from a stored backup."></i>
 
-            <i class="far fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display navigation help for this page."></i>
+            <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display navigation help for this page."></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openDocumentation" title="Open the YES3 Exporter2 online documentation"></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Open_docPage" title="Open the YES3 Exporter2 online documentation"></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" data-bs-toggle="tooltip" action="Theme_dark" title="Switch to the dark side"></i>
             <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" data-bs-toggle="tooltip" action="Theme_light" title="Switch to the sunny side"></i>

@@ -1,4 +1,7 @@
 
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap');
+
 html {
 /*
 --yes3-font-family: "Segoe UI semibold","Segoe UI","Frutiger","Frutiger Linotype","Dejavu Sans",Helvetica,Arial,sans-serif;
@@ -311,6 +314,11 @@ pre {
     border-color: var(--yes3-pre-border-color) !important;
     color: var(--yes3-pre-color) !important;
     font-size: 1em !important;
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+}
+
+.yes3-monospace {
+    font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 
 label:not(.yes3-override) {
@@ -1362,6 +1370,14 @@ div#yes3-help-panel, div.yes3-help-panel {
    max-width: 900px !important;
    background-color: var(--yes3-help-panel-background-color) !important;
 }
+
+div#yes3-help-panel h5 {
+   color: var(--yes3-help-panel-header-color) !important;
+   font-weight: var(--yes3-font-weight-semibold) !important;
+   font-size: 1.25em !important;
+   margin: 0 !important;
+   padding-bottom: 6px !important;
+}
  
 .yes3-panel p:not(.yes3-headroom) {
    margin-top: 0;
@@ -1444,13 +1460,6 @@ div.yes3-max-headroom {
     color: var(--yes3-panel-subtitle-color);
     font-weight: var(--yes3-font-weight-semibold);
     font-style: normal;
- }
- 
- .yes3-panel-footer {
-    float: left;
-    clear: both;
-    width: 100%;
-    cursor: move;
  }
  
  .yes3-panel-close-link-block {
@@ -1672,6 +1681,21 @@ div.yes3-max-headroom {
    font-size: 1em !important;
  }
 
+ .yes3-panel-got-it {
+   width: 100%;
+   float: left;
+   clear: both;
+   padding-top: 10px;
+   /*border-top: 1px solid var(--yes3-color);*/
+   margin-top: 10px;
+   padding-bottom: 10px;
+ }
+
+ .yes3-panel-got-it * {
+    color: var(--yes3-color) !important;
+    border-color: var(--yes3-color) !important;
+ }
+
 
 /* CHECKBOXES */
 
@@ -1706,7 +1730,7 @@ div.yes3-max-headroom {
  /* Create a custom checkbox, same dimensions and color as balloon radios */
  .yes3-checkmark {
     position: absolute;
-    top: 0;
+    top: 2px;
     left: 0;
     height: 15px;
     width: 15px;

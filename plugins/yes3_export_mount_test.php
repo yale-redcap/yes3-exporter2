@@ -30,62 +30,34 @@ if (empty($mount_path)) {
     exit();
 }
 
-$filename = "yes3_exporter_test_" . getCompactTimestamp() . ".txt";
+?>
 
-echo "<pre>";
+<?= $module->initializeJavascriptModuleObject(); ?>
 
-echo "Mount path: $mount_path\n";
+<script>
 
-echo "Test filename: $filename\n";
+    const jmo = <?= $module->getJavascriptModuleObjectName() ?>;
 
-// append the directopry separator to the mount path if it is not already there
-if (substr($mount_path, -1) !== DIRECTORY_SEPARATOR) {
-    $mount_path .= DIRECTORY_SEPARATOR;
-}
+    function runWriteTest() {
 
-// path to the file to be created
-$file_path = $mount_path . $filename;
+        jmo.ajax('test-filesystem-write', {}).then(function(response) {
+        
+            document.getElementById('test-write-result').innerText = response;
+            document.getElementById('test-write-result').style.display = 'block';
+        }).catch(function(err) {
 
-$file_content = "This is a test file created by the Yes3 Exporter2 External Module on " . date('Y-m-d H:i:s');
-
-$file_content .= "\nProject: " . $module->getProject()->getTitle() . " ( pid " . $module->getProjectId() . " )";
-
-$file_content .= "\nUser: " . $module->getUser()->getUsername() . "\n";
-
-// write the content to the file and store the result in a variable
-$write_result = file_put_contents($file_path, $file_content);
-
-if ($write_result === false) {
-    echo "Failed to write to file: $file_path.\n";
-} else {
-    echo "Successfully wrote $write_result bytes to file: $file_path.\n";
-    // delete the test file after writing
-    //unlink($file_path);
-}
-
-echo "</pre>";
-
-/**
- * Encodes a number in base 36 (0-9, a-z)
- * 
- * @param mixed $num 
- * @return string 
- */
-function base36Encode($num) {
-    $chars = '0123456789abcdefghijklmnopqrstuvwxyz';
-    $base = strlen($chars);
-    $encoded = '';
-
-    while ($num > 0) {
-        $remainder = $num % $base;
-        $num = intval($num / $base);
-        $encoded = $chars[$remainder] . $encoded;
+            // Handle error
+            document.getElementById('test-write-result').innerText = 'Error: ' + err;
+            document.getElementById('test-write-result').style.display = 'block';
+        });
     }
+</script>
 
-    return $encoded;
-}
+<h4>Yes3 Exporter II - Host filesystem write test</h4>
 
-function getCompactTimestamp() {
-    $currentTimestamp = time();
-    return base36Encode($currentTimestamp);
-}
+<p>This test will attempt to write a small text file to the configured export target folder.</p>
+<p>If the write is successful, the test file will be deleted.</p>
+<p>This test does not export any data from REDCap. It only tests the ability of the web server to write to the configured folder.</p>
+<p><strong>Note:</strong> The configured folder must be accessible to the web server user (e.g. www-data, apache, etc.) and must have write permissions.</p>
+<input type="button" id="test-write-btn" value="Run the test" onclick="runWriteTest();" />
+<pre id="test-write-result" style="margin-top:20px;max-width: 1000px;display:none;"></pre>
