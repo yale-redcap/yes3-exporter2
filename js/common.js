@@ -264,7 +264,7 @@ FMAPR.markAsDirty = function( message )
     
     if ( !YES3.dirty ) {
 
-        console.log("FMAPR.markAsDirty: Setting dirty to true");
+        //console.log("FMAPR.markAsDirty: Setting dirty to true");
 
         YES3.dirty = true;
         //FMAPR.displayActionIconsAndInputs();
@@ -280,7 +280,7 @@ FMAPR.markAsDirty = function( message )
         }
     }
 
-    console.log("FMAPR.markAsDirty: YES3.dirty = " + YES3.dirty);
+    //console.log("FMAPR.markAsDirty: YES3.dirty = " + YES3.dirty);
 
     return true;
 
@@ -517,7 +517,7 @@ FMAPR.cookieMonster = function() {
         
         //const cookieData = JSON.parse(cookieDataJson);
 
-        console.log("cookieMonster! cookieData: ", cookieData);
+        //console.log("cookieMonster! cookieData: ", cookieData);
 
         /*
         let msg = `Download complete for export <strong>${cookieData.export_name}</strong>.`;
