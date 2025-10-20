@@ -470,7 +470,7 @@ FMAPR.renderExportTable = function()
     const $requiredHeaderCells = FMAPR.exportTable().find('thead tr th.yes3-required-column');
     const $requiredFooterCells = FMAPR.exportTable().find('tfoot tr td.yes3-required-column');
     const $requiredTbodyCells  = $exportRowsToDisplay.find('td.yes3-required-column');
-$
+
     const $notRequiredHeaderCells = FMAPR.exportTable().find('thead tr th:not(.yes3-required-column)');
     const $notRequiredFooterCells = FMAPR.exportTable().find('tfoot tr td:not(.yes3-required-column)');
     const $notRequiredTbodyCells  = $exportRowsToDisplay.find('td:not(.yes3-required-column)');
@@ -549,6 +549,9 @@ FMAPR.refreshSpecificationCallback = function( response ){
         return false;
     }
 
+    // clear any existing tooltips for this row
+    YES3.clearBsTooltipsForContainer( $tr[0] );
+
     // update the row with the new export specification data
     $tr.replaceWith( FMAPR.exportTableRowHtml( export_specification ) );
 
@@ -560,8 +563,8 @@ FMAPR.refreshSpecificationCallback = function( response ){
 
     FMAPR.renderExportVisibilityCell();
 
-    // regenerate tooltips
-    FMAPR.setDynamicToolTips();
+    // regenerate tooltips for the updated row
+    YES3.setBsTooltipListenersForContainer ( $newTr[0] );
 
     // resize in case of enfarglement
     $(window).trigger('resize');

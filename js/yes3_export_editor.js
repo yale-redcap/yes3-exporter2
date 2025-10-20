@@ -314,6 +314,7 @@ FMAPR.warnIfMixedRepeating = function( allForms ) {
 
     // special case: all forms are selected
     if ( $(`tr[data-object_type=form][data-object_name="${ALL_OF_THEM}"]`).length > 0 ) allForms = true;
+    else if ( $(`tr[data-object_type=form][data-object_name="${ALL_FORMS}"]`).length > 0 ) allForms = true;
 
     if ( allForms ){
         repeaters = 0;
@@ -693,6 +694,8 @@ YES3.Functions.editExportItem = function()
 
 FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
 {   
+    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle the alias
+    
     //theRowBeforeWhich = theRowBeforeWhich || FMAPR.getNewFieldRow();
     yes3_fmapr_data_element_name = yes3_fmapr_data_element_name || "";
     unsaved = unsaved || false;
@@ -804,6 +807,7 @@ FMAPR.setObjectInsertMode = function( theRowBeforeWhich )
 
 FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
 {   
+    
     //theRowBeforeWhich = theRowBeforeWhich || FMAPR.getNewFieldRow();
     yes3_fmapr_data_element_name = yes3_fmapr_data_element_name || "";
     unsaved = unsaved || false;
@@ -1175,8 +1179,6 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
 
             FMAPR.setNewItemModeLabel(); // update the mode label to reflect the object type
 
-
-
             // update the tooltip for the mode label
             FMAPR.setBsToolTipsForNewItemOptions();
 
@@ -1209,7 +1211,9 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
                     let object_name = $(this).val();
                     //let object_type =$("select#yes3-fmapr-rapidentry-object-type").val();
 
-                    object_name = object_name.trim();                    
+                    object_name = object_name.trim();
+
+                    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
                     if ( !object_name ){
 
@@ -1243,8 +1247,23 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
         .on("click", function(){
 
             let object_type =$("input[type=radio][name=new_object_type]:checked").val();
-            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
-            let object_name=$("input#yes3-fmapr-rapidentry-object-name").val();
+            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val() || "";
+            let object_name=$("input#yes3-fmapr-rapidentry-object-name").val() || "";
+
+            if ( !object_name.trim() ){
+
+                YES3.hello("Please enter a valid name for the item to be added.");
+                return false;
+            }
+
+            if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+
+            // special case: all forms and events
+            if ( object_type==="form" && object_name===ALL_OF_THEM && ( !FMAPR.project.is_longitudinal || object_event===ALL_OF_THEM ) ){
+
+                FMAPR.addEverything();
+                return true;
+            }
 
             FMAPR.addRapidEntryItem(object_type, object_name, object_event);
 
@@ -1263,8 +1282,25 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
         .on("click", function(){
 
             let object_type =$("input[type=radio][name=new_object_type]:checked").val();
-            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
-            let object_name=$("input#yes3-fmapr-rapidentry-object-name").val();
+            let object_event=$("select#yes3-fmapr-rapidentry-object-event").val() || "";
+            let object_name=$("input#yes3-fmapr-rapidentry-object-name").val() || "";
+
+            if ( !object_name.trim() ){
+
+                YES3.hello("Please enter a valid name for the item to be added.");
+                return false;
+            }
+
+            if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+
+            // special case: all forms and events
+            if ( object_type==="form" && object_name===ALL_OF_THEM && ( !FMAPR.project.is_longitudinal || object_event===ALL_OF_THEM ) ){
+
+                FMAPR.addEverything( true );
+                return true;
+            }
+
+        
 
             FMAPR.addRapidEntryItem(object_type, object_name, object_event, true);
 
@@ -1294,12 +1330,15 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
 
     allFieldsForForm = allFieldsForForm || false;
 
+    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+
     console.log("FMAPR.addRapidEntryItem", object_type, object_name, object_event);
 
     // parms for inserting above the editor row
     const mode = FMAPR.getNewItemMode(); // "insert" or "append" depending on the selected row count
     const yes3_fmapr_data_element_name = "";
     const theRowBeforeWhich = (mode === "insert") ? $('tr.yes3-row-selected') : null;
+    const itemsContainer = $('tbody#yes3-fmapr-export-items-tbody')[0];
 
     if ( !object_type || (FMAPR.project.is_longitudinal && !object_event) || !object_name ){
 
@@ -1312,6 +1351,9 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
         YES3.hello("No can do: this item is already included in this export.");
         return false;
     }
+
+    // clear any tooltips
+    YES3.clearBsTooltipsForContainer( itemsContainer );
 
     if ( object_type === "field" ){
 
@@ -1337,6 +1379,9 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
 
     FMAPR.markAsDirty("Be sure to save your changes ( * - unsaved).");
 
+    // populate the table header, now that we have items
+    FMAPR.populateExportItemsTableHead();
+
     FMAPR.resizeExportItemsTable();
 
     FMAPR.scrollExportItemsTableToBottom();
@@ -1344,6 +1389,9 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
     FMAPR.resetExportItemEditor();
 
     FMAPR.warnIfMixedRepeating();
+
+    // rebuild any tooltips
+    YES3.setBsTooltipListenersForContainer( itemsContainer );
 
     //YES3.notBusy();
 }
@@ -1360,36 +1408,52 @@ FMAPR.everythingIsAdded = function(){
     let object_name = theItemRow.data('object_name');
     let object_event = ALL_OF_THEM;
 
+    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+
     if ( FMAPR.project.is_longitudinal ){
 
         object_event = theItemRow.data('object_event');
     }
 
-    return ( object_type==="form" && object_name===ALL_OF_THEM && object_event===ALL_OF_THEM ) ? true : false;
+    return ( object_type==="form" && object_name===ALL_OF_THEM ) ? true : false;
 }
 
-FMAPR.addEverything = function()
+FMAPR.addEverything = function( asFields )
 {
     let K = FMAPR.getExportItemRowCount() || 0;
 
+    asFields = asFields || false;
+
     if ( K > 0 ){
 
-        YES3.YesNo(
-            `WARNING: You are about to add all forms (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
-            FMAPR.addEverything_Yes
-        );
+        if ( asFields ){
+            YES3.YesNo(
+                `WARNING: You are about to add all fields (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
+                FMAPR.addEverything_Yes_Fields
+            );
+        } else {
+            YES3.YesNo(
+                `WARNING: You are about to add all forms (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
+                FMAPR.addEverything_Yes
+            );
+        }
     }
     else {
 
-        FMAPR.addEverything_Yes();
+        FMAPR.addEverything_Yes( asFields );
     }
 }
 
-FMAPR.addEverything_Yes = function()
+FMAPR.addEverything_Yes_Fields = function(){
+
+    FMAPR.addEverything_Yes( true );
+}
+
+FMAPR.addEverything_Yes = function( asFields )
 {
     FMAPR.getExportItemRows().remove();
 
-    FMAPR.addRapidEntryItem("form", ALL_OF_THEM, ALL_OF_THEM);
+    FMAPR.addRapidEntryItem("form", ALL_OF_THEM, ALL_OF_THEM, asFields );
 
     FMAPR.markColumnCountChanged();
     
@@ -1426,6 +1490,8 @@ FMAPR.exportItemRowEventLabel = function(event)
 FMAPR.addREDCapForm = function( form_name, event, theRowBeforeWhich )
 {   
     theRowBeforeWhich = theRowBeforeWhich || {};
+
+    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle the alias
 
     let form_index = FMAPR.project.form_index[form_name];
 
@@ -1845,6 +1911,9 @@ FMAPR.doExportItemsTableHousekeeping = function( isClean )
 
 FMAPR.removeDataElement = function(element_name)
 {
+    // remove any attache tooltips
+    $(`tr[data-yes3_fmapr_data_element_name='${element_name}']`).find('[data-bs-toggle="tooltip"]').tooltip('dispose');
+    
     $(`tr[data-yes3_fmapr_data_element_name='${element_name}']`).remove();
 
     FMAPR.markAsDirty();
@@ -2074,6 +2143,8 @@ FMAPR.getFormEventHtml = function( form_name, yes3_fmapr_data_element_name ){
 
     let formEvents = [];
 
+    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle the alias
+
     if ( form_name === ALL_OF_THEM ){
 
         formEvents = FMAPR.project.project_event_metadata;
@@ -2289,13 +2360,15 @@ FMAPR.getFieldAutoCompleteSource = function(event)
     //YES3.debugMessage("getFieldAutoCompleteSource", acSource);
 
     // if acsource is non empty, add an 'all fields' option
+    /* DEPRECATED - having 'all fields' in the field selector is confusing
     if ( acSource.length > 1 ){
 
         acSource.unshift({
-            "value": ALL_OF_THEM,
+            "value": ALL_FIELDS,
             "label": "ALL FIELDS"
         });
     }
+    */
 
     return acSource;
 }
@@ -2362,7 +2435,7 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
     if ( acSource.length > 1 && !suppressAllForms ){
 
         acSource.unshift({
-            "value": ALL_OF_THEM,
+            "value": ALL_FORMS,
             "label": "ALL FORMS"
         });
     }
@@ -2991,7 +3064,8 @@ FMAPR.addREDcapObjectToSpecification = function(data_element_name, form_name, fi
     let k = 0;
     let items = 0;
 
-    YES3.debugMessage('addREDcapObjectToSpecification', data_element_name, form_name, field_name, event_id_option);
+    //YES3.debugMessage('addREDcapObjectToSpecification', data_element_name, form_name, field_name, event_id_option);
+    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle the alias
 
     /**
      * add a single item (redcap field)
@@ -3370,6 +3444,8 @@ FMAPR.getFormOptionsHtml = function(event_id)
 FMAPR.getEventOptionsHtml = function(form_name)
 {
     form_name = form_name || ALL_OF_THEM;
+
+    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM;
 
     let optionHtml = `<option value='${ALL_OF_THEM}'>all events for form</option>`;
 
@@ -4326,8 +4402,8 @@ FMAPR.populateSpecificationTables = function( specification )
     /** a little help for the help panel */
     $('span[name=export_code_filename_base]').html( FMAPR.exportSpecification.export_code_filename_base );
     
-    YES3.displayActionIcons();
-    FMAPR.displayActionIcons();
+    YES3.displayActionIcons(); // global action icons
+    FMAPR.displayActionIcons(); // action icons specific to this page
 }
 
 FMAPR.postExportName = function( export_name ){
@@ -4393,7 +4469,7 @@ FMAPR.displayActionIcons = function()
     // squelch any controls not allowed when all items already selected
     FMAPR.disableIconsWhenEverythingAdded();
 
-    console.log("FMAPR.displayActionIcons: dirty = ", FMAPR.dirty);
+    //console.log("FMAPR.displayActionIcons: dirty = ", FMAPR.dirty);
 
     // make sure disabled icons are unbound
     YES3.setActionIconListeners( YES3.container() );
@@ -4565,6 +4641,7 @@ FMAPR.populateExportItemsTableHead = function(){
     const table = FMAPR.getExportItemsTable().get(0); // DOM object
     const $tbody = FMAPR.getExportItemsTable().find('tbody');
     const $thead = FMAPR.getExportItemsTable().find('thead');
+    const thead = $thead.get(0); // DOM object
 
     let html = '';
 
@@ -4582,7 +4659,7 @@ FMAPR.populateExportItemsTableHead = function(){
     html = '<tr>';
 
     // row number column
-    html += '<th class="yes3-fmapr-row-number yes3-text-center" style="opacity: 1.0"><i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_rowselector"></i></th>';
+    html += '<th class="yes3-fmapr-row-number yes3-text-center" style="opacity: 1.0"><i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" data-bs-toggle="tooltip" title="Click to obtain detailed instructions for selecting, relocating and removing export items." action="Help_rowselector"></i></th>';
 
     // object editor link column
     //html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center"><i class="far fa-edit"></i></th>';
@@ -4605,9 +4682,19 @@ FMAPR.populateExportItemsTableHead = function(){
 
     html += '</tr>';
 
-    $thead.append(html);
+    // clear any existing tooltip objects in the thead
+    YES3.clearBsTooltipsForContainer( thead );
 
-    console.log("FMAPR.populateExportItemsTableHead: ncols=", ncols, html);
+    $thead.empty().append(html);
+
+    // set the tooltip handlers
+    YES3.setBsTooltipListenersForContainer( thead );
+
+    //FMAPR.displayActionIcons(); // action icons specific to this page (we just added one)
+
+    YES3.setActionIconListeners( $thead );
+
+    //console.log("FMAPR.populateExportItemsTableHead: ncols=", ncols, html);
 
     return html;
 }
@@ -4853,6 +4940,8 @@ FMAPR.setExportItemEditorListeners = function()
 
         let saveResult = "";
 
+        if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle 'all forms' alias
+
         // set the 'insert_as' option for field
         if ( object_type==="field" ){
 
@@ -5095,6 +5184,8 @@ FMAPR.setExportItemEditorListeners = function()
         let thePanel = $(this).closest("div.yes3-panel");
         let form_name = $(this).val();
 
+        if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle alias
+
         if ( !form_name ){
 
             thePanel.find(".yes3-save-button").css("visibility", "hidden");
@@ -5166,6 +5257,8 @@ FMAPR.exportItemEditorSave_fields = function(object_name, object_event, theRowBe
     let html = "";
 
     let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+
+    if ( object_name===ALL_FORMS ) object_name = ALL_OF_THEM; // handle alias
 
     if ( object_name===ALL_OF_THEM ) {
 

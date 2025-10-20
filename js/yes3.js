@@ -34,6 +34,7 @@ const YES3_RESULT_SUCCESS = "success";
 const YES3_RESULT_FAIL = "fail";
 
 const ALL_OF_THEM = "_all_";
+const ALL_FORMS = "_ALL_FORMS_"; // an alias for _all_ for form selection
 
 String.prototype.truncateAt = function( n ){
     if ( this.length > n-3 ) return this.substring(0, n-3) + "...";
@@ -599,7 +600,7 @@ YES3.displayActionIcons = function( listenersLater )
     }
 }
 
-YES3.setActionIconListeners = function(parentElement)
+YES3.setActionIconListeners_deprecated = function(parentElement)
 {
     actionIcons = parentElement.find("i.yes3-action-icon");
 
@@ -617,6 +618,28 @@ YES3.setActionIconListeners = function(parentElement)
         }    
     })
 }
+
+YES3.setActionIconListeners = function( $parentElement )
+{
+    $parentElement = $parentElement || YES3.getYes3ContainerElement(); // defaults to the main container
+    
+    const $actionIcons = $parentElement.find("i.yes3-action-icon:not(.yes3-action-disabled):not(.yes3-nohandler)");
+
+    //console.log("YES3.setActionIconListeners: n=", $actionIcons.length, $parentElement);
+
+    $actionIcons.off().on("click", function(){
+
+        let action = $(this).attr("action");
+
+        if ( typeof YES3.Functions[action] === "function" ) {
+            YES3.Functions[action].call(this); // icon DOM element is passed as 'this' to the function, in case it would be useful
+        }
+        else {
+            YES3.hello(`No can do: the feature 'YES3.Functions.${action}' has not been implemented yet.`);
+        }    
+    })
+}
+
 
 /*** REGISTER NAMESPACE */
 YES3.RegisterApplicationNameSpace = function( nameSpace )

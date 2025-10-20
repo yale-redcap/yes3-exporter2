@@ -138,16 +138,20 @@ FMAPR.populateSetupEventTable = function()
 
     let event_prefix = "";
 
+    YES3.clearBsTooltipsForContainer( FMAPR.eventPrefixesTable()[0] );
+
     for ( let e=0; e<FMAPR.event_settings.length; e++){
 
         event_id = FMAPR.event_settings[e].event_id;
         event_name = FMAPR.event_settings[e].event_name;
         event_prefix = FMAPR.event_settings[e].event_prefix;
 
-        html += `<tr id='event-${event_id}'><td data-setting='event_name'>${event_name}</td><td><input type='text' class='yes3-input-integer yes3-monospace' data-setting='event_prefix' value='${event_prefix}' /></td></tr>`;
+        html += `<tr id='event-${event_id}'><td data-setting='event_name'>${event_name}</td><td><input type='text' class='yes3-input-integer yes3-monospace' data-bs-toggle="tooltip" title="Prefix for event #${event_id} (<strong>${event_name}</strong>)." data-setting='event_prefix' value='${event_prefix}' /></td></tr>`;
     }
 
     FMAPR.eventPrefixesTable().find('tbody').empty().append(html);
+
+    YES3.setBsTooltipListenersForContainer( FMAPR.eventPrefixesTable()[0] );
 }
 
 FMAPR.specToRemove = -1;

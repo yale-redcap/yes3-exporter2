@@ -79,7 +79,7 @@ $module->getCodeFor("yes3_export_prefixes", true);
                     
                     <tr>
                         <td>
-                            <i class="fas fa-undo yes3-action-icon yes3-nohandler"></i>
+                            <i class="fas fa-reply yes3-action-icon yes3-nohandler"></i>
                         </td>
                         <td>
                             Restore all the settings on this page to their stored values (undo).
@@ -174,16 +174,16 @@ $module->getCodeFor("yes3_export_prefixes", true);
 
         <div class="yes3-flex-col-33 yes3-flex-vcenter-hright">
 
-            <i class="far fa-save yes3-action-icon yes3-action-icon-controlpanel yes3-designer-only yes3-save-control" id="yes3-fmapr-save-control" action="Exportspecifications_saveSettings" title="Save all settings on this page."></i>
-            <i class="fas fa-undo yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-display-when-dirty yes3-designer-only" action="Exportspecifications_undoSettings" title="Restore all settings on this page to their stored values (undo)."></i>
-            <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" action="Help_openPanel" title="get some help"></i>
+            <i class="far fa-save yes3-action-icon yes3-action-icon-controlpanel yes3-designer-only yes3-save-control" data-bs-toggle="tooltip" id="yes3-fmapr-save-control" action="Exportspecifications_saveSettings" title="Save all settings on this page."></i>
+            <i class="fas fa-reply yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-display-when-dirty yes3-designer-only" data-bs-toggle="tooltip" action="Exportspecifications_undoSettings" title="Restore all settings on this page to their stored values (undo)."></i>
+            <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display the Prefix Editor Help panel"></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Open_docPage" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" data-bs-toggle="tooltip" action="Open_docPage" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
 
-            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" action="Theme_dark" title="Switch to the dark side"></i>
-            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" action="Theme_light" title="Switch to the sunny side"></i>
+            <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" data-bs-toggle="tooltip" action="Theme_dark" title="Switch to the dark side"></i>
+            <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" data-bs-toggle="tooltip" action="Theme_light" title="Switch to the sunny side"></i>
 
-            <img class="yes3-square-logo yes3-logo" alt="YES3 Logo" title="More about YES3..." />
+            <img class="yes3-square-logo yes3-logo" data-bs-toggle="tooltip" alt="YES3 Logo" title="Open the Yale YES Portal website." />
 
         </div>
 
@@ -206,7 +206,7 @@ $module->getCodeFor("yes3_export_prefixes", true);
                 Keep the prefixes as short as you can manage. 
                 </p>
                 <p>
-                    Click <a href="javascript:FMAPR.restoreToDefaultValues()">here</a> to restore your event prefixes to their default values.
+                    Click <a data-bs-toggle="tooltip" title="Restore the prefixes to their default values, based on the arm/event names. While the algorithm ensures brevity and uniqueness, we recommend that you build your own set of prefixes, so as to convey as much information as possible." href="javascript:FMAPR.restoreToDefaultValues()">here</a> to restore your event prefixes to their default values.
                 </p>
             </div>
 
