@@ -149,7 +149,7 @@ function validateExportFile(){
     $ddPackage = $module->buildExportDataDictionary($export_uuid);
 
     $XValidator = new Yes3ExportValidator();
-    $XValidator->initialize($project_id, $destPath, $ddPackage);
+    $XValidator->initialize($project_id, $destPath, $ddPackage, $module->isLongitudinal());
 
     $ValResults = $XValidator->validate();
 

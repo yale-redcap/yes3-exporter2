@@ -1317,6 +1317,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
             return strnatcasecmp($a['record'], $b['record']);
         });
+
+        //$this->logDebugMessage($this->getProjectId(), print_r($records, true), "writeExportDataFile: Records to export");
         
         /**
          * More helper arrays, required by writeExportDataForRecord()
@@ -1370,6 +1372,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             $group_id = $recordSpec['group_id'];
 
             $sqlSelectParams = array_merge([$this->getProjectId(), $record], $sqlEventParams);
+
+            //$this->logDebugMessage($this->getProjectId(), $sqlSelect, "writeExportDataFile: sqlSelect");
+            //$this->logDebugMessage($this->getProjectId(), print_r($sqlSelectParams, true), "writeExportDataFile: sqlSelectParams");
 
             $recLen = $this->writeExportDataForRecord(
                 $export,
@@ -2022,6 +2027,7 @@ WHERE project_id=? AND log_entry_type=?
         $instance = "?";
         $field_index = -1;
         $days_to_shift = 0;
+        $isLongitudinal = $this->isLongitudinal();
 
         if ( $export->export_shift_dates ){
 
@@ -2058,9 +2064,16 @@ WHERE project_id=? AND log_entry_type=?
         //$this->logDebugMessage($this->getProjectId(), $sqlSelect, "writeExportDataForRecord: sqlSelect");
         //$this->logDebugMessage($this->getProjectId(), print_r($sqlSelectParams, true), "writeExportDataForRecord: sqlSelectParams");
 
+        //$this->logDebugMessage($this->getProjectId(), print_r($dd, true), "writeExportDataForRecord: dd");
+        //$this->logDebugMessage($this->getProjectId(), print_r($dd_index, true), "writeExportDataForRecord: dd_index");
+        //$this->logDebugMessage($this->getProjectId(), print_r($dd_multiselect_index, true), "writeExportDataForRecord: dd_multiselect_index");
+        //$this->logDebugMessage($this->getProjectId(), print_r($field_events, true), "writeExportDataForRecord: field_events");
+
         foreach ( $this->recordGeneratorUnbuffered($sqlSelect, $sqlSelectParams) as $x ){
-        //$xx = $this->fetchRecords($sql, $sqlParams);
+        //$xx = $this->fetchRecords($sqlSelect, $sqlSelectParams);
         //foreach ( $xx as $x ){
+
+            //$this->logDebugMessage($this->getProjectId(), print_r($x, true), "writeExportDataForRecord: record data");
 
             //$K++;
 
@@ -2095,6 +2108,9 @@ WHERE project_id=? AND log_entry_type=?
            
             if ( $BOR ) {
 
+                //$this->logDebugMessage($this->getProjectId(), "BOR for REDCap record {$record}, event_id {$x['event_id']}, instance {$x_instance}", "writeExportDataForRecord: BOR");
+                //$this->logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR data so far");
+
                 // BE AWARE: this code is repeated in the EOR block below
                 if ( $y && $exportValues && $h !== false ){
 
@@ -2128,16 +2144,19 @@ WHERE project_id=? AND log_entry_type=?
 
                     /**
                      * constant specmap field?
-                     */
+                    
                     if ( substr($d['redcap_field_name'], 0, 9)==="constant:" ) {
 
                         $y[$d['var_name']] = str_replace("'", "", trim(substr($d['redcap_field_name'], 9)));
                     }
+                    */
                 }
+
+                //$this->logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR new record init");
 
                 $y[$RecordIdField] = $record;
 
-                if ( $export->export_layout!=="h" && $this->isLongitudinal() ) {
+                if ( $export->export_layout!=="h" && $isLongitudinal ) {
     
                     $y[self::VARNAME_EVENT_ID  ] = $x['event_id'];
                     $y[self::VARNAME_EVENT_NAME] = $eventName[$x['event_id']];
@@ -2247,7 +2266,7 @@ WHERE project_id=? AND log_entry_type=?
             // The dd_index for vertical layouts is keyed only by field name (i.e. one column per field)
             // but the export specification may include specific events for any field.
             // The helper table field_events is referenced to validate the field/event combination
-            if ( $acceptable && $export->export_layout!=="h" && isset($field_events[$field_name])){
+            if ( $acceptable && $export->export_layout!=="h" &&  $isLongitudinal && isset($field_events[$field_name])){
 
                 $acceptable = in_array((int)$event_id, $field_events[$field_name]);
             }
@@ -2289,6 +2308,12 @@ WHERE project_id=? AND log_entry_type=?
                         $y[ $dd[ $field_index]['var_name'] ] = $REDCapValue;
                     }
                 }
+
+                //$this->logDebugMessage(
+                //    $this->getProjectId(),
+                //    "record: {$record}, event_id: {$event_id}, instance: {$instance}, field_name: {$field_name}, value: {$REDCapValue}",
+                //    "writeExportDataForRecord: var_name: " . $dd[$field_index]['var_name']
+                //);
 
                 $exportValues++; // increment the count of values exported for this record (other than the recordid)
             }
@@ -5177,20 +5202,18 @@ WHERE project_id=? AND log_entry_type=?
 
         $enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports") ?? false;
 
-        //$projectSettings = $this->getProjectSettings();
-
         if ( !$user_rights['exporter'] ){
 
             return false;
         }
 
         // event prefixes are applicable only to longitudinal projects
-        if ( !$this->isLongitudinal() && $link['name'] !== "YES3 Exporter II Event Prefixes" ){ 
+        if ( !$this->isLongitudinal() && $link['name'] === "YES3 Exporter II Event Prefixes" ){ 
 
             return false;
         }
 
-        if ( $link['name'] === "YES3 Exporter II Mount Test" 
+        if ( $link['name'] === "YES3 Exporter II Filesystem Test" 
             && (!$enable_host_filesystem_exports || !$user_rights['isDesigner'])) { 
 
             return false;

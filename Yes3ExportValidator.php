@@ -82,33 +82,46 @@ class Yes3ExportValidator {
 
     private $delimiter = "\t"; // default delimiter for all exports
 
-    private $fileType = "csv"; // csv or tsv
+    private $fileType = "tsv"; // csv or tsv
 
     private $filePath = "";
 
     private $project_salt = "";
     private $date_shift_max = 0; // max date shift in days, default is 0 (no shift)
 
+    private $isLongitudinal = false;
+    private $event_id = 0;
+
     function __construct() {}
 
-    public function initialize( $project_id, $filePath, $ddPackage ) {
+    public function initialize( $project_id, $filePath, $ddPackage, $isLongitudinal=false ) {
 
         $this->project_id = (int) $project_id;
         $this->filePath = $filePath;
         $this->redcap_data_table = REDCap::getDataTable($this->project_id);
 
-        $this->export_uuid                = $ddPackage['export_uuid'] ?? "";
-        $this->export_label               = $ddPackage['export_label'] ?? "";
-        $this->export_name                = $ddPackage['export_name'] ?? "";
-        $this->export_layout              = $ddPackage['export_layout'] ?? "";
-        $this->export_max_text_length     = (int)($ddPackage['export_max_text_length'] ?? 0);
-        $this->export_inoffensive_text    = (int)($ddPackage['export_inoffensive_text'] ?? 0);
-        $this->export_no_tags             = (int)($ddPackage['export_no_tags'] ?? 0);
-        $this->export_ascii_text          = (int)($ddPackage['export_ascii_text'] ?? 0);
-        $this->export_shift_dates         = (int)($ddPackage['export_shift_dates'] ?? 0);
-        $this->export_group_id            = (int)($ddPackage['export_group_id'] ?? 0);
-        $this->export_hash_recordid       = (int)($ddPackage['export_hash_recordid'] ?? 0);
-        $this->export_has_repeatables     = (int)($ddPackage['export_has_repeatables'] ?? 0);
+        $this->isLongitudinal = $isLongitudinal;
+
+        if ( !$this->isLongitudinal ) {
+
+            $this->event_id = Yes3Fn::getFirstEventId($this->project_id);
+        }
+
+        /** @var Yes3Export $export */
+        $export = $ddPackage['export'];
+
+        $this->export_uuid                = $export->export_uuid ?? "";
+        $this->export_label               = $export->export_label ?? "";
+        $this->export_name                = $export->export_name ?? "";
+        $this->export_layout              = $export->export_layout ?? "";
+        $this->export_max_text_length     = (int)($export->export_max_text_length ?? 0);
+        $this->export_inoffensive_text    = (int)($export->export_inoffensive_text ?? 0);
+        $this->export_no_tags             = (int)($export->export_no_tags ?? 0);
+        $this->export_ascii_text          = (int)($export->export_ascii_text ?? 0);
+        $this->export_shift_dates         = (int)($export->export_shift_dates ?? 0);
+        $this->export_group_id            = (int)($export->export_group_id ?? 0);
+        $this->export_hash_recordid       = (int)($export->export_hash_recordid ?? 0);
+        $this->export_has_repeatables     = (int)($export->export_has_repeatables ?? 0);
         $this->dd                         = $ddPackage['export_data_dictionary'] ?? [];
 
         if ( !is_array($this->dd) || empty($this->dd) ) {
@@ -130,6 +143,11 @@ class Yes3ExportValidator {
 
             $this->delimiter = "\t";
             $this->fileType = "tsv";
+        }
+        else if (strtolower($extension) === 'csv') {
+
+            $this->delimiter = ",";
+            $this->fileType = "csv";
         }
 
         // items from the project object
@@ -334,8 +352,8 @@ class Yes3ExportValidator {
 
         $x = [
             'record' => $row[0] ?? null,
-            'redcap_event_id' => 0,
-            'redcap_event_name' => "",
+            'redcap_event_id' => $this->isLongitudinal ? null : $this->event_id,
+            'redcap_event_name' => $this->isLongitudinal ? null :"event_1_arm_1",
             'redcap_data_access_group_id' => 0,
             'redcap_repeat_instance' => 1,
             'redcap_field_name' => "",
@@ -591,12 +609,12 @@ class Yes3ExportValidator {
 
         $x['stored_value'] = trim(Yes3Fn::fetchValue( $sql, $params ) ?? "");
         /*
-        if ( $x['redcap_field_name'] === 'participant_type' ) {
+        if ( $x['redcap_field_name'] === 'scrn_date' ) {
 
             $xStr = print_r($x, true);
             $ddStr = print_r($ddItem, true);
 
-            throw new Exception("Debug participant_type: x['stored_value'] is '{$x['stored_value']}'. Data: {$xStr}. DD: {$ddStr}");
+            throw new Exception("Debug scrn_date: x['stored_value'] is '{$x['stored_value']}'. x: {$xStr}. DD: {$ddStr}");
         }
         */
         if ( $x['stored_value'] === $x['exported_value'] ) {
