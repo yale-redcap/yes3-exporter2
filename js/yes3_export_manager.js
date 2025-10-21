@@ -397,7 +397,7 @@ FMAPR.postExportEditedMesage = function(){
 
     if ( n === 0 ) return;
 
-    FMAPR.postMessage(`* At least 1 export has been opened for editing. Please click <i class="fas fa-refresh yes3-fmapr-edited"></i> to refresh the edited export(s)`);
+    FMAPR.postMessage(`* At least 1 export has been opened for editing. Please click <i class="fas fa-refresh yes3-fmapr-edited" onclick="FMAPR.loadSpecifications( 1 );"></i> to refresh this page to reflect the edited export(s)`, true, true);
 }
 
 

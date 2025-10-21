@@ -252,7 +252,7 @@ class Yes3Fn {
       return self::fetchValue($sql, [$project_id, $field_name]);
    }
 
-   public static function getFirstREDCapEventId(int $project_id=null)
+   public static function getFirstREDCapEventId(int $project_id=0)
    {
       if ( !$project_id ){
          $project_id = self::getProjectId();
