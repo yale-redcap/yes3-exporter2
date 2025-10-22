@@ -502,9 +502,10 @@ div#yes3-fmapr-new-item-options select{
     padding-left: 0.5em !important;
     border-radius: 6px;
     height: 2em;
+    max-width: 300px;
 }
 
-div#yes3-fmapr-new-item-options input#yes3-fmapr-rapidentry-object-name {
+div#yes3-fmapr-new-item-options input[type=text] {
     /*
     width: calc( 100% - var(--yes3-padding) - 100px );
     min-width: 60px;
@@ -518,6 +519,7 @@ div#yes3-fmapr-new-item-options input#yes3-fmapr-rapidentry-object-name {
     height: 2em;
     padding-left: 0.5em !important;
     padding-right: 0.5em !important;
+    max-width: 300px;
 }
 
 div#yes3-fmapr-new-item-options input[type=button] {

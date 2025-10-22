@@ -136,22 +136,22 @@ YES3.Functions.Help_criterionValue = function()
 
 YES3.Functions.Help_sascode = function()
 {
-    let thePanel = YES3.openPanel("yes3-fmapr-sascode-help-panel", true);
+    const thePanel = YES3.openPanel("yes3-fmapr-sascode-help-panel", true);
 }
 
 YES3.Functions.Help_rowselector = function()
 {
-    let thePanel = YES3.openPanel("yes3-fmapr-row-selector-help-panel", true);
+    const thePanel = YES3.openPanel("yes3-fmapr-row-selector-help-panel", true);
 }
 
 YES3.Functions.Help_export_file_type = function()
 {
-    let thePanel = YES3.openPanel("yes3-fmapr-export-file-type-help-panel", true);
+    const thePanel = YES3.openPanel("yes3-fmapr-export-file-type-help-panel", true);
 }
 
 YES3.Functions.Help_multiselect = function()
 {
-    let thePanel = YES3.openPanel("yes3-fmapr-multiselect-help-panel", true);
+    const thePanel = YES3.openPanel("yes3-fmapr-multiselect-help-panel", true);
 }
 
 YES3.Functions.Help_openDocumentation = function() {
@@ -159,6 +159,19 @@ YES3.Functions.Help_openDocumentation = function() {
     FMAPR.openDocumentation();
 }
 
+YES3.Functions.Help_rapidentry = function() {
+    let thePanel = YES3.openPanel("yes3-fmapr-rapidentry-help-panel", true);
+
+    if ( FMAPR.project.is_longitudinal ){
+        thePanel.find(".yes3-fmapr-longitudinal-only").show();
+        thePanel.find(".yes3-fmapr-crossectional-only").hide(); 
+    }
+    else 
+    {
+        thePanel.find(".yes3-fmapr-longitudinal-only").hide();
+        thePanel.find(".yes3-fmapr-crossectional-only").show(); 
+    }
+}
 
 /*
  * DOCUMENTATION
@@ -257,17 +270,23 @@ FMAPR.newItemOptionsTooltipSpecs = [
     { selector: "input#yes3-fmapr-rapidentry-object-add-singleton", html: "Add a form or field to the export specification." },
     { selector: "input#yes3-fmapr-rapidentry-object-add-everything", html: "Add ALL forms (and their fields), across all arms and events if applicatble, to the export specification." },
     { selector: "select#yes3-fmapr-rapidentry-object-event", html: "Select an event (or all events) for the form or field to be added to this export specification." },
-    { selector: "input#yes3-fmapr-rapidentry-object-name.yes3-object-field", html: "<p>Select the field to be added to this export specification.</p><p>If you have selected an event for this export specification item, only fields on forms assigned to that event will be selectable.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable fields.</p>" },
-    { selector: "input#yes3-fmapr-rapidentry-object-name.yes3-object-form", html: "<p>Select the form to be added to this export specification.</p><p>If you have selected an event for this export specification item, only forms assigned to that event will be selectable.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable forms.</p>" },
-    { selector: "label[for=yes3-fmapr-rapidentry-object-type-form]", html: "<p>Add a form to the export specification. All fields on the form will be included.</p><p>You will have the option of adding each field as a separate export item, which can be useful if you want to remove a small number of fields, or change the order.</p>" },
+    { selector: "label[for=yes3-fmapr-rapidentry-object-type-form]", html: "<p>Add a form (or all forms) to the export specification. All fields on the form will be included.</p><p>You will have the option of adding each field as a separate export item, which can be useful if you want to remove a small number of fields, or change the order.</p>" },
     { selector: "label[for=yes3-fmapr-rapidentry-object-type-field]", html: "Add a single field to the export specification." },
     { selector: "input#yes3-fmapr-rapidentry-object-add[value='append as form']", html: "Append the selected form to the export specification, as a single export item." },
-    { selector: "input#yes3-fmapr-rapidentry-object-add[value='append field']", html: "Append the selected field to the export specification." },
-    { selector: "input#yes3-fmapr-rapidentry-object-add-fields", html: "Append each field in the selected form to the export specification, as a separate export item." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-field", html: "Append the selected field to the export specification." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-form", html: "Append the selected form(s) to the export specification, as a single export item (as opposed to individual forms or fields)." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-fields", html: "Append each field in the selected form(s) to the export specification, as a separate export item." },
     { selector: "input#yes3-fmapr-rapidentry-object-add-forms", html: "Append each form in the selected event to the export specification, as a separate export item." },
-    { selector: "input#yes3-fmapr-rapidentry-object-cancel", html: "Cancel adding a new item to the export specification." },
+    //{ selector: "input#yes3-fmapr-rapidentry-object-cancel", html: "Cancel adding a new item to the export specification." },
     { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-append", html: "<h6>APPEND MODE</h6><p>You are appending an item to the end of the export specification.</p><p>If you would like to insert an item into a specific location, first select the existing item row <em>above which</em> you want to insert the new item.</p>" },
     { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-insert", html: "<h6>INSERT MODE</h6><p>You are inserting an item into the export specification, above the selected item.</p><p>If you would like to append an item to the end of the export specification, clear the item selection by pressing <strong>Ctrl&rarr;Z.</strong></p>" },
+    // tooltips for longitudinal projects
+    { selector: "input#yes3-fmapr-rapidentry-field_name.yes3-longitudinal", html: "<p>Select the field to be added to this export specification.</p><p class='yes3-longitudinal-only'>If you have selected an event for this export specification item, only fields on forms assigned to that event will be selectable.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable fields.</p>" },
+    { selector: "select#yes3-fmapr-rapidentry-form_name.yes3-longitudinal", html: "<p>Select the form (or all forms) to be added to this export specification.</p><p class='yes3-longitudinal-only'>If you have selected an event for this export specification item, only forms assigned to that event will be selectable.</p>" },
+    // tooltips for cross-sectional projects
+    { selector: "input#yes3-fmapr-rapidentry-field_name.yes3-cross-sectional", html: "<p>Select the field to be added to this export specification.</p><p>This is an autocomplete field. Press the spacebar for the complete list of selectable fields.</p>" },
+    { selector: "select#yes3-fmapr-rapidentry-form_name.yes3-cross-sectional", html: "<p>Select the form (or all forms) to be added to this export specification.</p>" },
+
 
 ];
 
@@ -761,7 +780,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     if ( FMAPR.project.is_longitudinal ){
         html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="REDcap form name">${form_label}</td>`;
+    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="Form name: <strong>${form_name}</strong><br>Form label: ${form_label}<br>${object_repeating_class_title}">${form_label}</td>`;
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
     html += "</tr>";
 
@@ -828,6 +847,9 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
     //YES3.debugMessage("addREDCapFieldV2:theRowBeforeWhich", theRowBeforeWhich, mode, FMAPR.getNewFieldRow(), YES3.isEmpty( theRowBeforeWhich ));
 
     let field_label = FMAPR.project.field_metadata[field_index].field_label;
+    let form_name = FMAPR.project.field_metadata[field_index].form_name;
+    let form_index = FMAPR.project.form_index[form_name];
+    let form_label = FMAPR.project.form_metadata[form_index].form_label;
     let object_type = "field";
     let object_repeating_class = "yes3-non-repeating";
     let object_repeating_class_title = "This field is from a NON-REPEATING form";
@@ -853,7 +875,7 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
     if ( FMAPR.project.is_longitudinal ){
         html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="REDcap field name">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
+    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="form: <strong>${form_label}</strong><br>field: <strong>${field_name}</strong><br>label: ${field_label}<br>${object_repeating_class_title}">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += "</tr>";
 
@@ -927,7 +949,8 @@ FMAPR.renderNewItemOptionsSection = function( force ) {
     }
 
     // render the default item options form: [form or field] OR [everything]
-    FMAPR.renderNewItemOptionsSectionDefault();
+    //FMAPR.renderNewItemOptionsSectionDefault();
+    FMAPR.renderNewItemOptionsSectionFormOrField();
 }
 
 /**
@@ -1006,44 +1029,48 @@ FMAPR.renderNewItemOptionsSectionFormOrField = function() {
 
     //$section.css("height", sectionHeight + "px"); // reset the height to the original to minimize layout shifts
 
+    const projTypeClass = ( FMAPR.project.is_longitudinal ) ? "yes3-longitudinal" : "yes3-cross-sectional";
+
     let html = "";
 
     const mode = FMAPR.getNewItemMode().toUpperCase();
 
-    html += `<span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label">${mode}</span>:&nbsp;</span>`;
+    html += `<i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" action="Help_rapidentry" data-bs-toggle="tooltip" data-bs-html="true" title="Click for help with adding items to the export."></i>`;
 
-    html += `<input type="radio" class="balloon" value="form" name="new_object_type" id="yes3-fmapr-rapidentry-object-type-form" checked />`;
-    html += `<label for="yes3-fmapr-rapidentry-object-type-form">form</label>`;
+    html += `<span class="yes3-semibold ${projTypeClass}"><span class="yes3-fmapr-rapidentry-object-mode-label">${mode}</span></span>`;
 
-    html += `<input type="radio" class="balloon" value="field" name="new_object_type" id="yes3-fmapr-rapidentry-object-type-field" />`;
-    html += `<label for="yes3-fmapr-rapidentry-object-type-field">field</label>`;
+    html += `<input type="radio" class="balloon ${projTypeClass}" value="form" name="new_object_type" id="yes3-fmapr-rapidentry-object-type-form" checked />`;
+    html += `<label for="yes3-fmapr-rapidentry-object-type-form" class="${projTypeClass}">form(s)</label>`;
+
+    html += `<input type="radio" class="balloon ${projTypeClass}" value="field" name="new_object_type" id="yes3-fmapr-rapidentry-object-type-field" />`;
+    html += `<label for="yes3-fmapr-rapidentry-object-type-field" class="${projTypeClass}">field</label>`;
 
     if (FMAPR.project.is_longitudinal  ){
-        html += `<select name="new_object_event" id="yes3-fmapr-rapidentry-object-event">`;
+        html += `<select name="new_object_event" id="yes3-fmapr-rapidentry-object-event" class="${projTypeClass}">`;
         html += FMAPR.getAllEventOptionsHtml();
         html += `</select>`;
     }
 
     //html += `<input type="text" name="new_object_name" id="yes3-fmapr-rapidentry-object-name" placeholder="start typing or spacebar for all" />`;
 
-    html += `<input type="text" id="yes3-fmapr-rapidentry-field_name" data-bs-toggle="tooltip" title="Start typing to select the field (or all fields). Press the spacebar to list all fields." placeholder="start typing or spacebar for all" style="display: none;" />`;
+    html += `<input type="text" id="yes3-fmapr-rapidentry-field_name" placeholder="start typing or spacebar for all" class="${projTypeClass}" style="display: none;" />`;
 
-    html += `<select id="yes3-fmapr-rapidentry-form_name" data-bs-toggle="tooltip" title="Select a form to add (or all forms)" style="display: none;">`;
+    html += `<select id="yes3-fmapr-rapidentry-form_name" class="${projTypeClass}" style="display: none;">`;
     html += `<option value="">-- select form --</option>`;
     html += `<option value="${ALL_OF_THEM}">all forms</option>`;
     html += `</select>`;
 
     //html += `<input type="button" id="yes3-fmapr-rapidentry-object-add" value="add to export" style="display: none;" />`;
 
-    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-form" value="append as form" style="display: none;" />`;
+    html += `<input type="button" class="yes3-fmapr-add-object ${projTypeClass}" id="yes3-fmapr-rapidentry-object-add-form" value="append as form" style="display: none;" />`;
 
-    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-forms" value="append as forms" style="display: none;" />`;
+    html += `<input type="button" class="yes3-fmapr-add-object ${projTypeClass}" id="yes3-fmapr-rapidentry-object-add-forms" value="append as forms" style="display: none;" />`;
 
-    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-field" value="append as field" style="display: none;" />`;
+    html += `<input type="button" class="yes3-fmapr-add-object ${projTypeClass}" id="yes3-fmapr-rapidentry-object-add-field" value="append as field" style="display: none;" />`;
  
-    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-fields" value="append as fields" style="display: none;" />`;
+    html += `<input type="button" class="yes3-fmapr-add-object ${projTypeClass}" id="yes3-fmapr-rapidentry-object-add-fields" value="append as fields" style="display: none;" />`;
 
-    html += `<input type="button" id="yes3-fmapr-rapidentry-object-cancel" value="cancel" />`;
+    //html += `<input type="button" id="yes3-fmapr-rapidentry-object-cancel" value="cancel" />`;
 
     $section.append(html);
 
@@ -1229,6 +1256,83 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
         }
     );
 
+    $("select#yes3-fmapr-rapidentry-form_name")
+        .off()
+        .on("change", function(){
+
+            FMAPR.rapidEntrySkipper();
+        }
+    );
+
+    // add single form
+    $("input#yes3-fmapr-rapidentry-object-add-form")
+        .off()
+        .on("click", function(){
+
+            const objectType  = "form";
+            const objectEvent = $("select#yes3-fmapr-rapidentry-object-event").val();
+            const objectName  = $("select#yes3-fmapr-rapidentry-form_name").val();
+            
+            if ( objectName === ALL_OF_THEM && (objectEvent === ALL_OF_THEM || !FMAPR.project.is_longitudinal ) ) {
+                FMAPR.addEverything(false, false);
+            }
+            else {
+                FMAPR.addRapidEntryItem(objectType, objectName, objectEvent, false, false);
+            }
+        })
+    ;
+
+    // add all forms for event (all forms, if not longitudinal)
+    $("input#yes3-fmapr-rapidentry-object-add-forms")
+        .off()
+        .on("click", function(){
+
+            const objectType  = "form";
+            const objectEvent = $("select#yes3-fmapr-rapidentry-object-event").val();
+            const objectName  = $("select#yes3-fmapr-rapidentry-form_name").val();
+
+            if ( objectEvent === ALL_OF_THEM || !FMAPR.project.is_longitudinal ) {
+                FMAPR.addEverything(false, true);
+            }
+            else {
+                FMAPR.addRapidEntryItem(objectType, objectName, objectEvent, false, true);
+            }
+        })
+    ;
+
+    // add all fields for form
+    $("input#yes3-fmapr-rapidentry-object-add-fields")
+        .off()
+        .on("click", function(){
+
+            const objectType  = "form";
+            const objectEvent = $("select#yes3-fmapr-rapidentry-object-event").val();
+            const objectName  = $("select#yes3-fmapr-rapidentry-form_name").val();
+
+            if ( objectName === ALL_OF_THEM && ( objectEvent === ALL_OF_THEM || !FMAPR.project.is_longitudinal )) {
+                FMAPR.addEverything( true, false );
+                return;
+            }
+            else {
+                FMAPR.addRapidEntryItem(objectType, objectName, objectEvent, true, false);
+            }
+        })
+    ;
+
+    // add a single field
+    $("input#yes3-fmapr-rapidentry-object-add-field")
+        .off()
+        .on("click", function(){
+
+            const objectType  = "field";
+            const objectEvent = $("select#yes3-fmapr-rapidentry-object-event").val();
+            const objectName  = $("input#yes3-fmapr-rapidentry-field_name").val();
+
+            FMAPR.addRapidEntryItem(objectType, objectName, objectEvent, false, false);
+        })
+    ;
+
+    /*
     $("input#yes3-fmapr-rapidentry-object-cancel")
         .off()
         .on("click", function(){
@@ -1236,6 +1340,7 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
             FMAPR.renderNewItemOptionsSectionDefault();
         })
     ;
+    */
 
     // display the default object type inputs
     $("input[type=radio][name=new_object_type]:checked").trigger("change");
@@ -1267,6 +1372,8 @@ FMAPR.setNewItemOptionsFieldAutocomplete = function(){
                 .val(ui.item.value)
                 .prop("title", ui.item.label)
             ;
+
+            FMAPR.rapidEntrySkipper();
             return false;
         }
     })
@@ -1288,7 +1395,9 @@ FMAPR.setNewItemOptionsFieldAutocomplete = function(){
 
             YES3.hello(`'${$(this).val()}' is not a valid field name.`);
             $(this).val("");
-        }                        
+        } 
+        
+        FMAPR.rapidEntrySkipper();
     });
 }
 
@@ -1365,7 +1474,7 @@ FMAPR.setNewItemOptionsSingletonListeners_deprecated = function()
                         return false;
                     }
 
-                    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+                    //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
                     if ( object_type==="form" && object_name !== ALL_OF_THEM ){
 
@@ -1406,7 +1515,7 @@ FMAPR.setNewItemOptionsSingletonListeners_deprecated = function()
                 return false;
             }
 
-            if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+            //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
             // special case: all forms and events
             if ( object_type==="form" && object_name===ALL_OF_THEM && ( !FMAPR.project.is_longitudinal || object_event===ALL_OF_THEM ) ){
@@ -1441,7 +1550,7 @@ FMAPR.setNewItemOptionsSingletonListeners_deprecated = function()
                 return false;
             }
 
-            if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+            //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
             // special case: all forms and events
             if ( object_type==="form" && object_name===ALL_OF_THEM && ( !FMAPR.project.is_longitudinal || object_event===ALL_OF_THEM ) ){
@@ -1490,6 +1599,8 @@ FMAPR.rapidEntrySkipper = function(){
     const $addAsFieldButton = $("input#yes3-fmapr-rapidentry-object-add-field");
     const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
 
+    console.warn("rapidEntrySkipper", objectType, objectName, objectEvent);
+
     if ( !objectName || !objectType || !objectEvent ){
 
         $addAsFormsButton.hide();
@@ -1523,13 +1634,23 @@ FMAPR.rapidEntrySkipper = function(){
     }
 }
 
-FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allFieldsForForm ){
+FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allFieldsForForm, allFormsForEvent ){
 
     allFieldsForForm = allFieldsForForm || false;
+    allFormsForEvent = allFormsForEvent || false;
 
-    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+    //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
-    console.log("FMAPR.addRapidEntryItem", object_type, object_name, object_event);
+    // output all parms (by name) to the console
+    console.warn("addRapidEntryItem parms:", {
+        object_type: object_type,
+        object_name: object_name,
+        object_event: object_event,
+        allFieldsForForm: allFieldsForForm,
+        allFormsForEvent: allFormsForEvent
+    });
+
+    let saveResult = null;
 
     // parms for inserting above the editor row
     const mode = FMAPR.getNewItemMode(); // "insert" or "append" depending on the selected row count
@@ -1562,7 +1683,12 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
 
             saveResult = FMAPR.exportItemEditorSave_fields(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
 
-        } else {
+        } 
+        else if ( allFormsForEvent ) {
+
+            saveResult = FMAPR.exportItemEditorSave_forms(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
+        }
+        else {
 
             saveResult = FMAPR.exportItemEditorSave_form(object_name, object_event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode);
         }
@@ -1605,7 +1731,7 @@ FMAPR.everythingIsAdded = function(){
     let object_name = theItemRow.data('object_name');
     let object_event = ALL_OF_THEM;
 
-    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
+    //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
     if ( FMAPR.project.is_longitudinal ){
 
@@ -1615,20 +1741,28 @@ FMAPR.everythingIsAdded = function(){
     return ( object_type==="form" && object_name===ALL_OF_THEM ) ? true : false;
 }
 
-FMAPR.addEverything = function( asFields )
+FMAPR.addEverything = function( asFields, asForms )
 {
     let K = FMAPR.getExportItemRowCount() || 0;
 
     asFields = asFields || false;
+    asForms = asForms || false;
 
     if ( K > 0 ){
 
         if ( asFields ){
             YES3.YesNo(
-                `WARNING: You are about to add all fields (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
+                `WARNING: You are about to add all fields individually (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
                 FMAPR.addEverything_Yes_Fields
             );
-        } else {
+        } 
+        else if ( asForms ){
+            YES3.YesNo(
+                `WARNING: You are about to add all forms individually (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
+                FMAPR.addEverything_Yes_Forms
+            );
+        }
+        else {
             YES3.YesNo(
                 `WARNING: You are about to add all forms (and events if applicable) to the export, but this will cause your current ${K} item(s) to be discarded. Are you sure that you would like to proceed?`,
                 FMAPR.addEverything_Yes
@@ -1643,14 +1777,22 @@ FMAPR.addEverything = function( asFields )
 
 FMAPR.addEverything_Yes_Fields = function(){
 
-    FMAPR.addEverything_Yes( true );
+    FMAPR.addEverything_Yes( true, false );
 }
 
-FMAPR.addEverything_Yes = function( asFields )
+FMAPR.addEverything_Yes_Forms = function(){
+
+    FMAPR.addEverything_Yes( false, true );
+}
+
+FMAPR.addEverything_Yes = function( asFields, asForms )
 {
+    asFields = asFields || false;
+    asForms = asForms || false;
+    
     FMAPR.getExportItemRows().remove();
 
-    FMAPR.addRapidEntryItem("form", ALL_OF_THEM, ALL_OF_THEM, asFields );
+    FMAPR.addRapidEntryItem("form", ALL_OF_THEM, ALL_OF_THEM, asFields, asForms );
 
     FMAPR.markColumnCountChanged();
     
@@ -2388,7 +2530,7 @@ FMAPR.getAllEventOptionsHtml = function()
 
     if ( events.length > 1 ){
 
-        optionsHtml = `<option value="${ALL_OF_THEM}">all events</option>`;
+        optionsHtml = `<option value="${ALL_OF_THEM}">ALL EVENTS</option>`;
     }
 
     for ( let e=0; e<events.length; e++ ){
@@ -2502,6 +2644,7 @@ FMAPR.getFieldAutoCompleteSource = function(event)
 
     let accepted = false;
     let form_name = "";
+    let field_label = "";
     let form_index = 0;
     let j = 0;
     let events = [];
@@ -2547,9 +2690,17 @@ FMAPR.getFieldAutoCompleteSource = function(event)
 
         if ( accepted ){
 
+            field_label = "[" + FMAPR.project.field_metadata[i].field_name + "]";
+
+            if ( FMAPR.project.form_metadata[form_index].form_repeating ){
+                field_label += "[R]";
+            }
+
+            field_label += " " + FMAPR.project.field_metadata[i].field_label;
+
             acSource.push({
                 "value": FMAPR.project.field_metadata[i].field_name,
-                "label": "[" + FMAPR.project.field_metadata[i].field_name + "] " + FMAPR.project.field_metadata[i].field_label
+                "label": field_label
             });
         }
     }
@@ -2579,6 +2730,7 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
 
     let accepted = false;
     let form_name = "";
+    let form_label = "";
     let j = 0;
     let events = [];
     let acSource = [];
@@ -2592,6 +2744,11 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
     for (let form_index=0; form_index<FMAPR.project.form_metadata.length; form_index++){
 
         form_name = FMAPR.project.form_metadata[form_index].form_name;
+        form_label = FMAPR.project.form_metadata[form_index].form_label;
+
+        if ( FMAPR.project.form_metadata[form_index].form_repeating ){
+            form_label += " [R]";
+        }
 
         // first make sure the form is appropriate for the layout
         if ( !FMAPR.formApprovedForLayout( form_name )){
@@ -2629,9 +2786,8 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
         if ( accepted ){
 
             acSource.push({
-                "value": FMAPR.project.form_metadata[form_index].form_name,
-                //"label": `[${FMAPR.project.form_metadata[form_index].form_name}] ${FMAPR.project.form_metadata[form_index].form_label}`
-                "label": `${FMAPR.project.form_metadata[form_index].form_label}`
+                "value": form_name,
+                "label":form_label
             });
         }
     }
@@ -2656,7 +2812,7 @@ FMAPR.getNewItemOptionsFormSelectOptionsHtml = function(){
 
     const formsAcSource = FMAPR.getFormAutoCompleteSource( objectEvent, false );
     
-    let optionsHtml = "";
+    let optionsHtml = "<option value=''>-- select form --</option>";
     for ( let i=0; i<formsAcSource.length; i++ ){
         optionsHtml += `<option value='${formsAcSource[i].value}'>${formsAcSource[i].label}</option>`;
     }
@@ -5166,7 +5322,7 @@ FMAPR.setExportItemEditorListeners = function()
 
         let saveResult = "";
 
-        if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle 'all forms' alias
+        //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle 'all forms' alias
 
         // set the 'insert_as' option for field
         if ( object_type==="field" ){
