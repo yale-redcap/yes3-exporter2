@@ -1948,6 +1948,10 @@ div#niayes3-study-info {
    display: none !important;
 }
 
+.yes3-shown-block {
+   display: block !important;
+}
+
 .yes3-shown-flex {
    display: flex !important;
 }
