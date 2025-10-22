@@ -264,6 +264,7 @@ FMAPR.newItemOptionsTooltipSpecs = [
     { selector: "input#yes3-fmapr-rapidentry-object-add[value='append as form']", html: "Append the selected form to the export specification, as a single export item." },
     { selector: "input#yes3-fmapr-rapidentry-object-add[value='append field']", html: "Append the selected field to the export specification." },
     { selector: "input#yes3-fmapr-rapidentry-object-add-fields", html: "Append each field in the selected form to the export specification, as a separate export item." },
+    { selector: "input#yes3-fmapr-rapidentry-object-add-forms", html: "Append each form in the selected event to the export specification, as a separate export item." },
     { selector: "input#yes3-fmapr-rapidentry-object-cancel", html: "Cancel adding a new item to the export specification." },
     { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-append", html: "<h6>APPEND MODE</h6><p>You are appending an item to the end of the export specification.</p><p>If you would like to insert an item into a specific location, first select the existing item row <em>above which</em> you want to insert the new item.</p>" },
     { selector: "span.yes3-fmapr-rapidentry-object-mode-label.yes3-fmapr-mode-insert", html: "<h6>INSERT MODE</h6><p>You are inserting an item into the export specification, above the selected item.</p><p>If you would like to append an item to the end of the export specification, clear the item selection by pressing <strong>Ctrl&rarr;Z.</strong></p>" },
@@ -925,11 +926,16 @@ FMAPR.renderNewItemOptionsSection = function( force ) {
         }
     }
 
-    // render the default (multiple) item options section
-    FMAPR.renderNewItemOptionsSectionMultiple();
+    // render the default item options form: [form or field] OR [everything]
+    FMAPR.renderNewItemOptionsSectionDefault();
 }
 
-FMAPR.renderNewItemOptionsSectionMultiple = function() {
+/**
+ * The default item add form: [form or field] OR [everything]
+ * 
+ * @returns {void}
+ */
+FMAPR.renderNewItemOptionsSectionDefault = function() {
 
     const $section = FMAPR.getExportNewItemOptionsSection();
 
@@ -981,10 +987,14 @@ FMAPR.renderNewItemOptionsSectionMultiple = function() {
 
 FMAPR.addItemSingleton = function(){
 
-    FMAPR.renderNewItemOptionsSectionSingleton();
+    FMAPR.renderNewItemOptionsSectionFormOrField();
 }
-
-FMAPR.renderNewItemOptionsSectionSingleton = function() {
+/**
+ * The singleton item add form: [form or field]
+ * 
+ * @returns {void}
+ */
+FMAPR.renderNewItemOptionsSectionFormOrField = function() {
 
     const $section = FMAPR.getExportNewItemOptionsSection();
     const section = $section[0]; // raw DOM element
@@ -1014,11 +1024,24 @@ FMAPR.renderNewItemOptionsSectionSingleton = function() {
         html += `</select>`;
     }
 
-    html += `<input type="text" name="new_object_name" id="yes3-fmapr-rapidentry-object-name" placeholder="start typing or spacebar for all" />`;
+    //html += `<input type="text" name="new_object_name" id="yes3-fmapr-rapidentry-object-name" placeholder="start typing or spacebar for all" />`;
 
-    html += `<input type="button" id="yes3-fmapr-rapidentry-object-add" value="add to export" />`;
+    html += `<input type="text" id="yes3-fmapr-rapidentry-field_name" data-bs-toggle="tooltip" title="Start typing to select the field (or all fields). Press the spacebar to list all fields." placeholder="start typing or spacebar for all" style="display: none;" />`;
 
-    html += `<input type="button" id="yes3-fmapr-rapidentry-object-add-fields" value="append as fields" />`;
+    html += `<select id="yes3-fmapr-rapidentry-form_name" data-bs-toggle="tooltip" title="Select a form to add (or all forms)" style="display: none;">`;
+    html += `<option value="">-- select form --</option>`;
+    html += `<option value="${ALL_OF_THEM}">all forms</option>`;
+    html += `</select>`;
+
+    //html += `<input type="button" id="yes3-fmapr-rapidentry-object-add" value="add to export" style="display: none;" />`;
+
+    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-form" value="append as form" style="display: none;" />`;
+
+    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-forms" value="append as forms" style="display: none;" />`;
+
+    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-field" value="append as field" style="display: none;" />`;
+ 
+    html += `<input type="button" class="yes3-fmapr-add-object" id="yes3-fmapr-rapidentry-object-add-fields" value="append as fields" style="display: none;" />`;
 
     html += `<input type="button" id="yes3-fmapr-rapidentry-object-cancel" value="cancel" />`;
 
@@ -1147,7 +1170,130 @@ FMAPR.ensureNewItemRowAtEndV2 = function()
 }
 */
 
+FMAPR.setNewItemOptionsObjectNameContent = function(){
+
+    const objectType =$("input[type=radio][name=new_object_type]:checked").val();
+    const $objectEvent=$("select#yes3-fmapr-rapidentry-object-event");
+    const $formSelect = $("select#yes3-fmapr-rapidentry-form_name");
+    const $fieldInput = $("input#yes3-fmapr-rapidentry-field_name");
+
+    let objectEvent = $objectEvent.val();
+
+    if ( !objectEvent || objectEvent==="") {
+        objectEvent = ALL_OF_THEM;
+        $objectEvent.val(objectEvent);
+    }
+
+    if ( objectType==="field" ){
+        
+        FMAPR.setNewItemOptionsFieldAutocomplete();
+        $fieldInput.val("");
+    }
+    else {
+
+        $formSelect.empty().append(FMAPR.getNewItemOptionsFormSelectOptionsHtml()).val("");
+    }
+
+    FMAPR.rapidEntrySkipper();
+}
+
 FMAPR.setNewItemOptionsSingletonListeners = function()
+{
+    $("input[type=radio][name=new_object_type]")
+        .off()
+        .on("change", function(){
+
+            const objectType =$("input[type=radio][name=new_object_type]:checked").val();
+            const $formSelect = $("select#yes3-fmapr-rapidentry-form_name");
+            const $fieldInput = $("input#yes3-fmapr-rapidentry-field_name");
+
+            if ( objectType==="field" ){
+                
+                $formSelect.hide();
+                $fieldInput.show();
+            }
+            else {
+                $fieldInput.hide();
+                $formSelect.show();
+            }
+
+            FMAPR.setNewItemOptionsObjectNameContent();
+        }
+    );
+
+    $("select#yes3-fmapr-rapidentry-object-event")
+        .off()
+        .on("change", function(){
+
+            FMAPR.setNewItemOptionsObjectNameContent();
+        }
+    );
+
+    $("input#yes3-fmapr-rapidentry-object-cancel")
+        .off()
+        .on("click", function(){
+
+            FMAPR.renderNewItemOptionsSectionDefault();
+        })
+    ;
+
+    // display the default object type inputs
+    $("input[type=radio][name=new_object_type]:checked").trigger("change");
+
+}
+
+FMAPR.setNewItemOptionsFieldAutocomplete = function(){
+
+    const objectEvent=$("select#yes3-fmapr-rapidentry-object-event").val();
+    const $fieldName = $("input#yes3-fmapr-rapidentry-field_name");
+
+    $fieldName
+    .val("")
+    .autocomplete({
+        source: FMAPR.getFieldAutoCompleteSource(objectEvent),
+        minLength: 1,
+        position: { my: "left top", at: "left bottom", collision: "flipfit" },
+        select: function(event, ui) {
+
+            if (!ui.item) {
+                $(this)
+                    .val("")
+                    .prop("title", "")
+                ;
+                return false;
+            }
+
+            $(this)
+                .val(ui.item.value)
+                .prop("title", ui.item.label)
+            ;
+            return false;
+        }
+    })
+    .off("change")
+    .on("change", function(){
+
+        let object_name = $(this).val();
+
+        object_name = object_name.trim();
+
+        if ( !object_name ){
+
+            FMAPR.rapidEntrySkipper();
+
+            return false;
+        }
+
+        if ( typeof FMAPR.project.field_index[object_name] !== 'number' ) {
+
+            YES3.hello(`'${$(this).val()}' is not a valid field name.`);
+            $(this).val("");
+        }                        
+    });
+}
+
+
+FMAPR.setNewItemOptionsSingletonListeners_deprecated = function()
 {
     $("input[type=radio][name=new_object_type], select#yes3-fmapr-rapidentry-object-event")
         .off()
@@ -1156,8 +1302,6 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
             const object_type =$("input[type=radio][name=new_object_type]:checked").val();
 
             const object_event=$("select#yes3-fmapr-rapidentry-object-event").val();
-
-            const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
 
             const objectTypeClass = ( object_type==="field" ) ? "yes3-object-field" : "yes3-object-form";
 
@@ -1168,14 +1312,15 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
                 .removeClass("yes3-object-field yes3-object-form")
                 .addClass( objectTypeClass )
             ;
-
+            /* huh?
             if ( object_type==="form" ){
 
                 $addAsFieldsButton.show();
             }
             else {
-                $addAsFieldsButton.hide();
+                $addAsFieldsButton.show();
             }
+            */
 
             FMAPR.setNewItemModeLabel(); // update the mode label to reflect the object type
 
@@ -1213,12 +1358,14 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
 
                     object_name = object_name.trim();
 
-                    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
-
                     if ( !object_name ){
+
+                        FMAPR.rapidEntrySkipper();
 
                         return false;
                     }
+
+                    if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
                     if ( object_type==="form" && object_name !== ALL_OF_THEM ){
 
@@ -1236,9 +1383,12 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
                             $(this).val("");
                         }                        
                     }
-            
+
+                    FMAPR.rapidEntrySkipper();
                 })
             ;
+
+            FMAPR.rapidEntrySkipper();
         })
     ;
 
@@ -1300,8 +1450,6 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
                 return true;
             }
 
-        
-
             FMAPR.addRapidEntryItem(object_type, object_name, object_event, true);
 
             FMAPR.postMessage(`${object_type} '${object_name}' added to export.`, true);
@@ -1318,12 +1466,61 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
         .off()
         .on("click", function(){
 
-            FMAPR.renderNewItemOptionsSectionMultiple();
+            FMAPR.renderNewItemOptionsSectionDefault();
         })
     ;
 
     // set the autocomplete source for the name input
     $("input[type=radio][name=new_object_type]:checked").trigger("change");
+}
+
+FMAPR.rapidEntrySkipper = function(){
+
+    const objectType =$("input[type=radio][name=new_object_type]:checked").val();
+ 
+    const $fieldName = $("input#yes3-fmapr-rapidentry-field_name");
+    const $formName = $("select#yes3-fmapr-rapidentry-form_name");
+
+    const objectName = ( objectType==="field" ) ? $fieldName.val() : $formName.val();
+
+    const objectEvent=$("select#yes3-fmapr-rapidentry-object-event").val();
+
+    const $addAsFormButton = $("input#yes3-fmapr-rapidentry-object-add-form");
+    const $addAsFormsButton = $("input#yes3-fmapr-rapidentry-object-add-forms");
+    const $addAsFieldButton = $("input#yes3-fmapr-rapidentry-object-add-field");
+    const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
+
+    if ( !objectName || !objectType || !objectEvent ){
+
+        $addAsFormsButton.hide();
+        $addAsFieldsButton.hide();
+        $addAsFormButton.hide();
+        $addAsFieldButton.hide();
+
+        return false;
+    }
+
+    if ( objectType==="form" && objectName !== ALL_OF_THEM ){
+
+        $addAsFieldButton.hide();
+        $addAsFormsButton.hide();
+        $addAsFormButton.show();
+        $addAsFieldsButton.show();
+    }
+    else if ( objectType==="form" && objectName === ALL_OF_THEM ){
+
+        $addAsFieldButton.hide();
+        $addAsFormButton.show();
+        $addAsFormsButton.show();
+        $addAsFieldsButton.show();
+    }
+    else if ( objectType==="field" ){
+
+        $addAsFormsButton.hide();
+        $addAsFieldsButton.hide();
+        $addAsFormButton.hide();
+        $addAsFieldButton.show();
+    }
 }
 
 FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allFieldsForForm ){
@@ -2386,6 +2583,12 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
     let events = [];
     let acSource = [];
 
+    let allFormsLabel = "ALL FORMS";
+
+    if ( FMAPR.project.is_longitudinal && event !== ALL_OF_THEM ){
+        allFormsLabel = "ALL FORMS FOR EVENT";
+    }
+
     for (let form_index=0; form_index<FMAPR.project.form_metadata.length; form_index++){
 
         form_name = FMAPR.project.form_metadata[form_index].form_name;
@@ -2427,7 +2630,8 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
 
             acSource.push({
                 "value": FMAPR.project.form_metadata[form_index].form_name,
-                "label": `[${FMAPR.project.form_metadata[form_index].form_name}] ${FMAPR.project.form_metadata[form_index].form_label}`
+                //"label": `[${FMAPR.project.form_metadata[form_index].form_name}] ${FMAPR.project.form_metadata[form_index].form_label}`
+                "label": `${FMAPR.project.form_metadata[form_index].form_label}`
             });
         }
     }
@@ -2435,14 +2639,29 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
     if ( acSource.length > 1 && !suppressAllForms ){
 
         acSource.unshift({
-            "value": ALL_FORMS,
-            "label": "ALL FORMS"
+            "value": ALL_OF_THEM,
+            "label": allFormsLabel
         });
     }
 
     console.warn("getFormAutoCompleteSource", acSource);
 
     return acSource;
+}
+
+FMAPR.getNewItemOptionsFormSelectOptionsHtml = function(){
+
+    const $formSelect = $("select#yes3-fmapr-rapidentry-form_name");
+    const objectEvent=$("select#yes3-fmapr-rapidentry-object-event").val();
+
+    const formsAcSource = FMAPR.getFormAutoCompleteSource( objectEvent, false );
+    
+    let optionsHtml = "";
+    for ( let i=0; i<formsAcSource.length; i++ ){
+        optionsHtml += `<option value='${formsAcSource[i].value}'>${formsAcSource[i].label}</option>`;
+    }
+
+    return optionsHtml;
 }
 
 FMAPR.getFormForField = function( field_name )
@@ -2829,8 +3048,10 @@ FMAPR.clearSelections = function( stickyToo )
 FMAPR.setNewItemModeLabel = function(){
 
     const $newItemActionLabel = $('span.yes3-fmapr-rapidentry-object-mode-label');
-    const $newItemActionButton = $('input#yes3-fmapr-rapidentry-object-add');
     const $newItemAddFieldsButton = $('input#yes3-fmapr-rapidentry-object-add-fields');
+    const $newItemAddFormsButton = $('input#yes3-fmapr-rapidentry-object-add-forms');
+    const $newItemAddFieldButton = $('input#yes3-fmapr-rapidentry-object-add-field');
+    const $newItemAddFormButton = $('input#yes3-fmapr-rapidentry-object-add-form');
 
     const mode = FMAPR.getNewItemMode().toUpperCase();
 
@@ -2842,19 +3063,24 @@ FMAPR.setNewItemModeLabel = function(){
 
     $newItemActionLabel.removeClass("yes3-fmapr-mode-append yes3-fmapr-mode-insert").addClass(modeClass);
 
+    $newItemAddFieldsButton.val(mode+" as individual fields");
+    $newItemAddFormsButton.val(mode+" as individual forms");
+    $newItemAddFieldButton.val(mode);
+    $newItemAddFormButton.val(mode);
+
+    /*
+    const $newItemActionButton = $('input#yes3-fmapr-rapidentry-object-add');
+    $newItemActionButton.val(mode+" as a single export item");
     if ( $newItemActionButton.length ){
 
         if ( objectType === "form") {
-
-            $newItemActionButton.val(mode+" as form");
-            $newItemAddFieldsButton.val(mode+" as fields").show();
         }
         else if ( objectType === "field") {
 
             $newItemActionButton.val(mode+" field");
-            $newItemAddFieldsButton.hide();
         }
     }
+    */
 
     FMAPR.setBsToolTipsForNewItemOptions(); // a tooltip is attached to the label
 }
@@ -4280,12 +4506,12 @@ FMAPR.hideDashboardHead = function() {
 FMAPR.showExportItems = function() {
     FMAPR.getExportItemsTableWrapper().show();
     FMAPR.getExportItemsTable().show();
-    FMAPR.getExportNewItemOptionsSection().removeClass("yes3-hidden").addClass("yes3-shown-flex");
+    FMAPR.getExportNewItemOptionsSection().show();
 }
 
 FMAPR.hideExportItems = function() {
     FMAPR.getExportItemsTable().hide();
-    FMAPR.getExportNewItemOptionsSection().removeClass("yes3-shown-flex").addClass("yes3-hidden");
+    FMAPR.getExportNewItemOptionsSection().hide();
     FMAPR.getExportItemsTableWrapper().hide();
 }
 
