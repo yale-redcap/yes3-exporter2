@@ -1047,7 +1047,7 @@ YES3.enableTooltips = function( tooltipSpecs=[] ){
     }
 }
 */
-YES3.setBsTooltipPropertiesFromSpecs = function( tooltipSpecs=[] ){
+YES3.setBsTooltipPropertiesFromSpecs = function( tooltipSpecs=[]) {
 
     for (let i=0; i<tooltipSpecs.length; i++){
         let t = tooltipSpecs[i];

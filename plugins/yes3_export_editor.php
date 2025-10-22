@@ -490,6 +490,75 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
 </div>
 
+
+<!-- RAPID ENTRY HELP -->
+<div id="yes3-fmapr-rapidentry-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
+
+    <div class="yes3-panel-header-row">
+        <div class="yes3-panel-row-left">
+            Adding export items
+        </div>
+        <div class="yes3-panel-row-right">
+            <a href="javascript: YES3.closePanel('yes3-fmapr-rapidentry-help-panel')"><i class="fas fa-times fa-2x"></i></a>
+        </div>
+    </div>
+
+    <div class="yes3-information yes3-scrolling-container yes3-full-width yes3-default-panel-height">
+
+        <p><em>Note: you may leave this information panel open while working with the export items.</em></p>
+
+        <h6>Export Items</h6>
+
+        <p>
+            An export item specifies a field (or fields) to be included in the export.
+            An export item may represent a single field, a single form, or all forms.
+            For longitudinal projects, an export item must also specify the event(s) from which to export data.
+        </p>
+
+        <h6>Append and Insert modes</h6>
+
+        <p>Current mode: <span class="yes3-semibold yes3-fmapr-rapidentry-object-mode-label"></span></p>
+
+        <p>If an existing export item is selected, new items will be inserted above it. Otherwise, new items will be appended to the end of the list.</p>
+
+        <p>To change the mode from <strong>Append</strong> to <strong>Insert</strong>, click the row selector of the export item <em>above which</em> you would like to insert the new item(s). The row selector is where the item number is displayed, to the left on the item row.</p>
+
+        <p>To change the mode from <strong>Insert</strong> to <strong>Append</strong>, click <strong>Ctrl&rarr;z</strong> to clear the item selection.</p>
+
+        <h6>How to append or insert an export item</h6>
+
+        <p>You add export items using the form at the bottom of the Export Items list, as directed below.</p>
+
+        <ol>
+            <li>
+                <strong>Select the type of item to add:</strong>
+                Click the 'form(s)' or 'field' radio button.
+            </li>
+            <li class="yes3-longitudinal-only">
+                <strong>Select the event(s):</strong>
+                From the event drop-down, select either 'ALL EVENTS' or a specific event from which to export data.
+            </li>
+            <li>
+                <strong>Select the form(s) or field:</strong>
+                Depending on whether you selected 'form(s)' or 'field' in step 1, a form or field dropdown will have been displayed.
+                Select the form (or ALL FORMS) or field from the dropdown menu, as appropriate.
+            </li>
+            <li>
+                <strong>Click the appropriate 'Add Item' button:</strong>
+                Depending on whether you selected 'form(s)' or 'field' in step 1, one or more of the following set of buttons will be displayed:
+                <ul>
+                    <li><span class="yes3-semibold yes3-fmapr-rapidentry-object-mode-label"></span>: adds the form or field selection,<span class="yes3-longitudinal-only">constrained by the event selection,</span> as a single export item.</li>
+                    <li><span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual forms</span> (displayed when ALL FORMS is selected): all forms in the project, <span class="yes3-longitudinal-only">constrained by the event selection,</span> will be added as individual export items.</li>
+                    <li><span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual fields</span> (displayed when any form is selected): adds each field in the selected form as a separate export item.
+                    If ALL FORMS is selected, then all fields in the project, <span class="yes3-longitudinal-only">constrained by the event selection,</span> will be added.</span></li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+</div>
+
+
 <!-- SASCODE HELP -->
 
 <div id="yes3-fmapr-sascode-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
