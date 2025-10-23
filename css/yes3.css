@@ -1342,12 +1342,22 @@ i.yes3-selected {
     width: 90%;
     min-height: 100px;
     /*min-width: 360px;*/
-    max-width: 800px;
+    /*max-width: 800px;*/
     position: relative;
     border-radius: 0;
     box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
     -webkit-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
     -moz-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
+ }
+
+ .yes3-panel-blockquote {
+    border-left: 6px solid rgba(100, 100, 100, 0.3333);
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: calc(2 * var(--yes3-padding));
+    color: inherit;
+    background-color: transparent;
+    margin-bottom: 1em;
  }
 
 .yes3-panel-small {
@@ -1369,6 +1379,10 @@ div#yes3-help-panel, div.yes3-help-panel {
    width: auto !important;
    max-width: 900px !important;
    background-color: var(--yes3-help-panel-background-color) !important;
+   /*
+   resize: vertical;
+   overflow: hidden;
+   */
 }
 
 div#yes3-help-panel h5 {
@@ -1559,10 +1573,21 @@ div.yes3-max-headroom {
     font-weight: var(--yes3-font-weight-semibold);
     color: var(--yes3-input-label-color);
  }
+
+ div.yes3-panel ul, div.yes3-panel ol {
+  margin: 0 0 1em 1em;  /* bottom and left spacing */
+  padding: 0;
+ }
  
  div.yes3-panel ul ul {
-    font-weight: var(--yes3-font-weight-semibold);
-    opacity: 85%;
+    font-weight: var(--yes3-font-weight-normal);
+ }
+
+ div.yes3-panel li {
+   padding-left: 1.5em;
+   text-indent: -1.5em;
+   margin-bottom: 0.25em;
+   list-style-position: inside;
  }
  
  .yes3-panel form input[type=text], .yes3-panel form input[type=password] {

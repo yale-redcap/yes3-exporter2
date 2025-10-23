@@ -124,9 +124,9 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                 The YES3 Exporter supports a 3-tiered help system:
             </p>
             <ol>
-                <li><strong>tooltips</strong>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
-                <li><strong>inline help</strong>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons (  <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i> ).</li>
-                <li><strong>online help</strong>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
+                <li><span class="yes3-semibold">tooltips</span>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
+                <li><span class="yes3-semibold">inline help</span>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons (  <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i> ).</li>
+                <li><span class="yes3-semibold">online help</span>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
             </ol>
 
             <div class='yes3-panel-row'>
@@ -238,11 +238,11 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
     
             <h5>Edit mode</h5>
             <p>
-                The Export Editor has two editing modes: <strong>Settings</strong> and <strong>Items</strong>.
+                The Export Editor has two editing modes: <span class="yes3-semibold">Settings</span> and <span class="yes3-semibold">Items</span>.
                 The edit mode is set by the EDIT MODE radio buttons at the top left of the Export Editor panel.
             </p>
             <p>
-                Export <strong>Settings</strong> mode allows you to configure the export options, while <strong>Items</strong> mode lets you manage the specific items to be exported.
+                Export <span class="yes3-semibold">Settings</span> mode allows you to configure the export options, while <span class="yes3-semibold">Items</span> mode lets you manage the specific items to be exported.
             </p>
             <p>You may switch between edit modes freely as you work.</p>
         </div>
@@ -274,72 +274,77 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
     <div class="yes3-information yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-        <p><em>Note: you may leave this information panel open while working with the export item list.</em></p>
+        <p><em>Note: you may leave this information panel open, and move it as needed, while working with the export item list.</em></p>
 
-        <h6>The row selector is the narrow column to the left of the export item list.
-        <br />It is used to select one or more rows for cutting, pasting, dragging or deleting.</h6>
+        <div class="yes3-panel-blockquote">The row selector is the narrow column to the left of the export item list.
+        <br />It is used to select one or more items for cutting, pasting, dragging or deleting.</div>
 
-        <ol>
-            <li>To select a single row:
+        <ul>
+            <li><span class="yes3-semibold">To select a single item:</span>
                 <ul>
-                    <li>Click in the row selector of the desired row.</li>
-                    <li>The selected row will be highlighted.</li>
+                    <li>Select the desired item by clicking in its row selector.</li>
+                    <li>The selected item will be highlighted.</li>
                 </ul>
             </li>
-            <li>To select a contiguous range of rows:
+            <li><span class="yes3-semibold">To select a contiguous range of items:</span>
                 <ul>
-                    <li>Click in the row selector of the first row in the range.</li>
-                    <li>Then, while holding down the <strong>Shift</strong> key, click in the row selector of the last row in the range.</li>
-                    <li>All rows in the range will be highlighted.</li>
+                    <li>Select the first item in the range.</li>
+                    <li>Then, while holding down the <span class="yes3-semibold">Shift</span> key, select the last item in the range.</li>
+                    <li>All items in the range will be highlighted.</li>
                 </ul>
             </li>
-            <li>To select multiple non-contiguous rows:
+            <li><span class="yes3-semibold">To select multiple non-contiguous items:</span>
                 <ul>
-                    <li>Click in the row selector of the first desired row.</li>
-                    <li>Then, while holding down the <strong>Ctrl</strong> key (or <strong>Cmd</strong> key on a Mac), click in the row selector of each additional desired row.</li>
-                    <li>All selected rows will be highlighted.</li>
+                    <li>Select the first item by clicking in its row selector.</li>
+                    <li>Then, while holding down the <span class="yes3-semibold">Ctrl</span> key (or <span class="yes3-semibold">Cmd</span> key on a Mac), select each additional item.</li>
+                    <li>All selected items will be highlighted.</li>
                 </ul>
             </li>
-        </ol>
+        </ul>
 
-        <h6>Once one or more rows are selected, the following actions are available:</h6>
+        <h6>Once one or more items are selected, the following actions are available:</h6>
 
-        <ol>
-            <li>To drag a single selected row to a new location:
+        <ul>
+            <li><span class="yes3-semibold">To drag a single selected item to a new location:</span>
                 <ul>
-                    <li>Click and hold in the row selector of the desired row.</li>
+                    <li>Click and hold in the row selector of the desired item.</li>
                     <li>Drag the row to the new location and release the mouse button.</li>
                 </ul>
             </li>
-            <li>To cut the selected row(s):
+            <li><span class="yes3-semibold">To cut the selected item(s):</span>
                 <ul>
-                    <li>Press <strong>Ctrl&#8594;X</strong>.</li>
-                    <li>This will <em>not</em> remove the rows from the table, but it will mark them as cut and available for relocation via pasting.</li>
+                <li>Right-click in the row selector of any of the selected items to open the cut/paste/delete/clear menu.</li>
+                <li>Click <span class="yes3-semibold">cut selection</span>.</li>
+                <li>Alternatively, press <span class="yes3-semibold">Ctrl&#8594;X</span>.</li>
+                <li>This will <em>not</em> remove the items from the list, but it will - somewhat garishly - mark them as cut and available for relocation via pasting.</li>
                 </ul>
             </li>
 
-            <li>To paste the cut row(s):
+            <li><span class="yes3-semibold">To paste the cut item(s):</span>
                 <ul>
-                <li>Click in the row selector of the row <em>above which</em> you want to paste the cut row(s).</li>
-                <li>Press <strong>Ctrl&#8594;V</strong>.</li>
-                <li>The cut row(s) will be pasted above the selected row.</li>
+                <li>Select the item <em>above which</em> you want to paste the cut item(s). </li>
+                <li>Right-click in the row selector of the selected item to open the cut/paste/delete/clear menu.</li>
+                <li>Click <span class="yes3-semibold">paste cut rows</span>. The cut item(s) will be pasted above the selected item.</li>
+                <li>Alternatively, select the item above which you want to paste the cut item(s), and press <span class="yes3-semibold">Ctrl&#8594;V</span>.</li>
                 </ul>
             </li>
 
-            <li>To delete the selected rows:
+            <li><span class="yes3-semibold">To delete the selected items:</span>
                 <ul>
-                <li>Right-click in the row selector of any of the selected rows to open the cut/paste/delete menu.</li>
-                <li>Click <strong>delete</strong>.</li>
+                <li>Right-click in the row selector of any of the selected items to open the cut/paste/delete/clear menu.</li>
+                <li>Click <span class="yes3-semibold">delete selection</span>.</li>
                 <li>Note: there is no keyboard shortcut for this action.</li>
                 </ul>
             </li>
 
-            <li>To clear the selection (deselect all rows):
+            <li><span class="yes3-semibold">To clear the selection (deselect all items):</span>
                 <ul>
-                <li>Press <strong>Ctrl&#8594;Z</strong>.</li>
+                <li>Right-click in the row selector of any of the selected items to open the cut/paste/delete/clear menu.</li>
+                <li>Click <span class="yes3-semibold">clear selection</span>.</li>
+                <li>Alternatively, press <span class="yes3-semibold">Ctrl&#8594;Z to clear the selection</span>.</li>
                 </ul>
             </li>
-        </ol>
+        </ul>
 
     </div>
 </div>
@@ -438,7 +443,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
         <ol>
             <li>
                 <p>
-                As <strong>Multiple Columns</strong>, with one column per choice in the list. In the export, each column will contain a 1 (selected) or <em>blank</em> if not.
+                As <span class="yes3-semibold">Multiple Columns</span>, with one column per choice in the list. In the export, each column will contain a 1 (selected) or <em>blank</em> if not.
                 As is typical for checklist data structures, there is no way that we are aware of to distinguish between "not selected" and "missing" for checkbox fields, so we leave it up to the user to interpret the results.
                 Each column will be named according to the REDCap convention of appending a triple underscore ("___") and the choice code to the field name.
                 </p><p>
@@ -448,7 +453,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             </li>
             <li>
                 <p>
-                As a <strong>Single Column</strong>, with the selected choices represented as a comma-separated list of choice codes.
+                As a <span class="yes3-semibold">Single Column</span>, with the selected choices represented as a comma-separated list of choice codes.
                 </p><p>
                 For example, if the user selected "Apple" and "Cherry" for the "fruits" field, the value in the export file would be "1,3".
                 </p>
@@ -505,7 +510,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
     <div class="yes3-information yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-        <p><em>Note: you may leave this information panel open while working with the export items.</em></p>
+        <p><em>Note: you may leave this information panel open, and move it as needed, while working with the export items.</em></p>
 
         <h6>Export Items</h6>
 
@@ -521,9 +526,12 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <p>If an existing export item is selected, new items will be inserted above it. Otherwise, new items will be appended to the end of the list.</p>
 
-        <p>To change the mode from <strong>Append</strong> to <strong>Insert</strong>, click the row selector of the export item <em>above which</em> you would like to insert the new item(s). The row selector is where the item number is displayed, to the left on the item row.</p>
+        <p>To change the mode from <span class="yes3-semibold">Append</span> to <span class="yes3-semibold">Insert</span>, click the row selector of the export item <em>above which</em> you would like to insert the new item(s). 
+        The row selector is where the item number is displayed, to the left on the item row.
+        The switch will be made immediately when you click the row selector.
+        </p>
 
-        <p>To change the mode from <strong>Insert</strong> to <strong>Append</strong>, click <strong>Ctrl&rarr;z</strong> to clear the item selection.</p>
+        <p>To change the mode from <span class="yes3-semibold">Insert</span> to <span class="yes3-semibold">Append</span>, click <span class="yes3-semibold">Ctrl&rarr;z</span> to clear the item selection.</p>
 
         <h6>How to append or insert an export item</h6>
 
@@ -531,26 +539,26 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <ol>
             <li>
-                <strong>Select the type of item to add:</strong>
+                <span class="yes3-semibold">Select the type of item to add:</span>
                 Click the 'form(s)' or 'field' radio button.
             </li>
             <li class="yes3-longitudinal-only">
-                <strong>Select the event(s):</strong>
+                <span class="yes3-semibold">Select the event(s):</span>
                 From the event drop-down, select either 'ALL EVENTS' or a specific event from which to export data.
             </li>
             <li>
-                <strong>Select the form(s) or field:</strong>
+                <span class="yes3-semibold">Select the form(s) or field:</span>
                 Depending on whether you selected 'form(s)' or 'field' in step 1, a form or field dropdown will have been displayed.
                 Select the form (or ALL FORMS) or field from the dropdown menu, as appropriate.
             </li>
             <li>
-                <strong>Click the appropriate 'Add Item' button:</strong>
+                <span class="yes3-semibold">Click the appropriate 'Add Item' button:</span>
                 Depending on whether you selected 'form(s)' or 'field' in step 1, one or more of the following set of buttons will be displayed:
                 <ul>
-                    <li><span class="yes3-semibold yes3-fmapr-rapidentry-object-mode-label"></span>: adds the form or field selection,<span class="yes3-longitudinal-only">constrained by the event selection,</span> as a single export item.</li>
-                    <li><span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual forms</span> (displayed when ALL FORMS is selected): all forms in the project, <span class="yes3-longitudinal-only">constrained by the event selection,</span> will be added as individual export items.</li>
-                    <li><span class="yes3-semibold"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual fields</span> (displayed when any form is selected): adds each field in the selected form as a separate export item.
-                    If ALL FORMS is selected, then all fields in the project, <span class="yes3-longitudinal-only">constrained by the event selection,</span> will be added.</span></li>
+                    <li><span class="yes3-fmapr-rapidentry-sim-button yes3-fmapr-rapidentry-object-mode-label"></span> adds the form or field selection,<span class="yes3-longitudinal-only">subject to the event selection,</span> as a single export item.</li>
+                    <li><span class="yes3-fmapr-rapidentry-sim-button"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual forms</span> (displayed when ALL FORMS is selected): all forms in the project, <span class="yes3-longitudinal-only">subject to the event selection,</span> will be added as individual export items.</li>
+                    <li><span class="yes3-fmapr-rapidentry-sim-button"><span class="yes3-fmapr-rapidentry-object-mode-label"></span> as individual fields</span> (displayed when any form is selected): adds each field in the selected form as a separate export item.
+                    If ALL FORMS is selected, then all fields in the project, <span class="yes3-longitudinal-only">subject to the event selection,</span> will be added.</span></li>
                 </ul>
             </li>
         </ol>

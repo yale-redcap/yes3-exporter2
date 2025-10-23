@@ -1601,7 +1601,7 @@ FMAPR.rapidEntrySkipper = function(){
 
     console.warn("rapidEntrySkipper", objectType, objectName, objectEvent);
 
-    if ( !objectName || !objectType || !objectEvent ){
+    if ( !objectName || !objectType || (FMAPR.project.is_longitudinal && !objectEvent) ){
 
         $addAsFormsButton.hide();
         $addAsFieldsButton.hide();

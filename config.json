@@ -187,17 +187,20 @@
             }
         },
         {
+            "hidden": true,
             "key": "toast-the-host",
             "type" : "descriptive",
             "name": "<h5>HOST FILE SYSTEM EXPORTS</h5><p>YES3 Exporter II can export to the host file system. This will require services from your REDCap host system administrator, and the blessing of your Information Security Officer.</p>"
         },
         {
+            "hidden": true,
             "key": "enable-host-filesystem-exports",
             "name": "Enable export to host file system",
             "type": "checkbox",
             "required": false
         },
         {
+            "hidden": true,
             "key": "export-target-folder",
             "name": "Host file system folder. This folder must be writable by the web server user, and is typically an automount bound to a secure external fileshare",
             "type": "textarea",
@@ -208,6 +211,7 @@
             }
         },
         {
+            "hidden": true,
             "key": "enable-user-data-downloads-info",
             "type" : "descriptive",
             "name": "<h5>ALLOW USER DOWNLOADS AS WELL AS FILE SYSTEM EXPORTS</h5><p>You have enabled direct exports to your file system, but you may elect to allow user downloads as well. For security reasons we recommend that you do not allow user downloads in addition to filesystem exports.</p>",
@@ -217,6 +221,7 @@
             }
         },
         {
+            "hidden": true,
             "key": "enable-user-data-downloads",
             "name": "Allow user downloads in addition to filesystem exports",
             "type": "checkbox",
@@ -227,6 +232,7 @@
             }
         },
         {
+            "hidden": true,
             "key": "enable-cron-batch-exports-info",
             "type" : "descriptive",
             "name": "<h5>ENABLE BATCH EXPORTS</h5><p>You may enable automated batch exports. If you do, each export for which you have checked 'Include in batch export' will be run as part of the nightly Exporter cron job.</p>",
@@ -236,6 +242,7 @@
             }     
         },
         {
+            "hidden": true,
             "key": "enable-cron-batch-exports",
             "name": "Enable automated (cron) batch exports",
             "required": false,
@@ -248,7 +255,7 @@
         {
             "key":   "sascode-header",
             "type" : "descriptive",
-            "name":  "<h5>SAS CODE DEFAULTS</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These defaults may be overriden for any given export specification.</p>"
+            "name":  "<h5>SAS CODE DEFAULTS</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These optional defaults may be overriden for any given export specification.</p>"
         },
         {
             "key": "sascode-libref",
@@ -265,7 +272,7 @@
         {
             "key":   "backup-retention-header",
             "type" : "descriptive",
-            "name":  "<h5>BACKUP RETENTION</h5><p>By default, 20 generations of each export specification are retained, and can be restored using the 'undo' feature. You may change this number, or elect to retain all generations.</p>"
+            "name":  "<h5>BACKUP RETENTION</h5><p>By default, 20 generations of each export specification are retained, and can be restored using the 'wayback' feature. You may change this number, or elect to retain all generations.</p>"
         },
         {
             "key": "export-spec-backup-retention",
