@@ -522,12 +522,12 @@ div#yes3-fmapr-new-item-options input[type=text] {
     max-width: 300px;
 }
 
-div#yes3-fmapr-new-item-options input[type=button] {
+div#yes3-fmapr-new-item-options input[type=button], .yes3-fmapr-rapidentry-sim-button {
     /*
     width: 100px;
     */
     border: 1px solid var(--yes3-color) !important;
-    background-color: var(--yes3-fmapr-control-background-color) !important;
+    background-color: transparent;
     color: var(--yes3-color) !important;
     font-weight: var(--yes3-font-weight-normal) !important;
     /*
