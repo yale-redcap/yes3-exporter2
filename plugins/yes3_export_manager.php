@@ -2,11 +2,11 @@
 
 namespace Yale\Yes3Exporter2;
 
-
+/*
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
+*/
 
 $module = new Yes3Exporter2();
 
@@ -20,6 +20,17 @@ if ( $uRights['dag'] ) {
 
     $uSummary .= " / " . $uRights['dag'];
 }
+
+$module->disableBetaFeatures();
+
+/*
+$x = $module->getProjectSetting('enable-host-filesystem-exports');
+$xt = gettype($x);
+
+print "<pre> '" . $x . "' " . $xt . " </pre>";
+
+exit();
+*/
 
 use Yale\Yes3\Yes3;
 use REDCap;
@@ -83,12 +94,13 @@ $module->getCodeFor("yes3_export_manager", true);
             The YES3 Exporter II Export Manager has a 2-tiered help system:
         </p>
         <ol>
-            <li><strong>tooltips</strong>: explanations of interface elements (action icons, below), available by hovering over them for 1 second or more with the mouse pointer.</li>
-            <li><strong>online help</strong>: user and technical guide available online, accessible by clicking on the 'book-reader' icon.</li>
+            <li><span class="yes3-semibold">tooltips</span>: explanations of interface elements (action icons, below), available by hovering over them for 1 second or more with the mouse pointer.</li>
+            <li><span class="yes3-semibold">online help</span>: user and technical guide available online, accessible by clicking on the 'book-reader' icon.</li>
         </ol>
         
         <div class="yes3-panel-blockquote yes3-legroom">
-            Note: Every interactive element in the Exporter II Manager interface has a tooltip. If you are unsure of what an icon or button does, hover over it with your mouse pointer to see its tooltip.
+            <span class="yes3-semibold">Note: Every interactive element in the Exporter II Manager interface has a tooltip.</span>
+            <br>If you are unsure of what an icon or button does, hover over it with your mouse pointer to see its tooltip.
         </div>
 
         <h5>Action icons</h5>
@@ -242,8 +254,6 @@ $module->getCodeFor("yes3_export_manager", true);
 
         <div class="yes3-flex-col-33 yes3-flex-vcenter-hright">
 
-            <!--i class="fas fa-check yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-validator-only yes3-tooltip-static" action="Open_validator" data-bs-toggle="tooltip" title="Open the validator" id="yes3-fmapr-validator-icon"></i-->
-
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openPanel" data-bs-toggle="tooltip" title="Open a navigation help panel."></i>
 
             <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Open_docPage" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
@@ -273,7 +283,6 @@ $module->getCodeFor("yes3_export_manager", true);
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="Export layout: vertical or horizontal">Layout</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-fmapr-batch-exports yes3-tooltip-static" data-bs-toggle="tooltip" title="Indicates whether the export is included<br />in the daily batch (cron) job.">Batch</th>
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-tooltip-static" data-bs-toggle="tooltip" title="The column count for the selected export.">Columns</th>
-                        <!--th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="validate this export, or import from an external datasheet">Val/Imp</th-->
                         <th class="yes3-col-sm yes3-header yes3-halign-center yes3-required-column yes3-tooltip-static yes3-designer-only" data-bs-toggle="tooltip" title="Remove or restore the export.">Remove</th>
                     </tr>
                 </thead>
@@ -283,14 +292,13 @@ $module->getCodeFor("yes3_export_manager", true);
                 <tfoot id="yes3-fmapr-export-tfoot">
                     <tr class='yes3-designer-only'>
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column" title="dum de dum-dum">&nbsp</i></td>
-                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" data-bs-toggle="tooltip" title="Click to <strong>add a new export specification</strong>"><i class="fas fa-plus" onclick="FMAPR.NewExport_openPanel()"></i></td>
+                        <td class="yes3-col-sm yes3-halign-center yes3-required-column" data-bs-toggle="tooltip" title="Click to <span class='yes3-semibold'>add a new export specification</span>"><i class="fas fa-plus" onclick="FMAPR.NewExport_openPanel()"></i></td>
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column"></td>
                         <td class="yes3-col-md yes3-halign-left   yes3-required-column"><em>new export</em></td>
                         <td class="yes3-col-lg yes3-halign-left"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
                         <td class="yes3-col-sm yes3-halign-left yes3-fmapr-batch-exports"></td>
                         <td class="yes3-col-sm yes3-halign-left"></td>
-                        <!--<th class="yes3-col-sm yes3-header yes3-halign-center yes3-validator-enabled" title="who you lookin at?"></th>-->
                         <td class="yes3-col-sm yes3-halign-center yes3-required-column" id="yes3-fmapr-visibility-control">
                             show xx<br>removed
                         </td>
@@ -321,10 +329,7 @@ $module->getCodeFor("yes3_export_manager", true);
             <div id="yes3-user"><?= $uSummary ?></div>
 
         </div>
-
     </div>
-
-
 </div>
 
 <!-- NEW EXPORT FORM -->
@@ -379,13 +384,6 @@ $module->getCodeFor("yes3_export_manager", true);
                     <label for="yes3-fmapr-new-export-layout-v" title="Vertical: one row per record per event (per repeat instance)">
                         Vertical: one row per record per event (per repeat instance)
                     </label>
-
-                    <!--br class="yes3-has-repeating-forms">
-
-                    <input type="radio" class="balloon yes3-has-repeating-forms" value="r" name="new_export_layout" id="yes3-fmapr-new-export-layout-r">
-                    <label class="yes3-has-repeating-forms" for="yes3-fmapr-new-export-layout-r" title="Repeating SINGLE Form: one row per record per event (per repeat instance), only one form allowed">
-                        Repeating Form (DEPRECATED): one row per record per event per repeat instance
-                    </label-->
 
                 </td>
             </tr>

@@ -39,112 +39,108 @@ $module->getCodeFor("yes3_export_prefixes", true);
     
     <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
 
-        <div class="yes3-panel-row">
+        <p><em>Note: You may leave this help panel open as you use the Yes3 Exporter II Event Prefix editor. 
+            You may resize it, or grab it on the top row to drag it out of the way.</em></p>
 
-            <h5>Overview</h5>
-            <p>
-                The Exporter Arm/Event Prefix Editor is a tool for designing and editing <em>arm/event prefixes</em> 
-                which are used to formulate variable names for horizontal export layouts.
-            </p>
-            <p>
-                This Getting Started panel provides guidance on using the Exporter Arm/Event Prefix Editor.
-                You may leave this panel open while working with the Exporter Arm/Event Prefix Editor, or close it and refer to it later as needed.
-            </p>
-            <h5>How help is organized</h5>
-            <p>
-                The YES3 Exporter Arm/Event Prefix Editor supports a 2-tiered help system:
-            </p>
-            <ol>
-                <li><strong>tooltips</strong>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
-                <li><strong>online help</strong>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
-            </ol>
+        <h5>Overview</h5>
+        <p>
+            The Exporter Arm/Event Prefix Editor is a tool for designing and editing <em>arm/event prefixes</em> 
+            which are used to formulate variable names for horizontal export layouts.
+        </p>
+        <p>
+            This Getting Started panel provides guidance on using the Exporter Arm/Event Prefix Editor.
+            You may leave this panel open while working with the Exporter Arm/Event Prefix Editor, or close it and refer to it later as needed.
+        </p>
+        <h5>How help is organized</h5>
+        <p>
+            The YES3 Exporter Arm/Event Prefix Editor supports a 2-tiered help system:
+        </p>
+        <ol>
+            <li><span class="yes3-semibold">tooltips</span>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
+            <li><span class="yes3-semibold">online help</span>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon.</li>
+        </ol>
 
-            <h5>Action icons (top right)</h5>
-            <p>
-                The Exporter Arm/Event Prefix Editor interface includes a set of 'action icons' located at the top right of the page.
-                These invoke editor-level features such as save and rollback. Each action icon is displayed below, along with the feature it invokes.
-            </p>
+        <h5>Action icons (top right)</h5>
+        <p>
+            The Exporter Arm/Event Prefix Editor interface includes a set of 'action icons' located at the top right of the page.
+            These invoke editor-level features such as save and rollback. Each action icon is displayed below, along with the feature it invokes.
+        </p>
 
-            <table class="yes3-legroom yes3-help-table">
-                <tbody>  
+        <table class="yes3-legroom yes3-help-table">
+            <tbody>  
 
-                    <tr>
-                        <td>
-                            <i class="far fa-save yes3-action-icon yes3-nohandler"></i>
-                        </td>
-                        <td>
-                            Save the export event prefixes.
-                        </td>
-                    </tr>
-                    
-                    <tr>
-                        <td>
-                            <i class="fas fa-reply yes3-action-icon yes3-nohandler"></i>
-                        </td>
-                        <td>
-                            Restore all the settings on this page to their stored values (undo).
-                        </td>
-                    </tr>   
+                <tr>
+                    <td>
+                        <i class="far fa-save yes3-action-icon yes3-nohandler"></i>
+                    </td>
+                    <td>
+                        Save the export event prefixes.
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <i class="fas fa-reply yes3-action-icon yes3-nohandler"></i>
+                    </td>
+                    <td>
+                        Restore all the settings on this page to their stored values (undo).
+                    </td>
+                </tr>   
 
-                    <tr>
-                        <td>
-                            <i class="fas fa-question yes3-action-icon yes3-nohandler"></i>
-                        </td>
-                        <td>
-                            Display this Help panel.
-                        </td>
-                    </tr>
-                    
-                    <tr class="yes3-light-theme-only">
-                        <td>
-                            <i class="fas fa-moon yes3-action-icon yes3-nohandler"></i>
-                        </td>
-                        <td>
-                            Switch to dark theme.
-                        </td>
-                    </tr>
-                    <tr class="yes3-dark-theme-only">
-                        <td>
-                            <i class="fas fa-sun yes3-action-icon yes3-nohandler"></i>
-                        </td>
-                        <td>
-                            Switch to light theme.
-                        </td>
-                    </tr>   
+                <tr>
+                    <td>
+                        <i class="fas fa-question yes3-action-icon yes3-nohandler"></i>
+                    </td>
+                    <td>
+                        Display this Help panel.
+                    </td>
+                </tr>
+                
+                <tr class="yes3-light-theme-only">
+                    <td>
+                        <i class="fas fa-moon yes3-action-icon yes3-nohandler"></i>
+                    </td>
+                    <td>
+                        Switch to dark theme.
+                    </td>
+                </tr>
+                <tr class="yes3-dark-theme-only">
+                    <td>
+                        <i class="fas fa-sun yes3-action-icon yes3-nohandler"></i>
+                    </td>
+                    <td>
+                        Switch to light theme.
+                    </td>
+                </tr>   
 
-                </tbody>
-            </table>
+            </tbody>
+        </table>
 
-            <h5>About event prefixes</h5>
+        <h5>About event prefixes</h5>
 
-            <p>
-                The YES3 Exporter supports a 'horizontal layout' for longitudinal projects,
-                in which fields for forms that are placed on multiple events are all 
-                included on the same row.
-            </p><p> 
-                To make this possible, the field names are altered by prefixing them
-                with the event abbreviations displayed on this page. The export field name
-                will have the form 
-            </p><p>
-                <pre>[event prefix]_[REDCap field name]</pre>
-            </p><p>
-                You should inspect and edit the default prefixes, for both brevity and clarity.
-            </p>
+        <p>
+            The YES3 Exporter supports a 'horizontal layout' for longitudinal projects,
+            in which fields for forms that are placed on multiple events are all 
+            included on the same row.
+        </p><p> 
+            To make this possible, the field names are altered by prefixing them
+            with the event abbreviations displayed on this page. The export field name
+            will have the form 
+        </p><p>
+            <pre>[event prefix]_[REDCap field name]</pre>
+        </p><p>
+            You should inspect and edit the default prefixes, for both brevity and clarity.
+        </p>
 
-            <h5>REDCap field name considerations</h5>
+        <blockquote>
+            <p class="yes3-semibold">REDCap field name considerations</p>
 
             <p>
                 As you design a project, you should be aware of any field name length limits 
                 imposed by the statistical package(s) that will process the exported data.
                 For example, SAS 9.4 imposes a 32-character limit on variable names.
             </p>
-
-            <p>
-                You may leave this help panel open as you use the Yes3 Exporter. 
-                Grab it on the top row to drag it out of the way.
-            </p>
-
-        </div> <!-- panel row -->
+        </blockquote>
 
     </div> <!-- scrolling container -->
     
@@ -205,9 +201,9 @@ $module->getCodeFor("yes3_export_prefixes", true);
                 <p>
                 Keep the prefixes as short as you can manage. 
                 </p>
-                <p>
+                <!--p>
                     Click <a data-bs-toggle="tooltip" title="Restore the prefixes to their default values, based on the arm/event names. While the algorithm ensures brevity and uniqueness, we recommend that you build your own set of prefixes, so as to convey as much information as possible." href="javascript:FMAPR.restoreToDefaultValues()">here</a> to restore your event prefixes to their default values.
-                </p>
+                </p-->
             </div>
 
             <table id="yes3-fmapr-setup-events" class="yes3-fmapr yes3-fmapr-specification yes3-fmapr-item yes3-dashboard yes3-editor">
@@ -216,7 +212,7 @@ $module->getCodeFor("yes3_export_prefixes", true);
 
                     <tr class='yes3-fmapr-event-prefixes-header'>
                         <th>Event</th>
-                        <th>Prefix</th>
+                        <th>Prefix (hover over prefix for details)</th>
                     </tr>
 
                 </thead>

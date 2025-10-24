@@ -54,9 +54,6 @@ class Yes3Export {
 
     public $export_has_repeatables = 0;
 
-    //public $export_data_dictionary = [];
-    //public $mapping_specification = "";
-
     public $export_items = [];
 
     public function __construct( $exportSettings )
@@ -121,8 +118,6 @@ class Yes3Export {
                 // If the record ID is hashed, we set the hashed flag
                 $exportItemProperties['hashed'] = 1;
                 $exportItemProperties['var_type'] = self::VARTYPE_TEXT; // hashed record ID is always a text field
-                //$exportItemProperties['min_length'] = Yes3Fn::HASHED_VALUE_LENGTH; // SHA-256 hash length
-                //$exportItemProperties['max_length'] = Yes3Fn::HASHED_VALUE_LENGTH;
             }
         }
 

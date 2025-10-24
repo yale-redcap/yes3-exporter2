@@ -259,17 +259,20 @@
             }
         },
         {
+            "hidden": true,
             "key":   "sascode-header",
             "type" : "descriptive",
             "name":  "<h5>SAS CODE DEFAULTS</h5><p>Your exports can be accompanied by execution-ready SAS code. In this section you may enter defaults for information required by the SAS code generator. These optional defaults may be overriden for any given export specification.</p>"
         },
         {
+            "hidden": true,
             "key": "sascode-libref",
             "name": "SAS libref (1-8 character library name; typically a shortened version of your project name)",
             "required": false,
             "type": "text"
         },
         {
+            "hidden": true,
             "key": "sascode-libref-path",
             "name": "SAS library path (full path to the directory where the SAS <b>datasets</b> and <b>format libraries</b> will be written). Note for Windows users: You must escape backslashes in file paths, e.g. (Z:\\\\mypath\\\\sascode) instead of (Z:\\mypath\\sascode)",
             "required": false,

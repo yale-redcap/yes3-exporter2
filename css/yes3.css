@@ -1350,7 +1350,7 @@ i.yes3-selected {
     -moz-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
  }
 
- .yes3-panel-blockquote {
+ .yes3-panel blockquote, .yes3-panel-blockquote {
     border-left: 6px solid rgba(100, 100, 100, 0.3333);
     margin-left: 0 !important;
     margin-right: 0 !important;

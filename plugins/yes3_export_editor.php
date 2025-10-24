@@ -1,14 +1,11 @@
 <?php
 
 namespace Yale\Yes3Exporter2;
-
-//use HtmlPage;
-
-
+/*
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
-
+*/
 
 $module = new Yes3Exporter2();
 
@@ -20,11 +17,6 @@ $default_sascode_libref = $module->getProjectSetting('sascode-libref');
 $default_sascode_libref_path = $module->getProjectSetting('sascode-libref-path');
 $default_sascode_dsname = $module->getProjectSetting('sascode-dsname') ?? "yes3_exporter";
 $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesystem-exports') ? 1 : 0;
-
-//$HtmlPage = new HtmlPage();
-//$HtmlPage->ProjectHeader();
-
-//$module->getCodeFor("yes3_export_editor", true);
 
 ?>
 
@@ -41,8 +33,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
-    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"-->
 
     <link rel="icon" type="image/x-icon" href="<?= $module->getUrl('favicon.ico')?>">
 
@@ -128,10 +118,11 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                 <li><span class="yes3-semibold">inline help</span>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons".</li>
                 <li><span class="yes3-semibold">online help</span>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon.</li>
             </ol>
-        
-        <div class="yes3-panel-blockquote yes3-legroom">
-            Note: Every interactive element in the Exporter II Editor interface has a tooltip. If you are unsure of what an icon or button does, hover over it with your mouse pointer to see its tooltip.
-        </div>
+            
+            <blockquote class="yes3-legroom">
+                <span class="yes3-semibold">Note: Every interactive element in the Exporter II Editor interface has a tooltip.</span>
+                <br>If you are unsure of what an icon or button does, hover over it with your mouse pointer to see its tooltip.
+            </blockquote>
 
             <div class='yes3-panel-row'>
                 <h5>Action icons</h5>
@@ -236,7 +227,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                     
                 </tbody>
             </table>
-        </div>
+        </div> <!-- yes3-panel-row -->
 
         <div class='yes3-panel-row'>
     
@@ -280,8 +271,8 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <p><em>Note: you may leave this information panel open, and move it as needed, while working with the export item list.</em></p>
 
-        <div class="yes3-panel-blockquote">The row selector is the narrow column to the left of the export item list.
-        <br />It is used to select one or more items for cutting, pasting, dragging or deleting.</div>
+        <blockquote>The row selector is the narrow column to the left of the export item list.
+        <br />It is used to select one or more items for cutting, pasting, dragging or deleting.</blockquote>
 
         <ul>
             <li><span class="yes3-semibold">To select a single item:</span>
@@ -446,21 +437,17 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <ol>
             <li>
-                <p>
                 As <span class="yes3-semibold">Multiple Columns</span>, with one column per choice in the list. In the export, each column will contain a 1 (selected) or <em>blank</em> if not.
                 As is typical for checklist data structures, there is no way that we are aware of to distinguish between "not selected" and "missing" for checkbox fields, so we leave it up to the user to interpret the results.
                 Each column will be named according to the REDCap convention of appending a triple underscore ("___") and the choice code to the field name.
-                </p><p>
-                For example, a multi-select field named "fruits" with choices "1, Apple", "2, Banana" and "3, Cherry" would be represented in the export by three columns named:
+                <br>
+                <em>Example</em>: a multi-select field named "fruits" with choices "1, Apple", "2, Banana" and "3, Cherry" would be represented in the export by three columns named:
                 "fruits___1", "fruits___2" and "fruits___3".
-                </p>
             </li>
             <li>
-                <p>
                 As a <span class="yes3-semibold">Single Column</span>, with the selected choices represented as a comma-separated list of choice codes.
-                </p><p>
-                For example, if the user selected "Apple" and "Cherry" for the "fruits" field, the value in the export file would be "1,3".
-                </p>
+                <br>
+                <em>Example</em>: if the user selected "Apple" and "Cherry" for the "fruits" field, the value in the export file would be "1,3".
             </li>
         </ol>
 </div>
@@ -516,14 +503,14 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <p><em>Note: you may leave this information panel open, and move it as needed, while working with the export items.</em></p>
 
-        <div class="yes3-panel-blockquote">
-        <h6>Export Items</h6>
-        <p>
-            An export item specifies a field (or fields) to be included in the export.
-            An export item may represent a single field, a single form, or all forms.
-            For longitudinal projects, an export item must also specify the event(s) from which to export data.
-        </p>
-        </div>
+        <blockquote>
+            <h6>Export Items</h6>
+            <p>
+                An export item specifies a field (or fields) to be included in the export.
+                An export item may represent a single field, a single form, or all forms.
+                For longitudinal projects, an export item must also specify the event(s) from which to export data.
+            </p>
+        </blockquote>
 
         <h6>Append and Insert modes</h6>
 
@@ -568,7 +555,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             </li>
         </ol>
     </div>
-
 </div>
 
 
@@ -645,33 +631,25 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             </tr>
         </table>
 
-        <h5>Default settings</h5>
-
-        <div class="yes3-information yes3-headroom yes3-legroom">
-            Typically, the same libref and SAS dataset folder is used for all SAS datasets for a project.
-            Accordingly, you may enter the default libref and SAS dataset folder for all project export specifications 
-            into the YES3 Exporter External Module settings.
-            These defaults will automatically populate exports, but may be overridden for individual export specifications.
-        </div>
-
-        <div class="yes3-information-em yes3-headroom yes3-legroom">
-            Note: the generated SAS code uses the observed maximum lengths of REDCap field values to define the lengths of SAS character variables.
+        <h6>SAS character variable lengths</h6>
+        <p>
+            The generated SAS code uses the observed maximum lengths of REDCap field values to define the lengths of SAS character variables.
             In this way, the generated code will not truncate any data and the SAS dataset will be as compact as possible.
             We recommend that you regenerate and execute the updated SAS code each time you export data, as the maximum value lengths may change over time as you add or modify REDCap data.
-        </div>
+        </p>
 
-        <h5>A note on the export file format</h5>
-        
-        <div class="yes3-information-em yes3-headroom yes3-legroom">
-            <p>The SAS code generated by the YES3 Exporter will support either tab-delimited (TSV) or comma-delimited (CSV) export file types.</p>
-            <p>However, we recommend that you use the tab-delimited (TSV) file type, as it is less likely to break the INPUT program.
+        <blockquote>
+
+            <h6>A note on the export file format</h6>
+
+            <p>
+                The SAS code generated by the YES3 Exporter will support either tab-delimited (TSV) or comma-delimited (CSV) export file types.
+            </p>
+            <p>
+                However, we recommend that you use the tab-delimited (TSV) file type, as it is less likely to break the INPUT program.
                 We have found that embedded line feeds, quotation marks and other characters in text fields are less likely to cause problems in TSV files than in CSV files.
             </p>
-            <ul>
-                <li>TSV files are less likely to contain embedded tabs in text fields than CSV files are to contain embedded commas.</li>
-                <li>TSV files do not require double quotes around text fields, which makes them easier to read and inspect.</li>
-                <li>TSV files can be imported into Excel without any special handling, whereas CSV files may be misinterpreted by Excel if they contain embedded commas or double quotes.</li>
-        </div>
+        </blockquote>
 
     </div>
 
@@ -1124,19 +1102,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                                 
                     </div>
 
-                    
-                    <!--div class="yes3-flex-left">
-                        
-                        <div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
-                            <label class="yes3-checkmarkContainer yes3-fmapr-if-hash-recordid">
-                                <input type="checkbox" name="export_hash_recordid_legacy" data-setting="export_hash_recordid_legacy" value="1" />
-                                <span class="yes3-checkmark"></span>Legacy hash
-                            </label>
-                        </div> 
-
-                    </div-->
-
-
                 </div>
 
                 <div class="yes3-fmapr-settings-section">
@@ -1153,13 +1118,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                                 <span class="yes3-checkmark"></span>Remove unprintable characters
                             </label>
                         </div>
-
-                        <!--div class="yes3-fmapr-filter-option yes3-fmapr-settings-block yes3-fmapr-sanitize-option">
-                            <label class="yes3-checkmarkContainer">
-                                <input type="checkbox" name="export_no_tags" data-setting="export_no_tags" value="1" />
-                                <span class="yes3-checkmark"></span>Remove HTML tags
-                            </label>
-                        </div-->
                     </div>
 
                     <div class="yes3-flex-left">
@@ -1289,13 +1247,6 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                         <span class="yes3-checkmark yes3-fmapr-batch-export-options"></span>Include in automated (cron) batch exports
                     </label>
                 </div>
-
-                <!--div class="yes3-fmapr-filter-option yes3-fmapr-settings-block">
-                    <label class="yes3-checkmarkContainer">
-                        <input type="checkbox" name="removed" data-setting="removed" id="yes3-export-removed" value="1" onclick="FMAPR.highlightRemovedIfSelected()"/>
-                        <span class="yes3-checkmark"></span>REMOVED
-                    </label>
-                </div-->
 
                 <div class="yes3-fmapr-settings-section">
                     NOTIFICATIONS

@@ -551,22 +551,16 @@ YES3.displayActionIcons = function( listenersLater )
 
     if ( YES3.contentExpanded && YES3.contentLoaded ){
 
-        //$('i.yes3-collapsed').addClass('yes3-action-disabled');
-        //$('i.yes3-expanded').removeClass('yes3-action-disabled');
         $('i.yes3-expanded').show();
         $('i.yes3-collapsed').hide();
     }
     else if ( !YES3.contentExpanded && YES3.contentLoaded ){
 
-        //$('i.yes3-collapsed').removeClass('yes3-action-disabled');
-        //$('i.yes3-expanded').addClass('yes3-action-disabled');
         $('i.yes3-expanded').hide();
         $('i.yes3-collapsed').show();
     }
     else {
 
-        //$('i.yes3-collapsed').removeClass('yes3-action-disabled');
-        //$('i.yes3-expanded').addClass('yes3-action-disabled');
         $('i.yes3-collapsed').hide();
         $('i.yes3-expanded').show().addClass('yes3-action-disabled');
     }
@@ -775,13 +769,11 @@ YES3.switchTheme = function(e) {
 
     if (e.target.checked) {
 
-        //document.documentElement.setAttribute('data-theme', 'dark');
         YES3.getYes3ParentElement().attr('data-theme', 'dark');
         localStorage.setItem('theme', 'dark');
     }
     else {
 
-        //document.documentElement.setAttribute('data-theme', 'light');
         YES3.getYes3ParentElement().attr('data-theme', 'light');
         localStorage.setItem('theme', 'light');
     }
@@ -975,30 +967,6 @@ YES3.setCaptions = function()
 }
 
 /*** DEBUGGING ***/
-/*
-window.onerror = function(message, source, lineno, error)
-{ 
-    if ( !YES3_DEBUG_MESSAGES ) return false;
-
-    // make sure the damn cursor is not spinning
-    YES3.notBusy();
-
-    // de-modalize
-    YES3.endModalState();
-
-    let msg = "A Javascript error was encountered! Please take a screen shot and write down exactly what preceded this sorry state."
-        + "<br>-------"
-        + "<br><br>message: " + message
-        + "<br><br>source: " + source
-        + "<br><br>lineno: " + lineno
-        + "<br><br>error: " + error
-    ;
-
-    YES3.hello( msg );
-
-    return true;
-}
-    */
 
 YES3.debugMessage = function()
 {
@@ -1041,15 +1009,7 @@ YES3.isUserInput = function (element) {
 }
     
 /* == TOOL TIPS AND POPOVERS == */
-/*
-YES3.enableTooltips = function( tooltipSpecs=[] ){
 
-    for (let i=0; i<tooltipSpecs.length; i++){
-        let t = tooltipSpecs[i];
-        YES3.setTooltipListenersForElement(t.selector, t.html, t.opts);
-    }
-}
-*/
 YES3.setBsTooltipPropertiesFromSpecs = function( tooltipSpecs=[]) {
 
     for (let i=0; i<tooltipSpecs.length; i++){
@@ -1236,86 +1196,6 @@ YES3.setBsTooltipPropertiesForElement = function (triggerSelector, title = '', o
     el.setAttribute('data-bs-html', 'true');
     el.setAttribute('data-bs-placement', placement);
 }
-/*
-YES3.setTooltipListenersForElement = function (triggerSelector, title = '', opts = {}) {
-    
-    const el = document.querySelector(triggerSelector);
-
-    if ( !el ) return;
-
-    if ( title ) el.setAttribute('title', title);
-    el.setAttribute('data-bs-toggle', 'tooltip');
-    el.setAttribute('data-bs-html', 'true');
-
-    let thisClass = "yes3-bs-tooltip";
-    let justify = "center";
-    let placement = opts.placement || "top";
-
-    if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
-    if ( el.classList.contains('yes3-warning') ) thisClass += " yes3-bs-tooltip-warning";
-    if ( el.classList.contains('yes3-error') ) thisClass += " yes3-bs-tooltip-error";
-
-    // control panel icons are placed to the left of the cursor
-    if ( el.classList.contains('yes3-action-icon-controlpanel') ) {
-        thisClass += " yes3-bs-tooltip-static"
-        placement = "left";
-    }
-
-    if ( placement === 'right' ){
-        
-        thisClass += " yes3-bs-tooltip-left";
-    }
-    const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
-        //container: el.parentElement,
-        container: 'body',
-        boundary: 'viewport',
-        placement: placement,
-        trigger: 'hover',
-        html: true,
-        delay: { "show": 1000, "hide": 0 },
-        customClass: thisClass,
-        offset: ({ placement, reference, popper }) => {
-
-            const refW = reference.width;
-            const popW = popper.width;
-            if (justify === "left") {
-                // shift so the tooltip's LEFT edge aligns with the trigger's LEFT edge
-                const skidding = (popW - refW) / 2;
-                const distance = 8; // vertical gap
-                return [skidding, distance];
-            }
-            return [0, 8];
-        },
-            popperConfig: cfg => ({
-            ...cfg,
-            modifiers: [
-                ...cfg.modifiers,
-                {
-                    name: 'shiftArrowLeft',
-                    enabled: true,
-                    phase: 'write',        // run after Popper’s 'arrow' modifier
-                    fn({ state }) {
-
-                        if ( !/^top/.test(state.placement) ) return;
-                        if ( justify !== "left" ) return;
-                        if ( !state.elements.arrow ) return;
-
-                        state.elements.arrow.style.left = '16px'; // reposition arrow to left edge of tooltip
-                        state.elements.arrow.style.transform = 'translate(0,0)'; // reset any previous adjustment (the mechanism Popper uses to position the arrow)
-                    }
-                }
-            ]
-        })
-
-    });
-
-    // close tooltip when element is clicked (eg. action icons)
-    el.addEventListener('click', () => {
-        tooltip.hide();
-    });
-
-}
-*/
 
 YES3.setBsTooltipListenersForContainer = function( container ){
 
@@ -1377,99 +1257,6 @@ YES3.setBsTooltipListenersForContainer = function( container ){
 
     });
 }
-/*
-YES3.setBsTooltipListenersForElement = function( element ){
-
-    if (!element) return;
-
-    //return;
-
-    element.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-
-        let thisClass = "yes3-bs-tooltip";
-        let justify = "center";
-        let placement = "top";
-
-        if ( el.classList.contains('yes3-tooltip-static') ) thisClass += " yes3-bs-tooltip-static";
-        if ( el.classList.contains('yes3-warning') ) thisClass += " yes3-bs-tooltip-warning";
-        if ( el.classList.contains('yes3-error') ) thisClass += " yes3-bs-tooltip-error";
-
-        // control panel icons are placed to the left of the cursor
-        if ( el.classList.contains('yes3-action-icon-controlpanel') ) {
-            thisClass += " yes3-bs-tooltip-static"
-            placement = "left";
-        }
-
-        if ( el.classList.contains('yes3-halign-left') || YES3.isUserInput(el) ) {
-            justify = "left";
-            thisClass += " yes3-bs-tooltip-left";
-        } else if ( el.classList.contains('yes3-halign-right') ) {
-            justify = "right";
-            thisClass += " yes3-bs-tooltip-right";
-        }
-
-        const tooltip = bootstrap.Tooltip.getOrCreateInstance(el, {
-            container: el.parentElement,
-            boundary: 'viewport',
-            placement: placement,
-            trigger: 'hover',
-            delay: { "show": 1000, "hide": 0 },
-            html: true,
-            customClass: thisClass,
-            offset: ({ placement, reference, popper }) => {
-
-                const refW = reference.width;
-                const popW = popper.width;
-                if (justify === "left") {
-                    // shift so the tooltip's LEFT edge aligns with the trigger's LEFT edge
-                    const skidding = (popW - refW) / 2;
-                    const distance = 8; // vertical gap
-                    return [skidding, distance];
-                }
-                return [0, 8];
-            },
-              popperConfig: cfg => ({
-                ...cfg,
-                modifiers: [
-                    ...cfg.modifiers,
-                    {
-                        name: 'shiftArrowLeft',
-                        enabled: true,
-                        phase: 'write',        // run after Popper’s 'arrow' modifier
-                        fn({ state }) {
-
-                            if ( !/^top/.test(state.placement) ) return;
-                            if ( justify !== "left" ) return;
-                            if ( !state.elements.arrow ) return;
-
-                            state.elements.arrow.style.left = '16px'; // reposition arrow to left edge of tooltip
-                            state.elements.arrow.style.transform = 'translate(0,0)'; // reset any previous adjustment (the mechanism Popper uses to position the arrow)
-                        }
-                    }
-                ]
-            })
-
-        });
-
-        // close tooltip when element is clicked (eg. action icons)
-        el.addEventListener('click', () => {
-            tooltip.hide();
-        });
-    });
-}
-
-YES3.setDefaultBsTooltipAttributes = function( element ){
-
-    if (!element) return;
-
-    // select child elements that have a title attribute but not a data-bs-toggle attribute
-    element.querySelectorAll('[title]:not([data-bs-toggle])').forEach(el => {
-
-        el.setAttribute('data-bs-toggle', 'tooltip');
-        el.setAttribute('data-bs-placement', 'top');
-    });
-}
-*/
 
 YES3.getTableColumnCount = function(table) {
   let maxCols = 0;
