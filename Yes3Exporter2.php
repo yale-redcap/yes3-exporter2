@@ -5200,7 +5200,8 @@ WHERE project_id=? AND log_entry_type=?
 
         $user_name = $this->getUsername();
 
-        $enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports") ?? false;
+        //$enable_host_filesystem_exports = $this->getProjectSetting("enable-host-filesystem-exports") ?? false;
+        $enable_host_filesystem_exports = false; // temporarily disable host filesystem exports
 
         if ( !$user_rights['exporter'] ){
 
@@ -5215,12 +5216,6 @@ WHERE project_id=? AND log_entry_type=?
 
         if ( $link['name'] === "YES3 Exporter II Filesystem Test" 
             && (!$enable_host_filesystem_exports || !$user_rights['isDesigner'])) { 
-
-            return false;
-        }
-
-        if ($link['name'] === "YES3 Exporter II Workshop" 
-            && $user_name !== "criwebtools" && $user_name !== "charpe" ) { 
 
             return false;
         }
