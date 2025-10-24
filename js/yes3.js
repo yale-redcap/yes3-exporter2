@@ -468,6 +468,9 @@ YES3.openPanel = function(panelName, nonmodal, x, y, atTheTop, toTheLeft)
 
     panel.css({'z-index': YES3.maxZ}).show();
 
+    // trigger a resize event in case the panel has elements that need it
+    panel.trigger('resize');
+
     return panel;
 };
  
@@ -1483,6 +1486,39 @@ YES3.getTableColumnCount = function(table) {
   return maxCols;
 }
 
+YES3.setHelpPanelProperties = function() {
+
+    const $helpPanels = $('div.yes3-help-panel');
+
+    $helpPanels.each(function() {
+        const $panel = $(this);
+        const $innerContent = $panel.find('div.yes3-scrolling-container');
+
+        const W = $panel.innerWidth();
+        const defaultWidth = Math.min(900, Math.floor(W * 0.9));
+        $panel.css('width', defaultWidth + 'px');
+        $innerContent.css('height', '400px');
+
+        // make resizable
+
+        $panel.resizable({
+            handles: 's,e,se',
+            minHeight: 300,
+            minWidth: 400,
+            maxWidth: 1000,
+            resize: function(event, ui) {
+                const $innerContent = $(this).find('div.yes3-scrolling-container');
+                const $footer = $(this).find('div.yes3-panel-got-it');
+                const footerHeight = $footer.outerHeight() || 20;
+                const innerContentY = $innerContent.position().top;
+                const newHeight = $(this).innerHeight() - footerHeight - innerContentY- 20; // 20 for padding
+                $innerContent.css('height', newHeight + 'px');
+                //console.log('Help panel resize:', footerHeight, innerContentY);
+            }
+        });
+    });
+}
+
 /*
 * the approved alternative to $(document).ready()
 */
@@ -1502,5 +1538,7 @@ $( function () {
     });
 
     YES3.setJQueryStuff();
+
+    YES3.setHelpPanelProperties();
 
 })

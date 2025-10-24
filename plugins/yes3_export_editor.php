@@ -78,7 +78,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-error-report" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left" id="yes3-help-panel-title">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Export specification errors
         </div>
         <div class="yes3-panel-row-right">
@@ -99,7 +99,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left" id="yes3-help-panel-title">
+        <div class="yes3-panel-row-left yes3-help-panel-title" id="yes3-help-panel-title">
             Getting Started with the Export Editor
         </div>
         <div class="yes3-panel-row-right">
@@ -107,7 +107,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
         </div>
     </div>
 
-    <div class="yes3-scrolling-container yes3-full-width yes3-default-panel-height">
+    <div class="yes3-scrolling-container yes3-full-width">
 
         <div class="yes3-panel-row">
             <h5>Overview</h5>
@@ -125,9 +125,13 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             </p>
             <ol>
                 <li><span class="yes3-semibold">tooltips</span>: brief descriptions of buttons and fields, available by hovering over them for 1 second or more with the mouse pointer. Every input field, button, checkbox, or other interactive element has an associated tooltip.</li>
-                <li><span class="yes3-semibold">inline help</span>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons (  <i class="far fa-question-circle yes3-action-icon yes3-nohandler"></i> ).</li>
-                <li><span class="yes3-semibold">online help</span>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon ( <i class="fas fa-book-reader yes3-action-icon yes3-nohandler"></i> ).</li>
+                <li><span class="yes3-semibold">inline help</span>: detailed context-specific assistance as you work, available by clicking on 'circled-question mark' icons".</li>
+                <li><span class="yes3-semibold">online help</span>: comprehensive documentation available online, accessible by clicking on the 'book-reader' icon.</li>
             </ol>
+        
+        <div class="yes3-panel-blockquote yes3-legroom">
+            Note: Every interactive element in the Exporter II Editor interface has a tooltip. If you are unsure of what an icon or button does, hover over it with your mouse pointer to see its tooltip.
+        </div>
 
             <div class='yes3-panel-row'>
                 <h5>Action icons</h5>
@@ -264,7 +268,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-row-selector-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             The export item row selector
         </div>
         <div class="yes3-panel-row-right">
@@ -354,7 +358,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-form-insertion-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Adding Forms to the Export Specification
         </div>
         <div class="yes3-panel-row-right">
@@ -429,7 +433,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-multiselect-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Multi-select field handling
         </div>
         <div class="yes3-panel-row-right">
@@ -466,7 +470,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-export-file-type-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Export File Type
         </div>
         <div class="yes3-panel-row-right">
@@ -500,7 +504,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-rapidentry-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Adding export items
         </div>
         <div class="yes3-panel-row-right">
@@ -512,13 +516,14 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <p><em>Note: you may leave this information panel open, and move it as needed, while working with the export items.</em></p>
 
+        <div class="yes3-panel-blockquote">
         <h6>Export Items</h6>
-
         <p>
             An export item specifies a field (or fields) to be included in the export.
             An export item may represent a single field, a single form, or all forms.
             For longitudinal projects, an export item must also specify the event(s) from which to export data.
         </p>
+        </div>
 
         <h6>Append and Insert modes</h6>
 
@@ -572,7 +577,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-sascode-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             SAS Code Generation
         </div>
         <div class="yes3-panel-row-right">
@@ -678,7 +683,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 <div id="yes3-fmapr-criterion-value-help-panel" class="yes3-panel yes3-help-panel yes3-draggable" style="display:none">
 
     <div class="yes3-panel-header-row">
-        <div class="yes3-panel-row-left">
+        <div class="yes3-panel-row-left yes3-help-panel-title">
             Selection criterion: value(s)
         </div>
         <div class="yes3-panel-row-right">
