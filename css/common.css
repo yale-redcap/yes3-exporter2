@@ -359,4 +359,8 @@ div#yes3-fmapr-copyright {
     width: 100%;
 }
 
+th i {
+    color: var(--yes3-th-title-color) !important;
+}
+
 

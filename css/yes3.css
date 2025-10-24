@@ -1375,10 +1375,9 @@ i.yes3-selected {
    max-width: 1600px !important;
 }
 
-div#yes3-help-panel, div.yes3-help-panel {
-   width: auto !important;
-   max-width: 900px !important;
+div.yes3-help-panel {
    background-color: var(--yes3-help-panel-background-color) !important;
+
    /*
    resize: vertical;
    overflow: hidden;
@@ -1456,7 +1455,18 @@ div.yes3-max-headroom {
     margin-bottom: var(--yes3-margin);
     cursor: move;
  }
- 
+
+/* the panel title inside the help panel has to be truncated to fit next to the close icon */
+.yes3-panel-header-row .yes3-help-panel-title {
+   white-space: nowrap;
+   -ms-text-overflow: ellipsis;
+   text-overflow: ellipsis;
+   overflow: hidden;
+   width: calc(100% - 50px) !important;
+   margin-right: 0 !important;
+   padding-right: 0 !important;
+}
+
  .yes3-panel-header-highlight {
     color: var(--yes3-panel-header-highlight-color);
     font-weight: var(--yes3-font-weight-light);
@@ -2285,7 +2295,7 @@ table.yes3-dashboard th:not(.yes3-th-title) {
 
 .yes3-default-panel-height {
    height: 500px;
-   min-height: 300px !important;
+   /*min-height: 300px !important;*/
 }
 
 /** tooltip **/

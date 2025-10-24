@@ -775,7 +775,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
 
     let html = `<tr class='yes3-fmapr-redcap-form yes3-fmapr-data-element ${object_repeating_class} yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap form" id="${rowId}" data-element_origin="redcap" data-object_type="form" data-object_name="${form_name}" data-object_event="${event}">`;
     html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+    //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
         html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
@@ -870,7 +870,7 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
 
     let html = `<tr class='yes3-fmapr-redcap-field ${object_repeating_class} yes3-fmapr-data-element yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap field" id="${rowId}" data-element_origin="redcap" data-object_type="field" data-object_name="${field_name}" data-object_event="${event}">`;
     html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+    //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
         html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
@@ -5044,8 +5044,7 @@ FMAPR.populateExportItemsTableHead = function(){
     html += '<th class="yes3-fmapr-row-number yes3-text-center" style="opacity: 1.0"><i class="far fa-question-circle yes3-action-icon yes3-action-icon-inline-large" data-bs-toggle="tooltip" title="Click to obtain detailed instructions for selecting, relocating and removing export items." action="Help_rowselector"></i></th>';
 
     // object editor link column
-    //html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center"><i class="far fa-edit"></i></th>';
-    html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center">&nbsp;</th>';
+    //html += '<th class="yes3-fmapr-redcap-object-editor yes3-text-center">&nbsp;</th>';
 
     // object type column
     html += '<th class="yes3-fmapr-redcap-object-type yes3-text-left">Type</th>';
@@ -5056,7 +5055,7 @@ FMAPR.populateExportItemsTableHead = function(){
     }
 
     // object name column
-    html += '<th class="yes3-fmapr-redcap-object-name yes3-text-left">Form or field name</th>';
+    html += '<th class="yes3-fmapr-redcap-object-name yes3-text-left">Form or field name (hover for details)</th>';
 
     // trashcan column
     //html += '<th class="yes3-fmapr-trashcan yes3-text-right"><i class="far fa-trash-alt"></i></th>';
