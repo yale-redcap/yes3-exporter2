@@ -249,28 +249,6 @@ function saveExportsManagerData()
         return "success";
     }
 }
-/*
-function orderTheExports( $exports=[] )
-{
-    global $module;
-
-    if ( !$exports ) {
-
-        $exports = getExportSpecificationList2(1);
-    }
-
-    $key_name = "export_order";
-
-    $k = 0;
-    foreach ( $exports as $export ){
-
-        $k++;
-        $order = strval($k);
-
-        $module->setEmLogParameter( $export['log_id'], $key_name, $order );
-    }
-}
-*/
     
 function addExportSpecification()
 {
@@ -518,9 +496,6 @@ function getExportSpecificationList():string
 
         return json_encode([]);
     }
-
-    // fetch the form metadata
-    //$formMetadata = $module->getFormMetadataStructures();
 
     /**
      * Distinct export specifications best determined by direct query
@@ -828,8 +803,6 @@ function downloadExportLog()
 
     $bytes = 0;
 
-    //exit("downloadExportLog: {$export_uuid}, {$export_name}, {$path}, {$bytes}, {$sql}");
-
     foreach ( $module->recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
 
         if ( !$bytes ) {
@@ -843,8 +816,6 @@ function downloadExportLog()
     }
 
     rewind($h);
-
-    //exit("downloadExportLog: {$export_uuid}, {$export_name}, {$path}, {$bytes}");
 
     $chunksize = 1024 * 1024; // 1MB per one chunk of file.
 
@@ -926,8 +897,6 @@ WHERE x.external_module_id=? AND x.project_id=? AND p1.`value`=? AND p2.`value`=
     $subSql .= " ORDER BY timestamp DESC LIMIT {$LIMIT}";
 
     $sql = "SELECT * FROM ( " . $subSql . " ) y ORDER BY y.log_id ASC";
-
-    //exit( json_encode( ['sql'=>$sql] ) );
 
     $data = $module->fetchRecords($sql, $params);
 
@@ -1114,91 +1083,15 @@ function getFieldMapRecord($export_uuid)
  * 
  * @return mixed
  */
-/*function sanitizeUploadSpec( $uSpec )
-{
-    global $module;
-    
-    if ( !is_array( $uSpec )){
 
-        return null;
-    }
-
-    if ( !is_array($uSpec['elements']) ){
-
-        return null;
-    }
-
-    if ( count($uSpec['elements'])==0 ){
-
-        return null;
-    }
-      
-    //$module->logDebugMessage($module->getProjectId(), print_r($uSpec, true), "sanitizeUploadSpec:pre");
-
-    for($i=0; $i<count($uSpec['elements']); $i++){
-
-        if ( isset($uSpec['elements'][$i]['name']) ){
-
-            $uSpec['elements'][$i]['name'] = $module->inoffensiveFieldName($uSpec['elements'][$i]['name']);
-        }
-        else {
-
-            $uSpec['elements'][$i]['name'] = "element_name_needed_here";
-        }
-
-        if ( isset($uSpec['elements'][$i]['type']) ){
-
-            $uSpec['elements'][$i]['type'] = $module->normalized_string($uSpec['elements'][$i]['type']);
-        }
-        else {
-
-            $uSpec['elements'][$i]['type'] = "element_type_needed_here";
-        }
-
-        if ( isset($uSpec['elements'][$i]['label']) ){
-
-            $uSpec['elements'][$i]['label'] = Yes3Fn::sanitizeForText($uSpec['elements'][$i]['label']);
-        }
-        else {
-
-            $uSpec['elements'][$i]['label'] = "element label needed here";
-        }
-
-        if ( isset($uSpec['elements'][$i]['valueset']) && is_array($uSpec['elements'][$i]['valueset']) ){
-
-            if ( $k = count($uSpec['elements'][$i]['valueset']) ) {
-
-                $uSpec['elements'][$i]['type'] = "nominal";
-
-                for($j=0; $j<$k; $j++){
-
-                    if ( isset($uSpec['elements'][$i]['valueset'][$j]['value']) ){
-
-                        $uSpec['elements'][$i]['valueset'][$j]['value'] = Yes3Fn::sanitizeForText($uSpec['elements'][$i]['valueset'][$j]['value']);
-                    }
-                    else {
-
-                        $uSpec['elements'][$i]['valueset'][$j]['value'] = "value_needed_here";
-                    }
-
-                    if ( isset($uSpec['elements'][$i]['valueset'][$j]['label']) ){
-
-                        $uSpec['elements'][$i]['valueset'][$j]['label'] = Yes3Fn::sanitizeForText($uSpec['elements'][$i]['valueset'][$j]['label']);
-                    }
-                    else {
-
-                        $uSpec['elements'][$i]['valueset'][$j]['label'] = "value label needed here";
-                    }
-                }
-            }
-        }
-    }
-  
-    //$module->logDebugMessage($module->getProjectId(), print_r($uSpec, true), "sanitizeUploadSpec:post");
-
-    return $uSpec;
-}*/
-
+/**
+ * Returns the event settings (event_id, event_name, event_prefix) as a json-encoded string.
+ * 
+ * function: getEventSettings
+ * 
+ * 
+ * @return string
+ */
 function getEventSettings()
 {
     global $module;
@@ -1206,6 +1099,15 @@ function getEventSettings()
     return json_encode( $module->getEventSettings() );
 }
 
+/**
+ * Saves the POSTed event setting array [{event_id, event_name, event_prefix},...] to the EM log.
+ * 
+ * function: saveEventSettings
+ * 
+ * 
+ * @return int
+ * @throws Exception
+ */
 function saveEventSettings()
 {
     global $module;
@@ -1360,10 +1262,6 @@ function get_field_mappings()
     }
 
     $map_record = $module->queryLogs($pSql, $params)->fetch_assoc();
-
-    //$msg = "log_id=" . $map_record['log_id'] . ", bytes=" . strlen($map_record['field_mappings']);
-    //$module->logDebugMessage($module->getProjectId(), $pSql, "get_field_mappings:pSql");
-    //$module->logDebugMessage($module->getProjectId(), $msg, "get_field_mappings:result");
 
     if ( !$map_record ){
 

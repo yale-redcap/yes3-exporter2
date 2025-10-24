@@ -307,8 +307,4 @@ $( function () {
 
     FMAPR.getProjectSettings();
 
-    // a convenient place to fetch the list of service functions so we can build the registry and live taint-free
-    //YES3.listServiceFunctions();
-
-
 })

@@ -267,9 +267,6 @@ FMAPR.exportTableRowHtml = function( data ){
         rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column yes3-icon-container">${cellHtml}</td>`;
     }
     else {
-        let banClass = "";
-        //if ( data.error_messages && data.error_messages.length > 0 ) banClass = "yes3-error";
-        //else if ( data.warning_messages && data.warning_messages.length > 0 ) banClass = "yes3-warning";
 
         rowHtml += `<td class="yes3-col-sm yes3-halign-center yes3-required-column"><i class="fas fa-ban yes3-warning" data-bs-toggle="tooltip" onclick="FMAPR.reportWhyBanned('${data.log_id}')" title="Either you do not have permission to download or export this specification, or the specification is incomplete. Click for more information."></i></td>`;
     }
@@ -279,11 +276,6 @@ FMAPR.exportTableRowHtml = function( data ){
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"  data-bs-toggle="tooltip" data-name="export_layout" title="${layout_tooltip}">${FMAPR.tooltipForLayout(data.export_layout)}</td>`;
     if ( YES3.EMSettings['enable-cron-batch-exports'] && YES3.EMSettings['enable-host-filesystem-exports'] ) rowHtml += `<td class="yes3-col-sm yes3-halign-center" data-name="export_batch" >${FMAPR.whatIsItYesOrNo(data.export_batch)}</td>`;
     rowHtml += `<td class="yes3-col-sm yes3-halign-center"                    data-name="column_count" >${data.column_count}</td>`;
-
-    // if ( YES3.EMSettings['enable-validator'] === 'Y' ) {
-    //     rowHtml += `<td class="yes3-col-sm yes3-halign-center"><i class="fas fa-file-import" onclick="FMAPR.openValidator('${data.log_id}')" title="Open the validator/importer"></i></td>`;
-    // }
-
 
     if ( YES3.userRights.isDesigner ) {
         
@@ -477,11 +469,7 @@ FMAPR.renderExportTable = function()
 
     const requiredColumnCount = $requiredHeaderCells.length;
 
-    //$exportTable.css({'height': tableHeight+'px'});
-
     if ( overflow < 0 )  $exportTableBody.css({'height': bodyHeight + overflow + 'px'});
-    
-    //$exportTableBody.css({'height': bodyHeight+'px'});
 
     if ( rowWidth < ROW_WIDTH_CUTOFF ){
 
@@ -511,8 +499,6 @@ $
         $exportTable.find('.yes3-col-md').css({'width': mdWidth+'px', 'max-width': mdWidth+'px'}).show();
         $exportTable.find('.yes3-col-lg').css({'width': lgWidth+'px', 'max-width': lgWidth+'px'}).show();
     }
-
-    //exportTableBody.scrollTop(exportTableBody.prop('scrollHeight') - exportTableBody.height());
 }
 
 FMAPR.refreshSpecification = function( export_uuid ){
@@ -520,8 +506,6 @@ FMAPR.refreshSpecification = function( export_uuid ){
     YES3.debugMessage('FMAPR.refreshSpecification', export_uuid);
 
     if ( !export_uuid ) return;
-
-    //YES3.isBusy(YES3.captions.wait);
 
     performance.mark('FMAPR.refreshSpecification.start');
 
@@ -577,8 +561,6 @@ FMAPR.refreshSpecificationCallback = function( response ){
 
     FMAPR.postMessage(`Export specification <strong>${export_specification.export_name}</strong> has been refreshed.`);
 }
-
-//FMAPR.getExportNames( FMAPR.loadSpecifications );
 
 FMAPR.loadSpecifications = function( get_removed )
 {
@@ -651,13 +633,11 @@ FMAPR.NewExport_openPanel = function()
 
     if ( FMAPR.project.is_longitudinal ){
 
-        //$("input#yes3-fmapr-new-export-layout-h").prop("checked", true);
        $tbl.find(".yes3-longitudinal-only").show();
     }
     else {
 
         $tbl.find(".yes3-longitudinal-only").hide();
-        //$("input#yes3-fmapr-new-export-layout-v").prop("checked", true);
     }
 
     if ( FMAPR.project.repeating_forms ){
@@ -774,9 +754,9 @@ FMAPR.openValidator = function()
  */
 FMAPR.editExport = function( log_id ){
 
-    const _MAX_WIDTH_ = 1500;
+    const _MAX_WIDTH_ = 2000;
     const _MIN_WIDTH_ = 500;
-    const _MAX_HEIGHT_ = 1000;
+    const _MAX_HEIGHT_ = 2000;
     const _MIN_HEIGHT_ = 450;
 
     FMAPR.selectRow( log_id );
@@ -796,7 +776,7 @@ FMAPR.editExport = function( log_id ){
     });
     
     let w = $(window).outerWidth() * 0.9; if ( w > _MAX_WIDTH_ ) w = _MAX_WIDTH_; else if ( w < _MIN_WIDTH_ ) w = _MIN_WIDTH_;  
-    let h = $(window).outerHeight() * 0.9; if ( h > _MAX_HEIGHT_ ) h = _MAX_HEIGHT_; else if ( h < _MIN_HEIGHT_ ) h = _MIN_HEIGHT_;
+    let h = $(window).outerHeight() * 0.98; if ( h > _MAX_HEIGHT_ ) h = _MAX_HEIGHT_; else if ( h < _MIN_HEIGHT_ ) h = _MIN_HEIGHT_;
 
     let url = YES3.moduleObject.getUrl("plugins/yes3_export_editor.php") + "&" + paramsObj.toString();
 
@@ -826,10 +806,10 @@ FMAPR.popupWindowFeatures = function(w, h){
     const refX = window.screenX;
     const refY = window.screenY;
 
-    const openWindowCount = FMAPR.countOpenWindows();
+    const openWindowCount = 1 + FMAPR.countOpenWindows();
 
-    const left = refX + 100*openWindowCount;
-    const top  = refY + 50*openWindowCount;
+    const left = refX; // + 50*openWindowCount;
+    const top  = refY - 40; // + 25*openWindowCount;
     
     return `left=${left},top=${top},width=${w},height=${h}`;
 }
