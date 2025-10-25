@@ -827,6 +827,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
      * writeExportFiles
      * 
      * This beast is way too long, but it is the main download/filesystem export function.
+     *
+     * This function is called by:
+     * --------------------------
+     * * Yes3Exporter::exportData() - for filesystem exports of data, data dictionary and info files
+     * * Yes3Exporter::downloadData() - for data downloads
+     * * Yes3Exporter::downloadZip() - for zip (package) downloads
      * 
      * It writes the data file, the data dictionary file, the info file and optionally the SAS code files.
      * * The data file is written in UTF8 with BOM, so that it can be opened in Excel without issues.
@@ -838,16 +844,24 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
      * Files are optionally written to the export_target_folder, which is set in the EM settings, 
      * or to the PHP temp dir if the destination is self::DESTINATION_DOWNLOAD.
      * 
-     * This function is called by:
-     * * Yes3Exporter::exportData() - for filesystem exports of data, data dictionary and info files
-     * * Yes3Exporter::downloadData() - for data downloads
-     * * Yes3Exporter::downloadZip() - foe zip (package) downloads
+     * outline of this function:
+     * -------------------------
+     *  - gather project props, export spec, event settings, dag settings etc
+     *  - build 'helper' index arrays to help optimize the record assembly
+     *  - build a SELECT query to select the record subset to export, based on the export selection criteria
+     *  - execute the query to generate and sort the record list (natural sort on record id)
+     *  - write the export data file by processing each record and calling writeExportDataForRecord()
+     *  - write the data dictionary file by calling writeExportDataDictionaryFile()
+     *  - write the info file by calling writeExportInfoFile()
+     *  - optionally write the SAS code files by calling writeSasCodeInputFile(), writeSasCodeFormatsCreateFile() and writeSasCodeFormatsAssignFile()
+     *  
+     * @param mixed     &$ddPackage         The data dictionary package. Includes the dd, the export object and other props. See Yes3Exporter::buildExportDataDictionary()
+     * @param string    $destination        Export destination (download or filesystem). 
+     *                                      See the Yes3Exporter::DESTINATION_* constants.
+     *                                      Note that currently only DESTINATION_DOWNLOAD is supported.
+     * @param int       &$bytesWritten      size of the data file written, in bytes.
+     * @param bool      $support_package    If true, the data file is not written, only the info, dictionary and sascode (if requested) files.
      * 
-     * @param mixed &$ddPackage The data dictionary package. See Yes3Exporter::buildExportDataDictionary()
-     * @param string $destination See the Yes3Exporter::DESTINATION_* constants.
-     * @param int &$bytesWritten size of the data file written, in bytes.
-     * @param bool $support_package If true, the data file is not written, only the info, dictionary and sascode (if requested) files.
-     * @param bool $sascode If true, the SAS code files are written.
      * @return array{export_data_message: string, export_data_filename: string, export_data_file_size: mixed, export_data_items: int, export_data_rows: int, export_data_columns: int, export_data_dictionary_message: string, export_data_dictionary_filename: mixed, export_data_dictionary_file_size: mixed, export_info_message: string, export_info_filename: string, export_info_file_size: int|false, export_info: array{host: mixed, timestamp: mixed, project_id: mixed, project_recordid_field: mixed, project_title: mixed, project_is_longitudinal: int, project_has_dags: int, export_name: mixed, export_layout: mixed, export_uuid: mixed, export_target_folder: mixed, path: mixed, bytes_written: mixed, columns: mixed, rows: mixed, destination: mixed, notification_email: mixed, username: mixed}, export_info_timestamp: mixed} 
      * @throws Exception 
      */
@@ -858,18 +872,29 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         /** @var Yes3Export $export */
         $export = $ddPackage['export'];
-        $export_group_id            = (int)($ddPackage['export_group_id'] ?? 0);
-        $export_specification       = $ddPackage['export_specification'] ?? [];
+
+        // export group id (data access group), if requesting user is in a dag
+        $export_group_id = (int)($ddPackage['export_group_id'] ?? 0);
 
         $export_data_filename = $this->exportDataFilename($export->export_name, $export->export_data_extension, $destination);
 
         $dd = $ddPackage['export_data_dictionary'] ?? [];
 
+        // redcap_data table name for this project
         $redcap_data = $this->getDataTable();
 
         $path = "";
 
-        // data file is not written for support packages
+        /*
+
+         A 'support package' (currently deprecated, may revisit later) is an export package that does not write the data file,
+         although records are processed as normal to build the data distribution summaries in the data dictionary.
+         It does include the data dictionary file, the info file and optionally the sascode files.
+
+         This is useful for generating distribution-enhanced data dictionaries and code files without 
+         exporting the data itself.
+        
+        */
         if ( $support_package ) {
 
             $h = false;
@@ -879,10 +904,13 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             $h = $this->export_file_handle( $path, $destination, $export->export_target_folder, $export_data_filename, true );
         }
         /**
-         * build an assoc array for rapid event name resolution
+         * build an assoc array for rapid event name resolution (event_1_arm_1 etc)
          */
+
+        // list of events pertaining to this export, with event names and event prefixes if relevant
         $eventSpecs = $this->getEventSettings();
 
+        // assoc array of event names, keyed by event_id
         $eventName = [];
 
         foreach( $eventSpecs as $eventSpec){
@@ -891,16 +919,13 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         }
 
         /**
-         * get an assoc array of dag names
+         * get an assoc array of dag  keyed by group_id
         **/
-
         $dagNameForGroupId = $this->getGroupNames(true);
         if ( !$dagNameForGroupId ){
 
             $dagNameForGroupId = [];
         }
-
-        //$spec = $this->getExportSpecification( $export_uuid );
 
         /**
          * DD 'helper' index arrays
@@ -912,11 +937,12 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
          * Two arrays are created. The first is for regular REDCap fields, the second is for multiselect fields.
          * The value returned is the index of the row in the master dd array.
          * 
-         *   (1) dd_index: for redcap fields that are not multiselects, keyed by:
+         *   (1) dd_index: column numbers for single-column redcap fields, keyed by:
          *       vertical layouts: field_name
          *       horizontal layouts: field_name and event_id
          * 
-         *   (2) dd_multiselect_index: for multiselect fields, keyed by:
+         *   (2) dd_multiselect_index: column numbers for multi-column checkbox fields 
+         *       to be represented by multiple columns (per export setting), keyed by:
          *       vertical layouts: field_name and multiselect option value
          *       horizontal layouts: field_name, event_id and multiselect option value
          */
@@ -944,19 +970,21 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
                 if ( $dd[$i]['redcap_field_name'] ){
 
+                    // multi-option checkbox field, represented by multiple columns in the export file per export setting
                     if ( $this->ddIsMultiselect($dd[$i]) ){
 
                         $dd_multiselect_index[$dd[$i]['redcap_field_name']][$dd[$i]['redcap_source_option']] = $i;
                     }
                     else {
 
+                        // scalar field, including multi-option checkbox fields represented by a single column (list) in the export file
                         $dd_index[$dd[$i]['redcap_field_name']] = $i;
                     }
                 }
             }
 
             /**
-             * The valueset for multiselects are stored as JSON strings.
+             * The valueset for multiselects are stored in the dd as JSON strings.
              * We will decode them here, so that they can be used to build the frequency tables that are part of the exported data dictionary,
              * and which are accumulated during the record processing.
              */
@@ -1137,6 +1165,10 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         //$this->logDebugMessage($this->getProjectId(), $sql, "writeExportDataFile: CritX SQL");
         //$this->logDebugMessage($this->getProjectId(), implode(",", $sqlParams), "writeExportDataFile: CritX Params");
 
+        /**
+         * BUILD AND SORT THE RECORD LIST
+         */
+
         $records = [];
         foreach ( $this->recordGeneratorUnbuffered($sql, $sqlParams) as $x ){
 
@@ -1173,18 +1205,6 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 }
             }
         }
-        /*
-        if ( $export_layout !== "h" ){
-
-            foreach ( $dd as $d ){
-
-                if ( $d['redcap_field_name'] && $d['redcap_events']){
-
-                    $field_events[$d['redcap_field_name']] = json_decode($d['redcap_events'], true);
-                }
-            }
-        }
-        */
 
         //$this->logDebugMessage($this->getProjectId(), print_r($field_events, true), 'writeX:field_events');
         //$this->logDebugMessage($this->getProjectId(), $sqlSelect, 'writeX:sqlSelect');
@@ -1765,30 +1785,23 @@ WHERE project_id=? AND log_entry_type=?
      * Note that multiple export records can be written for a singl;e REDCap record,
      * depending on the export layout and the number of events and instances.
      * 
-     * @param mixed $record 
-     * @param mixed $sqlSelect 
-     * @param mixed $sqlSelectParams 
-     * @param mixed $eventName 
-     * @param mixed &$dd 
-     * @param mixed $dd_index 
-     * @param mixed $dd_specmap_index 
-     * @param mixed $dd_multiselect_index 
-     * @param mixed $field_events 
-     * @param mixed $multiselect_fields 
-     * @param mixed $dagNameForGroupId 
-     * @param mixed $h 
-     * @param mixed $export_layout 
-     * @param mixed $export_max_text_length 
-     * @param mixed $export_inoffensive_text 
-     * @param mixed $export_no_tags
-     * @param mixed $export_ascii_text
-     * @param mixed $export_hash_recordid 
-     * @param mixed $export_shift_dates 
-     * @param mixed $export_group_id 
-     * @param mixed $export_has_repeatables 
-     * @param mixed &$K 
-     * @param mixed &$R 
-     * @param mixed &$C 
+     * @param Yes3Export $export            YES3Export object, useful for export settings
+     * @param mixed $record                 record id
+     * @param mixed $group_id               group_id for the record, or null
+     * @param string $sqlSelect             the SQL SELECT statement to retrieve the data for the record
+     * @param array $sqlSelectParams        the parameters for the SQL SELECT statement
+     * @param array $eventName              assoc array of event_id => event_name
+     * @param array &$dd                    the data dictionary
+     * @param array $dd_index               column number for scalar field, keyed by [field_name, event_id] 
+     * @param array $dd_multiselect_index   column number for a multi-column multiselect field, keyed by [field_name, event_id, option value]
+     * @param array $field_events           assoc array of field names and their defined events, for non-horizontal layouts
+     * @param array $multiselect_fields     list of multiselect checkbox fields
+     * @param array $dagNameForGroupId      assoc array of dag_name keyed by group_id
+     * @param resource|false $h             file handle for the export data file, or false if no file is to be written
+     * @param int &$K                       global datum count   
+     * @param int &$R                       global record count
+     * @param int &$C                       column count for this record
+     * 
      * @return mixed 
      * @throws Exception 
      */
@@ -1850,9 +1863,8 @@ WHERE project_id=? AND log_entry_type=?
             /**
              * $BOR: beginning of record
              * 
-             * No break for horiz layouts,
-             *   (event_id) for vertical,
-             *   (event_id, instance) for repeating
+             * Horizontal layout: break on instance change
+             * Vertical layout: break on event or instance change
              */
 
             if ( $export->export_layout==="h" ) {
@@ -1896,8 +1908,8 @@ WHERE project_id=? AND log_entry_type=?
 
                     if ( !isset($y[$d['var_name']]) ){
 
-                        //$y[$d['var_name']] = "";
-                        $y[$d['var_name']] =  ( $this->ddIsMultiselect($d) ) ? "0":"";
+                        $y[$d['var_name']] =  ""; // initialize to blank
+                        //$y[$d['var_name']] =  ( $this->ddIsMultiselect($d) ) ? "0":""; optional initialization for multiselects
                     }
                 }
 
@@ -2186,8 +2198,6 @@ WHERE project_id=? AND log_entry_type=?
         $response = "";
 
         $ddPackage = $this->buildExportDataDictionary($export_uuid);
-
-        //$this->determineExportFileType( $ddPackage['export']->export_file_type );
 
         if ($cron) {
             $destination = self::DESTINATION_CRON;
