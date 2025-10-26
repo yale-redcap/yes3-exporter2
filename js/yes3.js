@@ -36,6 +36,8 @@ const YES3_RESULT_FAIL = "fail";
 const ALL_OF_THEM = "_all_";
 const ALL_FORMS = "_ALL_FORMS_"; // an alias for _all_ for form selection
 
+const NUMERIC_MISSING = -1;
+
 String.prototype.truncateAt = function( n ){
     if ( this.length > n-3 ) return this.substring(0, n-3) + "...";
     else if ( this.length > n ) return this.substring(0, n);
@@ -1304,6 +1306,11 @@ YES3.setHelpPanelProperties = function() {
             }
         });
     });
+}
+
+YES3.valueOrMissing = function( value, missing=NUMERIC_MISSING )
+{
+    return ( typeof value === "undefined" || value === null ) ? missing : value;
 }
 
 /*

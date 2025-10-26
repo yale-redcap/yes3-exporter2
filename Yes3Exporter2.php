@@ -3274,6 +3274,7 @@ WHERE project_id=? AND log_entry_type=?
 
     public function getFormMetadataStructures():array
     {
+                
         $user_rights = $this->yes3UserRights();
         $form_export_permissions = $user_rights['form_export_permissions'];
         $designer = $user_rights['isDesigner'];
@@ -3327,7 +3328,7 @@ WHERE project_id=? AND log_entry_type=?
             }
 
             if ( $isLong ){
-
+                /*
                 $sqlE = "
                 SELECT ef.event_id, em.descrip
                 FROM redcap_events_forms ef
@@ -3335,6 +3336,15 @@ WHERE project_id=? AND log_entry_type=?
                     INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
                 WHERE ea.project_id=? and ef.form_name=?
                 ORDER BY em.day_offset, ef.event_id
+                ";
+                */
+                $sqlE = "
+SELECT ef.event_id, em.descrip, IF(er.event_id IS NOT NULL AND er.form_name IS NULL, '1', '0') AS event_repeats
+FROM redcap_events_forms ef
+	INNER JOIN redcap_events_metadata em ON em.event_id=ef.event_id
+	INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
+    LEFT JOIN redcap_events_repeat er ON er.event_id=ef.event_id
+WHERE ea.project_id=? and ef.form_name=?
                 ";
 
                 $ee = $this->fetchRecords($sqlE, [$this->getProjectId(), $m['form_name']]);
@@ -3346,7 +3356,8 @@ WHERE project_id=? AND log_entry_type=?
                     $events[] = [ 
                         'event_id' => (string)$e['event_id'],
                         'event_label' => Yes3Fn::sanitizeForLabel($e['descrip']),
-                        'descrip' => Yes3Fn::sanitizeForLabel($e['descrip'])
+                        'descrip' => Yes3Fn::sanitizeForLabel($e['descrip']),
+                        'event_repeats' => $e['event_repeats']
                     ];      
                 }
             }
@@ -3373,7 +3384,7 @@ WHERE project_id=? AND log_entry_type=?
                 'form_label' => Yes3Fn::sanitizeForLabel($m['form_menu_description']),
                 'form_events' => $events,
                 'form_fields' => $form_fields,
-                'form_repeating' => ( Yes3Fn::isRepeatingInstrument($m['form_name']) ) ? 1 : 0
+                'form_repeating' => Yes3Fn::isRepeatingInstrument( $m['form_name'] ) // 0/1
             ];
 
             $form_index[$form_name] = $form_index_num;
@@ -3449,7 +3460,7 @@ WHERE project_id=? AND log_entry_type=?
     }
 
     public function getFieldMetadataStructures(): array
-    {
+    {       
         $form_export_permissions = $this->yes3UserRights()['form_export_permissions'];
         
         if ( $this->isLongitudinal() ){
@@ -3555,7 +3566,7 @@ WHERE project_id=? AND log_entry_type=?
 
                 'field_name'        => $field_name,
                 'form_name'         => $form_name,
-                'form_repeating'    => ( Yes3Fn::isRepeatingInstrument($form_name) ) ? 1 : 0,
+                'form_repeating'    => Yes3Fn::isRepeatingInstrument( $form_name ), // repeating on at least one event
                 'field_label'       => $field_label,
                 'field_type'        => $field['element_type'],
                 'field_validation'  => $field['element_validation_type'],
@@ -4831,8 +4842,8 @@ WHERE project_id=? AND log_entry_type=?
                 const $emSettingsContainer = $('tr[data-module="yes3_exporter2"]');
                 const $description = $emSettingsContainer.find('div.external-modules-description');
 
-                console.log("YES3 Exporter II module object: ", module);
-                console.log("Legacy transfer status: ", legacy_transfer_status);
+                //console.log("YES3 Exporter II module object: ", module);
+                //console.log("Legacy transfer status: ", legacy_transfer_status);
                 
                 if (legacy_transfer_status==='pending') {
 

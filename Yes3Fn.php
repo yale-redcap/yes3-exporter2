@@ -456,37 +456,127 @@ class Yes3Fn {
       return $compressed;
    }
 
-   public static function isLongitudinal( $project_id=null )
-   {
-      if ( !$project_id ) $project_id = self::getProjectId();
-      
-      return (new Project((int) $project_id))->longitudinal;
-   }
-
-   public static function isRepeatingInstrument(string $form_name, $project_id=null )
-   {
-      if ( !$project_id ) $project_id = self::getProjectId();
-
-      $sql = "SELECT COUNT(*) AS k
-               FROM redcap_events_repeat er
-                  INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
-                  INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
-               WHERE ea.project_id=? AND er.form_name=?";
-      
-      return self::fetchValue($sql, [$project_id, $form_name]);
-   }
-
-    public static function hasRepeatingInstruments($project_id=null)
+    public static function isLongitudinal( $project_id=null )
     {
-      if ( !$project_id ) $project_id = self::getProjectId();
+        if ( !$project_id ) $project_id = self::getProjectId();
+        
+        return (new Project((int) $project_id))->longitudinal;
+    }
+
+    /**
+     * Determine if an event is a repeating event
+     * 
+     * A repeating event is represented in redcap_events_repeat with a NULL form_name
+     * 
+     * @param int|string $event_id
+     * @param int|null $project_id
+     * 
+     * @return int 0/1
+     */
+    public static function isRepeatingEvent($event_id, $project_id=null )
+    {
+        if ( !$project_id ) $project_id = self::getProjectId();
+
+        $event_id = intVal($event_id);
+
+        if ( !$event_id ) return 0;
 
         $sql = "SELECT COUNT(*) AS k
                 FROM redcap_events_repeat er
                     INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
                     INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
-                WHERE ea.project_id=?";
+                WHERE ea.project_id=? AND er.event_id=? AND er.form_name IS NULL";
         
-        return self::fetchValue($sql, $project_id);
+        return ( self::fetchValue($sql, [$project_id, $event_id]) ) ? 1 : 0;
+    }
+
+    /**
+     * Determine if a form is a repeating instrument (on any event)
+     * 
+     * @param string $form_name
+     * @param int|null $project_id
+     * 
+     * @return int 0/1
+     */
+    public static function isRepeatingInstrument(string $form_name, $project_id=null )
+    {
+        if ( !$project_id ) $project_id = self::getProjectId();
+
+        $sql = "SELECT COUNT(*) AS k
+                FROM redcap_events_repeat er
+                    INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
+                    INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
+                WHERE ea.project_id=? AND er.form_name=?";
+        
+        return ( self::fetchValue($sql, [$project_id, $form_name]) ) ? 1 : 0;
+    }
+
+    /**
+     * Determine if a form is a repeating instrument for a specific event
+     * 
+     * @param string $form_name
+     * @param int|string $event_id
+     * @param int|null $project_id
+     * 
+     * @return int 0/1
+     */
+    public static function isRepeatingInstrumentForEvent(string $form_name, $event_id, $project_id=null )
+    {
+        if ( !$form_name ) return 0;
+        
+        $event_id = intVal($event_id);
+
+        if ( !$event_id ) return 0;
+
+        if ( !$project_id ) $project_id = self::getProjectId();
+
+        $sql = "SELECT COUNT(*) AS k
+                FROM redcap_events_repeat er
+                    INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
+                    INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
+                WHERE ea.project_id=? AND er.form_name=? AND er.event_id=?";
+        
+        return ( self::fetchValue($sql, [$project_id, $form_name, $event_id]) ) ? 1 : 0;
+    }
+
+    /**
+     * Determine if the project has any repeating instruments
+     * 
+     * @param int|null $project_id
+     * 
+     * @return int count of repeating instruments
+     */
+    public static function hasRepeatingInstruments($project_id=null)
+    {
+        if ( !$project_id ) $project_id = self::getProjectId();
+
+        $sql = "SELECT COUNT(*) AS k
+                FROM redcap_events_repeat er
+                    INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
+                    INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
+                WHERE ea.project_id=? AND er.form_name IS NOT NULL";
+        
+        return ( self::fetchValue($sql, $project_id) ) ? 1 : 0;
+    }
+
+    /**
+     * Determine if the project has any repeating events
+     * 
+     * @param int|null $project_id
+     * 
+     * @return int count of repeating events
+     */
+    public static function hasRepeatingEvents($project_id=null)
+    {
+        if ( !$project_id ) $project_id = self::getProjectId();
+
+        $sql = "SELECT COUNT(*) AS k
+                FROM redcap_events_repeat er
+                    INNER JOIN redcap_events_metadata em ON em.event_id=er.event_id
+                    INNER JOIN redcap_events_arms ea ON ea.arm_id=em.arm_id
+                WHERE ea.project_id=? AND er.form_name IS NULL";
+        
+        return ( self::fetchValue($sql, $project_id) ) ? 1 : 0;
     }
 
    public static function getGroupnames( $unique_names=false, $group_id=null )

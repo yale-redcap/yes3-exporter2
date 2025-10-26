@@ -19,6 +19,8 @@ class Yes3ExportItem {
     public $redcap_event_name = "";
     
     public $repeatable = 0;
+    public $event_repeats = 0;
+    public $form_repeats = 0;
 
     public $non_missing_count = 0;
     public $min_length = Yes3Fn::VERY_LARGE_NUMBER;
@@ -43,10 +45,25 @@ class Yes3ExportItem {
             $this->$propName = $propValue;
         }
 
-        // If the item is a repeatable, we set the repeatable flag
-        if ( !$this->repeatable && isset( $exportItemProperties['redcap_form_name'] ) && Yes3Fn::isRepeatingInstrument( $exportItemProperties['redcap_form_name'] ) ) {
+        // If the item is a repeatable form or event, we set the repeatable flags
+        if ( isset( $exportItemProperties['redcap_form_name']) && isset( $exportItemProperties['redcap_event_id'] ) ) {
+
+            $form_repeats_this_event = 0;
+            $event_repeats = 0;
+
+            if ( isset( $exportItemProperties['redcap_event_id'] ) ) {
+
+                $event_repeats = Yes3Fn::isRepeatingEvent( $exportItemProperties['redcap_event_id'] );
             
-            $this->repeatable = 1;
+                $form_repeats_this_event = Yes3Fn::isRepeatingInstrumentForEvent( 
+                    $exportItemProperties['redcap_form_name'], 
+                    $exportItemProperties['redcap_event_id'] 
+                );
+            }
+            
+            $this->repeatable =  ( $event_repeats | $form_repeats_this_event );  // this is what counts, as it indicates that the instance must be on the export
+            $this->form_repeats = $form_repeats_this_event;
+            $this->event_repeats = $event_repeats;
         } 
     }
 }
