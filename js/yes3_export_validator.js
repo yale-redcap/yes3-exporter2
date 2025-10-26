@@ -27,7 +27,7 @@ FMAPR.loadSpecifications = function( get_removed )
 
 FMAPR.loadSpecificationsCallback = function( response )
 {
-    console.log('loadSpecificationsCallback', response, typeof response);
+    //console.log('loadSpecificationsCallback', response, typeof response);
 
     YES3.notBusy();
 
@@ -210,7 +210,7 @@ FMAPR.setValidatorListeners = function()
         
         // dev-only: verify file presence
         for (const [k, v] of FMAPR.formData.entries()) {
-            console.log('FormData entry:', k, (v instanceof File) ? { name: v.name, size: v.size, type: v.type } : v);
+            //console.log('FormData entry:', k, (v instanceof File) ? { name: v.name, size: v.size, type: v.type } : v);
         }
 
         FMAPR.fileToValidate = file.name;
@@ -250,7 +250,7 @@ FMAPR.clearFileSelectionForm = function() {
 
 FMAPR.uploadCallback = function( response )
 {
-    console.log('FMAPR.uploadCallback', response);
+    //console.log('FMAPR.uploadCallback', response);
 
     FMAPR.clearFileSelectionForm();
 

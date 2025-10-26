@@ -15,6 +15,12 @@ FMAPR.reloadParms = {
     "wayback": false
 }
 
+FMAPR.allSummaries = {
+    "all_fields": "",
+    "all_forms": "",
+    "all_events": "",
+}
+
 FMAPR.constrainedAutocompleteSource = [];
 
 FMAPR.tooltips = {
@@ -325,35 +331,51 @@ FMAPR.clearWarningMessage = function()
     }
 }
 
-FMAPR.warnIfMixedRepeating = function( allForms ) {
+FMAPR.warnIfMixedRepeating = function( allForms, allEvents ) {
 
     allForms = allForms || false;
+    allEvents = allEvents || false;
 
-    let repeaters = $(".yes3-repeating").length;
+    let repeating_forms = $(".yes3-repeating").length;
+    let repeating_events = $(".yes3-repeating-event").length;
     let nonRepeaters = $(".yes3-non-repeating").length;
 
     // special case: all forms are selected
     if ( $(`tr[data-object_type=form][data-object_name="${ALL_OF_THEM}"]`).length > 0 ) allForms = true;
-    else if ( $(`tr[data-object_type=form][data-object_name="${ALL_FORMS}"]`).length > 0 ) allForms = true;
 
     if ( allForms ){
-        repeaters = 0;
+        repeating_forms = 0;
         nonRepeaters = 0;
 
         // iterate through FMAPR.project.form_metadata
         for (const formId in FMAPR.project.form_metadata) {
             const form = FMAPR.project.form_metadata[formId];
             if (form.form_repeating) {
-                repeaters++;
+                repeating_forms++;
             } else {
                 nonRepeaters++;
             }
         }
     }
 
-    if ( repeaters && nonRepeaters ){
+    if ( FMAPR.project.is_longitudinal && allEvents ){
 
-        FMAPR.postWarningMessage("Warning! Mixed repeating and non-repeating forms.");
+        if ( FMAPR.project.is_longitudinal ){
+            for (const eventId in FMAPR.project.event_metadata) {
+                const event = FMAPR.project.event_metadata[eventId];
+                if ( event.event_repeating ) {
+                    repeating_events++;
+                }
+                else {
+                    nonRepeaters++;
+                }
+            }
+        }
+    }
+
+    if ( nonRepeaters && ( repeating_forms || repeating_events ) ) {
+
+        FMAPR.postWarningMessage("Warning! Mixed repeating and non-repeating forms and/or events.");
     }
     else {
 
@@ -714,19 +736,56 @@ YES3.Functions.editExportItem = function()
 
 FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
 {   
-    if ( form_name === ALL_FORMS ) form_name = ALL_OF_THEM; // handle the alias
-    
-    //theRowBeforeWhich = theRowBeforeWhich || FMAPR.getNewFieldRow();
+   
     yes3_fmapr_data_element_name = yes3_fmapr_data_element_name || "";
     unsaved = unsaved || false;
     batch = batch || false;
+    form_name = form_name || "";
+    event = event || "";
+
+    if ( !form_name.length ){
+
+        console.error("exportItemFormHtml: missing form_name");
+        return false;
+    }
+        
+    let form_index = YES3.valueOrMissing(FMAPR.project.form_index[form_name], NUMERIC_MISSING);
+
+    // fail silently if the form has been deleted from the project
+    if ( form_index === NUMERIC_MISSING && form_name !== ALL_OF_THEM ){
+        return false;
+    }
 
     let unsavedClass = ( unsaved ) ? "yes3-unsaved" : "";
-    let form_index = -1;
-    let form_label = "all forms";
+    let form_label = (form_index !== NUMERIC_MISSING) ? FMAPR.project.form_metadata[form_index].form_label : "";
+    let form_repeating = ( form_index !== NUMERIC_MISSING ) ? FMAPR.project.form_metadata[form_index].form_repeating || 0 : 0;
     let object_type = "form";
     let object_repeating_class = "yes3-non-repeating";
-    let object_repeating_class_title = "This export item is a NON-REPEATING form";
+    let object_repeating_class_title = ( !FMAPR.project.is_longitudinal || event === ALL_OF_THEM ) ? "This export item is a NON-REPEATING form." : "This field is from a NON-REPEATING form, on a NON-REPEATING event.";
+    let event_repeating = ( FMAPR.project.event_metadata[event] && FMAPR.project.event_metadata[event].event_repeating || 0 ) ? 1 : 0;
+
+    // disable repeating form status if event is repeating (since they cannot co-exist)
+    if ( form_repeating && event_repeating ) {
+
+        form_repeating = false;
+    }
+
+    // report all parameters
+    //console.warn("exportItemFormHtml: form_name=", form_name, " event=", event, " theRowBeforeWhich=", theRowBeforeWhich, " yes3_fmapr_data_element_name=", yes3_fmapr_data_element_name, " mode=", mode, " unsaved=", unsaved, " batch=", batch );
+    //console.warn("exportItemFormHtml: form_repeating=", form_repeating, " event_repeating=", event_repeating );
+
+    // consider the form as NON repeating if the event is repeating (the two cannot co-exist)
+    if ( form_repeating ) {
+
+        object_type = "form R";
+        object_repeating_class = "yes3-repeating";
+        object_repeating_class_title = "This form is REPEATING form";
+    } 
+    else if ( event_repeating ) {
+
+        object_repeating_class = "yes3-repeating-event";
+        object_repeating_class_title = "This form is from a REPEATING EVENT.";        
+    }
 
     if ( YES3.isEmpty( theRowBeforeWhich ) ){
         theRowBeforeWhich = FMAPR.getNewFieldRow();
@@ -752,13 +811,6 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
         else {
             form_label = FMAPR.project.form_metadata[form_index].form_label;
         }
-
-        if (FMAPR.project.form_metadata[form_index].form_repeating) {
-
-            object_type = "form R";
-            object_repeating_class = "yes3-repeating";
-            object_repeating_class_title = "This export item is a REPEATING form";
-        }
     }
 
     if ( !yes3_fmapr_data_element_name ) {
@@ -775,7 +827,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
     html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="Form name: <strong>${form_name}</strong><br>Form label: ${form_label}<br>${object_repeating_class_title}">${form_label}</td>`;
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
@@ -829,38 +881,61 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
     yes3_fmapr_data_element_name = yes3_fmapr_data_element_name || "";
     unsaved = unsaved || false;
     batch = batch || false;
+    event = event || "";
+    field_name = field_name || "";
 
-    let unsavedClass = ( unsaved ) ? "yes3-unsaved" : "";
-
-    let field_index = FMAPR.project.field_index[field_name];
-
-    if ( typeof field_index !== "number" && field_name !== ALL_OF_THEM ){
-        //YES3.debugMessage("addREDCapFieldV2: invalid field name", field_name);
+    if ( !field_name.length ){
+        console.error("exportItemFieldHtml: missing field_name");
         return false;
     }
 
-    //mode = "append";
+    let field_index = YES3.valueOrMissing(FMAPR.project.field_index[field_name], NUMERIC_MISSING);
 
-    //YES3.debugMessage("addREDCapFieldV2:theRowBeforeWhich", theRowBeforeWhich, mode, FMAPR.getNewFieldRow(), YES3.isEmpty( theRowBeforeWhich ));
+    // fail silently if the field has been deleted from the project
+    if ( field_index === NUMERIC_MISSING && field_name !== ALL_OF_THEM ){
+        return false;
+    }
 
-    let field_label = FMAPR.project.field_metadata[field_index].field_label;
-    let form_name = FMAPR.project.field_metadata[field_index].form_name;
-    let form_index = FMAPR.project.form_index[form_name];
-    let form_label = FMAPR.project.form_metadata[form_index].form_label;
+    let unsavedClass = ( unsaved ) ? "yes3-unsaved" : "";
+
+    let form_name = (field_index !== NUMERIC_MISSING) ? FMAPR.project.field_metadata[field_index].form_name : "";
+    let form_index = YES3.valueOrMissing(FMAPR.project.form_index[form_name], NUMERIC_MISSING);
+    let form_label = (form_index !== NUMERIC_MISSING) ? FMAPR.project.form_metadata[form_index].form_label : "";
+    let form_repeating = (form_index !== NUMERIC_MISSING) ? FMAPR.project.form_metadata[form_index].form_repeating || 0 : 0;
+
+    let field_label = (field_index !== NUMERIC_MISSING) ? FMAPR.project.field_metadata[field_index].field_label : "";
+
     let object_type = "field";
     let object_repeating_class = "yes3-non-repeating";
-    let object_repeating_class_title = "This field is from a NON-REPEATING form";
+    let object_repeating_class_title = ( !FMAPR.project.is_longitudinal || event === ALL_OF_THEM ) ? "This export item is from a NON-REPEATING form." : "This field is from a NON-REPEATING form, on a NON-REPEATING event.";
+    let event_repeating = ( FMAPR.project.event_metadata[event] && FMAPR.project.event_metadata[event].event_repeating || 0 ) ? 1 : 0;
+
+    // report all parameters
+    //console.warn("exportItemFieldHtml: field_name=", field_name, "field_index=", field_index, "form_name=", form_name, " event=", event, " theRowBeforeWhich=", theRowBeforeWhich, " yes3_fmapr_data_element_name=", yes3_fmapr_data_element_name, " mode=", mode, " unsaved=", unsaved, " batch=", batch );
+    //console.warn("exportItemFieldHtml: form_repeating=", form_repeating, " event_repeating=", event_repeating );
+
+    // disable repeating form status if event is repeating (since they cannot co-exist)
+    if ( form_repeating && event_repeating ) {
+
+        form_repeating = false;
+    }
+
+    // consider the form as NON repeating if the event is repeating (the two cannot co-exist)
+    if ( form_repeating ) {
+
+        object_type = "field R";
+        object_repeating_class = "yes3-repeating";
+        object_repeating_class_title = "This field is from a REPEATING form.";
+    }
+    else if ( event_repeating ) {
+
+        object_repeating_class = "yes3-repeating-event";
+        object_repeating_class_title = "This field is from a REPEATING EVENT.";        
+    }
 
     if ( !yes3_fmapr_data_element_name ) {
         
         yes3_fmapr_data_element_name = FMAPR.RawREDCapDataElementName(0);
-    }
-
-    if (FMAPR.project.field_metadata[field_index].form_repeating) {
-
-        object_type = "field R";
-        object_repeating_class = "yes3-repeating";
-        object_repeating_class_title = "This field is from a REPEATING form";
     }
 
     let rowId = FMAPR.dataElementRowId(yes3_fmapr_data_element_name);
@@ -870,7 +945,7 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
     //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_event}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
     html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="form: <strong>${form_label}</strong><br>field: <strong>${field_name}</strong><br>label: ${field_label}<br>${object_repeating_class_title}">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");'></i></td>`;
@@ -1157,10 +1232,14 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
             const objectEvent = $("select#yes3-fmapr-rapidentry-object-event").val();
             const objectName  = $("select#yes3-fmapr-rapidentry-form_name").val();
 
+            //console.warn("add-forms: objectEvent=", objectEvent, " objectName=", objectName );
+
             if ( objectEvent === ALL_OF_THEM || !FMAPR.project.is_longitudinal ) {
+                //console.warn("-->add-forms: adding everything" );
                 FMAPR.addEverything(false, true);
             }
             else {
+                //console.warn("-->add-forms: adding forms for event" );
                 FMAPR.addRapidEntryItem(objectType, objectName, objectEvent, false, true);
             }
         })
@@ -1456,7 +1535,7 @@ FMAPR.rapidEntrySkipper = function(){
     const $addAsFieldButton = $("input#yes3-fmapr-rapidentry-object-add-field");
     const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
 
-    console.warn("rapidEntrySkipper", objectType, objectName, objectEvent);
+    //console.warn("rapidEntrySkipper", objectType, objectName, objectEvent);
 
     if ( !objectName || !objectType || (FMAPR.project.is_longitudinal && !objectEvent) ){
 
@@ -1499,13 +1578,13 @@ FMAPR.addRapidEntryItem = function( object_type, object_name, object_event, allF
     //if ( object_name === ALL_FORMS ) object_name = ALL_OF_THEM; // handle the alias
 
     // output all parms (by name) to the console
-    console.warn("addRapidEntryItem parms:", {
-        object_type: object_type,
-        object_name: object_name,
-        object_event: object_event,
-        allFieldsForForm: allFieldsForForm,
-        allFormsForEvent: allFormsForEvent
-    });
+    //console.warn("addRapidEntryItem parms:", {
+    //    object_type: object_type,
+    //    object_name: object_name,
+    //    object_event: object_event,
+    //    allFieldsForForm: allFieldsForForm,
+    //    allFormsForEvent: allFormsForEvent
+    //});
 
     let saveResult = null;
 
@@ -1628,7 +1707,7 @@ FMAPR.addEverything = function( asFields, asForms )
     }
     else {
 
-        FMAPR.addEverything_Yes( asFields );
+        FMAPR.addEverything_Yes( asFields, asForms );
     }
 }
 
@@ -1679,9 +1758,46 @@ FMAPR.exportItemRowEventLabel = function(event)
         return `event missing!`;
     }
 
-    return FMAPR.project.event_metadata[event].event_label + " event";
+    let event_label = FMAPR.project.event_metadata[event].event_label || "event " + FMAPR.project.event_metadata[event].event_id;
+
+    if ( FMAPR.project.event_metadata[event].event_repeating ){
+
+        event_label += " R";
+    }
+
+    return event_label;
 }
 
+
+FMAPR.exportItemRowEventTooltip = function(event)
+{
+    if ( !FMAPR.project.is_longitudinal ) {
+
+        return "--"; // n/a
+    }
+
+    if ( event===ALL_OF_THEM ){
+
+        return "This export item is from ALL events.";
+    }
+
+    // event may have been deleted
+    if ( !FMAPR.project.event_metadata[event] ){
+
+        return 'Error constructing event tooltip: event metadata missing.';
+    }
+
+    let tooltip = "event name: " + FMAPR.project.event_metadata[event].event_name + "<br/>" +
+                  "event id: " + event
+    ;
+
+    if ( FMAPR.project.event_metadata[event].event_repeating ) {
+
+        tooltip += "<br />Note: This event is repeating.";
+    }
+
+    return tooltip;
+}
 
 FMAPR.addREDCapForm = function( form_name, event, theRowBeforeWhich )
 {   
@@ -1842,7 +1958,7 @@ YES3.Functions.saveExportSpecification = function(auditOnly)
  
 FMAPR.saveExportSpecificationCallback = function( response ){
   
-    console.warn( 'saveExportSpecificationCallback', response );
+    //console.warn( 'saveExportSpecificationCallback', response );
 
     //YES3.notBusy();
 
@@ -2522,7 +2638,7 @@ FMAPR.getFieldAutoCompleteSource = function(event)
             field_label = "[" + FMAPR.project.field_metadata[i].field_name + "]";
 
             if ( FMAPR.project.form_metadata[form_index].form_repeating ){
-                field_label += "[R]";
+                field_label += "R";
             }
 
             field_label += " " + FMAPR.project.field_metadata[i].field_label;
@@ -2563,7 +2679,7 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
         form_label = FMAPR.project.form_metadata[form_index].form_label;
 
         if ( FMAPR.project.form_metadata[form_index].form_repeating ){
-            form_label += " [R]";
+            form_label += " R";
         }
 
         // first make sure the form is appropriate for the layout
@@ -2616,7 +2732,7 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
         });
     }
 
-    console.warn("getFormAutoCompleteSource", acSource);
+    //console.warn("getFormAutoCompleteSource", acSource);
 
     return acSource;
 }
@@ -4195,7 +4311,7 @@ FMAPR.populateSpecificationTables = function( specification )
     
     FMAPR.markAsBuildInProgress();
 
-    FMAPR.setConstrainedAutocompleteSource(); // alternate source for repeaters
+    FMAPR.setConstrainedAutocompleteSource(); // alternate source for repeating_forms
 
     // settingsAreDirty will be true if any settings were blank and set to default values
     const settingsAreDirty = FMAPR.populateSettingsTable( specification );
@@ -4512,7 +4628,7 @@ FMAPR.populateExportItemsTableHead = function(){
 
     if ( FMAPR.project.is_longitudinal ){
         // event column
-        html += '<th class="yes3-fmapr-redcap-object-event yes3-text-left">Event name</th>';
+        html += '<th class="yes3-fmapr-redcap-object-event yes3-text-left">Event name (hover for details)</th>';
     }
 
     // object name column

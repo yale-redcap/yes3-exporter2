@@ -122,7 +122,7 @@ FMAPR.setToolTips = function(){
 
 FMAPR.refreshExportTable = function( response )
 {
-    console.warn('refreshExportTable', response);
+    //console.warn('refreshExportTable', response);
 
     if ( !YES3.userRights.isDesigner ) FMAPR.exportTable().find('.yes3-designer-only').remove();
     
@@ -578,7 +578,7 @@ FMAPR.loadSpecifications = function( get_removed )
 
 FMAPR.loadSpecificationsCallback = function( response )
 {
-    console.log('loadSpecificationsCallback', response, typeof response);
+    //console.log('loadSpecificationsCallback', response, typeof response);
 
         FMAPR.refreshExportTable( response );
         FMAPR.exportSpecifications = response;

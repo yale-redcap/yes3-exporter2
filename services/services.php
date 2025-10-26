@@ -1518,9 +1518,11 @@ function get_event_metadata():array
     global $module;
 
     $sql = "
-SELECT e.event_id, e.descrip
+SELECT e.event_id, e.descrip,
+  IF(er.event_id IS NOT NULL, '1', '0') AS event_repeating
 FROM redcap_events_metadata e
   INNER JOIN redcap_events_arms a on e.arm_id=a.arm_id
+  LEFT JOIN redcap_events_repeat er ON er.event_id=e.event_id AND er.form_name IS NULL
 WHERE a.project_id=?
 ORDER BY e.day_offset
     ";
@@ -1540,7 +1542,8 @@ ORDER BY e.day_offset
 
         $event_metadata[(string)$e['event_id']] = [
             'event_label' => $module->escape($e['descrip']),
-            'event_name' => $module->escape($event_name)
+            'event_name' => $module->escape($event_name),
+            'event_repeating' => (int) $e['event_repeating']
         ];
     }
 
