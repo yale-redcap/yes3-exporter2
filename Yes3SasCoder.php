@@ -52,6 +52,7 @@ class Yes3SasCoder {
     public $export_target_folder = ''; // target folder for the export
 
     public $delimiter = "\t"; // default delimiter for all exports
+    public $extension = "tsv";
     public $lrecl = 32767; // default logical record length for SAS input files
 
     function __construct() {}
@@ -82,6 +83,7 @@ class Yes3SasCoder {
         $this->filename_base = Yes3Fn::normalized_string($filename_base);
 
         $this->delimiter = $delimiter;
+        $this->extension = ( $delimiter == "\t" ) ? "tsv" : "csv";
         $this->lrecl = (int) $lrecl;
 
         // Note that the data dictionary is always an excel-friendly CSV file delinmited with commas
@@ -149,7 +151,192 @@ class Yes3SasCoder {
         ];
     }
 
+    public function getMacroLibCode() {
 
+        // gotta use a 'nowdoc' (<<<'EOT' syntax) to avoid variable interpolation, i.e., return a single-quoted string
+        $macro = <<<'SASMACRO'
+/*
+    Macro to resolve the input file path (fileref) based on execution context
+    (batch vs interactive), and store it in the macro variable _infile_fileref_.
+
+    The ground rule is that the input CSV/TSV file is always located in the same directory
+    as this SAS program.
+
+    If running in batch mode with -SYSIN, the fileref _infile_fileref_
+    will be resolved relative to the program directory.
+    Example: C:\path\to\program\my_export_data.csv
+
+    If running interactively, the fileref _infile_fileref_ will be a simple relative path
+    to the current working directory (where SAS was launched from).
+    Example: my_export_data.csv
+*/
+%MACRO resolve_infile_fileref();
+
+    %LOCAL _sysin_dir_ _sysin_value_ _sysin_path_ _dir _sep;
+
+    /* If batch: path passed via -SYSIN */
+    %LET _sysin_value_=%SYSFUNC(GETOPTION(SYSIN));
+
+    /* If we have a -sysin, determine the program dir */
+    %IF %LENGTH(&_sysin_value_) %THEN %DO;
+        /* 
+        A SAS trick to ensure that we have the full path to the program file
+        even if the -sysin was passed as a relative path.
+
+        First assign a fileref to the sysin path, then use PATHNAME to get the full path.
+        Finally, clear the fileref.
+
+        Note: %SYSFUNC is used to call DATA step functions in macro context.
+        */
+        FILENAME _temp_ "&_sysin_value_";
+        %LET _sysin_path_ =%SYSFUNC(PATHNAME(_temp_));
+        FILENAME _temp_ CLEAR;
+
+        /*
+            Now extract the directory path by removing the filename from the full path.
+            This regex works for both Windows and Unix-style paths.
+            Note: %QSYSFUNC(PRXCHANGE) is used to call PRXCHANGE in macro context, and to prevent issues with special characters in the resulting path.
+            Note: %SUPERQ is used to prevent double quoting issues.
+        */
+        %LET _sysin_dir_=%QSYSFUNC(
+            PRXCHANGE(%NRSTR(s#[/\\][^/\\]+$##), 1, %SUPERQ(_sysin_path_))
+        );
+    %END;
+
+    /* 
+        Normalize dir and pick a separator 
+        Note: %SUPERQ is used to prevent issues with special characters in the resulting path.
+    */
+    %LET _dir = %SUPERQ(_sysin_dir_);
+
+    %IF %LENGTH(&_dir) %THEN %DO;
+        
+        /* remove any trailing / or \ */
+        %LET _dir = %SYSFUNC(PRXCHANGE(%NRSTR(s#[/\\]+$##), 1, &_dir));
+
+        /* choose \ if the dir contains backslashes, else / */
+        %LET _sep = /;
+        %IF %SYSFUNC(INDEXC(&_dir, %STR(\))) %THEN %LET _sep = %STR(\);
+
+        /* build &_infile_fileref_ as a normal quoted string */
+        %LET _infile_fileref_ = %SYSFUNC(QUOTE(&_dir.&_sep.%SUPERQ(_datasheet_)));
+    %END;
+    %ELSE %DO;
+        /* no dir: just dataset file name as a normal quoted string */
+        %LET _infile_fileref_ = %SYSFUNC(QUOTE(%SUPERQ(_datasheet_)));
+    %END;
+
+    %PUT ----------------------------------------------------------------;
+    %PUT NOTE: fileref resolved to: &_infile_fileref_;
+    %PUT ----------------------------------------------------------------;
+
+%MEND;
+
+%MACRO abort_with_msg( msg );
+
+   %PUT ----------------------------------------------------------------;
+   %PUT NOTE: &msg;
+   %PUT ----------------------------------------------------------------;
+    
+   DATA _NULL_;
+        ABORT CANCEL;
+        STOP;
+   RUN;
+%MEND;
+
+%resolve_infile_fileref();
+
+
+SASMACRO;
+
+        return $macro;
+    }
+
+    public function getDataStepStartCode() {
+
+        $delimStr = ($this->delimiter == "\t") ? "'09'x" : "','";
+
+        $datastep_start = <<<DATASTEPINIT
+DATA &_dsname_ (LABEL=&_dslabel_);
+
+    RETAIN _errcount_ 0; DROP _errcount_;
+
+    /*
+        Rows on exporter-generated datasheets always terminated by CRLF
+        (even on Unix systems), so we specify TERMSTR=CRLF to ensure proper handling
+    */
+    INFILE &_infile_fileref_
+            DELIMITER={$delimStr} LRECL={$this->lrecl} MISSOVER DSD TERMSTR=CRLF FIRSTOBS=2 END=_eof_;
+DATASTEPINIT;
+
+        return $datastep_start;
+    }
+
+    public function getDataStepEndCode() {
+
+        $datastep_end = <<<DATASTEPEND
+
+        /* accumulate the errors */
+        IF _ERROR_ THEN _errcount_+1;
+
+        /* set the errcount macro var on the last iteration */
+        IF _eof_ THEN CALL symputx('_errcount_', _errcount_);
+
+RUN;
+DATASTEPEND;
+
+        return $datastep_end;
+    }
+
+    public function getPostDataStepCode() {
+
+        $code = <<<POSTDATASTEP
+	
+/*
+  Abort if record input errors occurred.
+  This prevents the creation of a partial or corrupt dataset.
+  ABORT will send a non-zero return code to the OS
+  that can be detected by calling process (e.g., command shell/powershell ERRORLEVEL).
+*/
+%IF %EVAL(&_errcount_ > 0) %THEN %DO;
+	 
+  %abort_with_msg(&_errcount_ error(s) encountered while inputting records. Check the log file.);
+%END;
+
+/*
+   Get the record count
+*/
+
+PROC SQL NOPRINT;
+    SELECT COUNT(*) INTO :_nrecords_ TRIMMED
+    FROM &_dsname_;
+QUIT;
+
+/*
+  Abort if no records were output.
+  This prevents the creation of an empty dataset.
+  ABORT will send a non-zero return code to the OS
+  that can be detected by calling process (e.g., command shell/powershell ERRORLEVEL).
+*/
+%IF %EVAL(&_nrecords_ = 0) %THEN %DO;
+
+   %abort_with_msg(No records were output. The dataset will NOT be created or replaced.);
+%END;
+
+%ELSE %DO;
+    /*
+    If we got this far without errors, the dataset has been created successfully
+    and we can make it permanent, possibly overwriting the existing dataset.
+    */
+    PROC COPY IN=WORK OUT=&_libref_;
+        SELECT &_dsname_;
+    RUN;
+%END;
+
+POSTDATASTEP;
+
+        return $code;
+    }
 
     public function summaryComment() {
 
@@ -173,9 +360,7 @@ class Yes3SasCoder {
         return $summary;
     }
 
-    public function genInputCode(
-        $infile="full-pathspec-of-input-csv-file"
-        ) {
+    public function genInputCode( $datasheet="full-pathspec-of-input-csv-file" ) {
 
         // This function should generate SAS code based on the data dictionary and info
         // For now, we will just return a placeholder string
@@ -186,26 +371,47 @@ class Yes3SasCoder {
 
         $header = $this->summaryComment();
 
-        $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} input program';\n";
+        $header .= <<<SASHEADER
 
-        $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
-        $header .= "\nOPTIONS PS=55 LS=72;\n";
+TITLE1 '{$this->info['export_properties']['export_name']} input program';
 
-        $header .= "\nLIBNAME {$this->libref} '{$this->libref_path}';\n";
+OPTIONS ERRORCHECK = STRICT;
+* OPTIONS MACROGEN; /* uncomment to enable macro debugging */
+OPTIONS NOSOURCE; /* comment this out to include the source code in the log */
 
-        $datastep = "\nDATA {$this->libref}.{$this->dataset_name} (LABEL='Generated from REDCap project #{$this->project_id} by YES3 Datamart SASCoder on {$timestamp}');\n";
-            
-        $infile = Yes3Fn::sanitizeForObjectname($infile);
+* OPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';
+OPTIONS PS=55 LS=132;
+/*
+   export metadata macro variables
+*/
+%LET _dsname_ = {$this->dataset_name}; /* SAS dataset name, from the export specs */
+%LET _datasheet_ = {$datasheet}; /* the input data sheet name */
+%LET _libref_path_ = '{$this->libref_path}';
+%LET _libref_ = {$this->libref};
+%LET _dslabel_ = 'Generated from REDCap project #{$this->project_id} by YES3 Datamart SASCoder on {$timestamp}';
+/*
+    record and error counters
+*/
+%LET _nrecords_ = 0;
+%LET _errcount_ = 0;
 
-        if ( $this->delimiter == "\t" ) {
+%LET _infile_fileref_ = ; /* will be resolved as suitable for batch or interactive */
 
-            $datastep .= "\n   INFILE '{$infile}' DELIMITER='09'x MISSOVER DSD LRECL={$this->lrecl} TERMSTR=CRLF FIRSTOBS=2;\n"; // use hex for tab
-        }
-        else {
+LIBNAME {$this->libref} '{$this->libref_path}';
 
-            $datastep .= "\n   INFILE '{$infile}' DELIMITER=',' MISSOVER DSD LRECL={$this->lrecl} TERMSTR=CRLF FIRSTOBS=2;\n"; 
-        }
+SASHEADER;
 
+        $header .= $this->getMacroLibCode();
+
+        $datastep_start = $this->getDataStepStartCode();
+
+        $datastep_end = $this->getDataStepEndCode();
+
+        $post_datastep_code = $this->getPostDataStepCode();
+
+        /**
+         * iterate over the data dictionary and generate the ATTRIB code and the list of variables for INPUT
+         */
         $attrib = "\n   ATTRIB\n";
 
         $record_var_name = $this->dd[0]['var_name'];
@@ -320,19 +526,11 @@ class Yes3SasCoder {
                 $attrib .= "          /* source REDCap field = [{$redcap_field_name}] */\n";
             }
 
-            if ($sas_format_name) {
-            //    $attrib .= "          /* FORMAT = {$sas_format_name}. */\n";
-            }
-
             if ( $varnum % 4 == 0 ) {
                 $input .= "\n      ";
             }
 
             $input .= "{$var_name}";
-
-            //if ( $informat ) {
-            //    $input .= " {$informat}";
-            //}
 
             $input .= " ";
 
@@ -340,9 +538,15 @@ class Yes3SasCoder {
 
         $attrib .= "   ;\n";
 
-        $input .= "\n   ;\n";
+        $input .= "\n      ;\n";
 
-        return $header . $datastep . $attrib . $input . "\n\nRUN;\n\n";
+        return $header 
+            . $datastep_start 
+            . $attrib 
+            . $input 
+            . $datastep_end 
+            . $post_datastep_code
+        ;
     }
 
     /**
