@@ -1290,8 +1290,14 @@ YES3.setHelpPanelProperties = function() {
 
         // make resizable
 
-        $panel.resizable({
-            handles: 's,e,se',
+        $panel
+            // place on top when dragging starts 
+            .on('dragstart', function(e) {
+                e.stopPropagation();
+                $(this).css('z-index', YES3.maxZ++);
+            })
+            .resizable({
+            handles: 's,e,w,se,sw',
             minHeight: 300,
             minWidth: 400,
             maxWidth: 1000,

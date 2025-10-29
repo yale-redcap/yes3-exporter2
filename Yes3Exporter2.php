@@ -628,8 +628,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
     private function writeSasCodeInputFile($export_name, $export_target_folder, $export_data_extension, $destination, $Sascoder)
     {
-        $infile_path = $this->exportDataFilename($export_name, $export_data_extension, SELF::DESTINATION_FILESYSTEM);
-        $code = $Sascoder->genInputCode( $infile_path );
+        $datasheet_name = $this->exportDataFilename($export_name, $export_data_extension, SELF::DESTINATION_FILESYSTEM);
+        $code = $Sascoder->genInputCode( $datasheet_name );
 
         return $this->writeCodeFile($export_name, $export_target_folder, $destination, $code, "input", "sas");
     }
