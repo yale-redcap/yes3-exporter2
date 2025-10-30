@@ -3,7 +3,7 @@
 
     "namespace": "Yale\\Yes3Exporter2",
 
-    "description": "The successor to the original YES3 Exporter launched in 2022. Key features include a 'horizontal' layout for longitudinal projects, having one column per event per field. Supports tab-delimited and comma-delimited exports. Can optionally deliver ready-to-run SAS code tuned to the specific export, and designed for interactive or batch execution.",
+    "description": "The successor to the original YES3 Exporter launched in 2022. Key features include a horizontal layout for longitudinal projects, with one column per event per field. It supports tab- or comma-delimited formats, payloads that include export-specific data dictionaries and data distribution summaries, and can generate ready-to-run SAS code tailored to each export for interactive or batch use.",
 
     "documentation": "https://yale-redcap.github.io/yes3-exporter2-docs/",
 
@@ -23,10 +23,16 @@
 
     "versions": [
         {
+            "version": "2.0.15",
+            "date": "2025-10-30",
+            "description": "FIRST DEPLOYED VERSION",
+            "comments": "README, description updated."
+        },        
+        {
             "version": "2.0.12",
             "date": "2025-10-29",
-            "description": "ready for prime time",
-            "comments": "Major SAS code generator improvements. Better z-index handling for inline help popups, triggered by dragging."
+            "description": "SASCoder improvements",
+            "comments": "Major SAS code generator improvements. SAS formats now shared across all exports. Better z-index handling for inline help popups, triggered by dragging."
         },        
         {
             "version": "2.0.11",
@@ -107,11 +113,6 @@
                 "name": "YES3 Exporter II Manager",
                 "icon": "fas fa-file-export",
                 "url":  "plugins/yes3_export_manager.php"
-            },
-            {
-                "name": "YES3 Exporter II Filesystem Test",
-                "icon": "fas fa-file-export",
-                "url":  "plugins/yes3_export_mount_test.php"
             }
         ]
     },

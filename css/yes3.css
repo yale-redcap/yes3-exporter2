@@ -1344,7 +1344,7 @@ i.yes3-selected {
     /*min-width: 360px;*/
     /*max-width: 800px;*/
     position: relative;
-    border-radius: 0;
+    border-radius: 8px;
     box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
     -webkit-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);
     -moz-box-shadow: 0 0 6px 1px rgba(100, 100, 100, 1.0);

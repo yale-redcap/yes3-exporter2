@@ -585,6 +585,7 @@ SASHEADER;
         foreach ($this->dd as $row) {
 
             $hasValueset = isset($row['valueset']) && is_string($row['valueset']) && trim($row['valueset']) !== '' && $row['var_type'] != 'CHECKBOX';
+            $valueset_id = $row['valueset_id'] ?? 0;
             
             $fmt_name = "";
 
@@ -612,7 +613,8 @@ SASHEADER;
 
                 $sas_var_type = $this->setSasVarTypeForNominals($valueset);  // NUM or CHAR
 
-                $fmt_name = $this->formatName( count($this->valuesets), $sas_var_type );
+                //$fmt_name = $this->formatName( count($this->valuesets), $sas_var_type );
+                $fmt_name = $this->formatName2( $valueset_id, $sas_var_type );
 
                 $valuesetJSON = $row['valueset'];
 
@@ -691,7 +693,7 @@ SASHEADER;
                     continue; // skip empty values
                 }
 
-                $value = $vsTuple['value'] ?? '';
+                $value = trim($vsTuple['value'] ?? '');
 
                 $label = Yes3Fn::sanitizeForText(
                     $vsTuple['label'] ?? '', 
@@ -799,6 +801,21 @@ SASHEADER;
         }
 
         return $fmtname_base . $suffix;
+    }
+
+    // name based on valueset registry
+    private function formatName2( $valueset_id, $sas_var_type ) {
+
+        // Generate a format name based on the valueset ID
+        // SAS format names begin and end with a letter or underscore, can contain letters, numbers, and underscores,
+        // and can be up to 32 characters long.
+        $fmtname = "fmt_" . str_pad($valueset_id, 6, '0', STR_PAD_LEFT) ."f";
+
+        if ( $sas_var_type == "CHAR" ) {
+            $fmtname = '$' . $fmtname; // prefix with $ for character formats
+        }
+
+        return $fmtname;
     }
 
     private function setSasVarTypeForNominals( $vs, &$sas_var_type=NULL, &$sas_var_length=NULL ) {
