@@ -13,6 +13,7 @@ require "Yes3Trait.php";
 require "Yes3Export.php";
 require "Yes3ExportItem.php";
 require "Yes3SasCoder.php";
+require "Yes3ValueSetIndexer.php";
 require "Yes3ExportValidator.php";
 require "Yes3Fn.php"; // factory functions and constants
 
@@ -40,6 +41,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
     const LOG_MESSAGE_DATA_DOWNLOADED = "export data downloaded";
     const LOG_MESSAGE_ZIP_DOWNLOADED = "export zip downloaded";
     const LOG_MESSAGE_LEGACY_TRANSFERRED = "legacy exporter environment transferred";
+
+    const LOG_MESSAGE_VSET_INDEX = "value set index";
 
     const DESTINATION_DOWNLOAD = "download";
     const DESTINATION_FILESYSTEM = "filesystem";
@@ -450,6 +453,20 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         foreach( $export->export_items as $export_item ){
 
+            $valueset = ( $export_item->valueset ) ? json_encode($export_item->valueset) : "";
+
+            if ( $valueset ) {
+                /*
+                    set and/or get the valueset registry id
+                    this approach ensures that identical value sets get the same id, across all exports
+                    n.b. the SASCoder relies on this id for format naming to build format catalogs
+                */
+                $valueset_id = $this->valueSetIndex( $valueset );
+            }
+            else {
+                $valueset_id = 0;
+            }
+
             $dd[] = [
                 'var_name' => $export_item->var_name,
                 'var_label' => $this->truncate( $export_item->var_label, $export->export_max_label_length ),
@@ -476,7 +493,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 'formatted_mean' => $export_item->formatted_mean,
                 'frequency_table' => $export_item->frequency_table,
                 'repeatable' => $export_item->repeatable,
-                'hashed' => $export_item->hashed
+                'hashed' => $export_item->hashed,
+                'valueset_id' => $valueset_id
             ];
         }
 
@@ -3448,7 +3466,7 @@ WHERE ea.project_id=? and ef.form_name=?
         return $this->fetchRecords($sql, $params);
     }
 
-    private function getFieldMetadata($field_name)
+    public function getFieldMetadata($field_name)
     {
         $sql = "
         SELECT m.field_order, m.form_name, m.field_name, m.element_type, m.element_label, m.element_enum, m.element_validation_type, m.field_phi
@@ -4465,17 +4483,123 @@ WHERE ea.project_id=? and ef.form_name=?
         }
     }
 
+    /*
+        === VALUE SET MANAGEMENT ===
+    */
+
+    /**
+     * returns a default value set (element_enum) for a given field type (yesno, truefalse)
+     */
+    public function getValueSetForFieldType( $element_type )
+    {
+        switch ( strtolower($element_type) ) {
+        case "yesno":
+            return '1, Yes\n0, No';
+        case "truefalse":
+            return '1, True\n0, False';
+       default:
+            return null;
+        }
+    }
+
+    /**
+     * Indexes a value set (element_enum) if it is not already indexed.
+     * Returns the new or existing value set id (log_id).
+     */
+    public function valueSetIndex( $element_enum )
+    {
+        if ( !$element_enum ){
+
+            return null;
+        }
+
+        $element_enum = trim( $element_enum );
+        
+        // first see if this element_enum is already indexed
+        $vset_id = $this->getValuesetId( $element_enum );
+
+        if ( $vset_id ){
+
+            return $vset_id;
+        }
+        
+        $params = [
+            'vset_timestamp' => date("Y-m-d H:i:s"),
+            'element_enum' => $element_enum
+        ];
+
+        $log_id = $this->log( self::LOG_MESSAGE_VSET_INDEX, $params );
+
+        if ( !$log_id ) {
+
+            return null;
+        }
+
+        return $log_id;
+    }
+
+    public function getValuesetId( $element_enum )
+    {
+        if ( !$element_enum ){
+
+            return null;
+        }
+
+        $element_enum = trim( $element_enum);
+
+        $sql = "
+SELECT emlp.log_id
+FROM redcap_external_modules_log_parameters emlp
+   INNER JOIN redcap_external_modules_log eml ON emlp.log_id = eml.log_id
+WHERE eml.project_id = ? 
+   AND eml.message = ? 
+   AND emlp.name = 'element_enum' 
+   AND emlp.value = ?
+        ";
+
+        return Yes3Fn::fetchValue($sql, [ $this->getProjectId(), self::LOG_MESSAGE_VSET_INDEX, $element_enum ]);
+    }
+
+    public function getValueSetIdForField( $field_name )
+    {
+        if ( !$field_name ){
+
+            return null;
+        }
+
+        $field_metadata = $this->getFieldMetadata( $field_name )[0] ?? null;
+
+        if ( !$field_metadata ){
+
+            return null;
+        }
+
+        // rejact calculated fields
+        if ( $field_metadata['element_type'] === "calc" ){
+
+            return null;
+        }
+
+        $element_enum = $field_metadata['element_enum'] ?? null;
+
+        if ( !$element_enum ){
+
+            $element_enum = $this->getValueSetForFieldType( $field_metadata['element_type'] );
+        }
+
+        if ( !$element_enum ){
+
+            return null;
+        }
+
+        return $this->valueSetIndex( $element_enum );
+    }
+
     /* 
       ==== IMPORT EXPORTER I EM PROJECT SETTINGS AND EXPORT SPECIFICATIONS ==== 
 
       All export specifications are stored as EM logs
-    
-    
-    
     */
-
-
-
     public function transferLegacyEnvironment() {
 
         $tx1 = $this->transferLegacySettings();
