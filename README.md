@@ -1,57 +1,35 @@
-![codeql workflow](https://github.com/yale-redcap/yes3-exporter/actions/workflows/codeql-javascript.yml/badge.svg)
-![sonarcloud workflow](https://github.com/yale-redcap/yes3-exporter/actions/workflows/sonarcloud.yml/badge.svg)
+# YES3 Exporter II README
 
-# YES3 Exporter README
+Version 2.0.15, October 2025
 
-Version 1.1.0, July 2024
+> YES3 Exporter II is documented here: https://yale-redcap.github.io/yes3-exporter2-docs/
 
-The YES3 Exporter complements REDCap's reports and data export tool by adding functionality to support integration with statistical software and datamarts, including host file system exports.
+The YES3 Exporter II complements REDCap's reports and data export tool by adding functionality to support integration with statistical software and datamarts.
 
-Major features include flexible layouts (horizontal, vertical, repeating forms), good performance on very large exports, and export-specific data dictionaries that can be packaged with data exports.  Other helpful built-in features include detailed audit reports, metadata and data distributions within the data dictionary, and the ability to roll back export specifications.
+Perhaps the most important feature is support for "horizontal layouts", that is exported datasheets for which there is one column per event-field combination. 
 
-## Important note about documentation
+Other features include:
 
-Comprehensive YES3 Exporter documentation is available online at [https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/). 
+- An expanded documentation model: our goal is to put all the information you need to operate Exporter II into the User Interface (UI). Documentation tools include:
+    - Dynamic tooltips on every interactive UI element (buttons, textboxes etc).
+    - Detailed topic-specific popups that can remain open and be resized and moved around as you work.
+    - Exhaustive online technical documentation,
+- Support for comma-delimited (csv) or tab-delimited (tsv) export datasheets.
+- Options for coding and conditioning data values:
+    - Remove PHI, freetext and/or date fields from the export, similar to REDCap's reporting options.
+    - REDCap-compatible date shifting and record hashing (validated as of REDCap v15.5).
+    - Convert to pure ASCII.
+    - Drop non-printable characters (newlines and tabs are converted to spaces).
+- Export-specific data dictionaries (csv files) that include data distribution summaries for each exported column. Depending on the field type, the summary will include:
+     - Univariate calculations: n, mean, min, max, mean, sample standard deviation, sum of values, sum of squared values. 
+     - For date and date/time fields, formatted mean, min and max are also provided.
+     - Frequency table (JSON structure; nominal fields only).
+     - Maximum observed string length (for text fields). This is intended for optimizing analysis files (SAS, R, SPSS etc),
+- The ability to organize export items by form and/or event
+- Rigorous auditing of every export, optionally with daily summaries mailed to a designated user
+- The ability to roll back an export specification to any previous version 
+- The export payload can include execution-ready SAS code to build datasets and format libraries. The code is optimized for the specific export. For example, character variable lengths are tuned to the observed max lengths in the export, potentially saving significant storage space. The dataset-building program will not replace an existing dataset if any error is encountered.
 
-The following documents are available:
+## YES3 Exporter II vs the original YES3 Exporter
 
-- [What's New](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/whats_new.html)
-- [Overview](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/introduction.html)
-- [User Guide](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/userguide.html)
-- [Technical Guide](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/technical.html)
-- [Change Log](https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/changelog.html)
-
-## Contact
-
-Please send any bug reports or feature suggestions to the contact email address below. We welcome comments, criticisms, suggestions and, of course, positive feedback!
-
-contact email: redcap@yale.edu 
-
-## About YES3
-
-Our vision for the Yale Study Support Suite (YES3) is to provide an ‘off-the-shelf’ suite of external modules within REDCap that features popular, high-utility software tools to meet a wide variety of epidemiological and clinical research needs.
-
-## Authors
-
-### EM Developer
-
--   Peter Charpentier, Yale University (retired) and CRI Web Tools LLC
-
-### Contributors
-
-**REDCap@Yale Team:**
--   Katy Araujo, Yale University
--   Brian Funaro, Yale University
--   Mary Geda, Yale University
--   Baylah Tessier-Sherman, Yale University
--   Janet Truebig, Yale University
--   Sui Tsang, Yale University
-
-## Funding
-
--   To support our work and ensure future opportunities for development, please acknowledge the software and funding.
--   The **YES3 Exporter** was funded by Yale’s Claude D. Pepper Older Americans Independence Center (OAIC) grant through a Development Project Award for the Operations Core, **3P30AG021342**.
-
-## Copyright
-
-Copyright © 2024 by Yale University
+YES3 Exporter II and the original YES3 Exporter are different EMs. You can have both enabled at the same time. We did not want to force you to immediately upgrade to Exporter II if you already had a major workflow investment in the original, but you should migrate from the original YES3 Exporter to YES3 Exporter II as time permits (it's easy, see below). We will not be supporting the original YES3 Exporter going forward.

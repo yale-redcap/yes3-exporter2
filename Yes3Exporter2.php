@@ -4880,6 +4880,9 @@ WHERE ea.project_id=? and ef.form_name=?
                         const btn    = e.originalEvent.submitter;  // <- jQuery wraps, so use .originalEvent
                         const action = btn.getAttribute('action');
 
+                        $form.find('button').remove(); // prevent multiple submissions
+                        $form.append($('<div>').text('Processing... Please wait.'));
+
                         module.ajax(action, {}).then(function(response) {
 
                             $form.remove();

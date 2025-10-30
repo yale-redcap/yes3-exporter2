@@ -3,7 +3,7 @@
 
     "namespace": "Yale\\Yes3Exporter2",
 
-    "description": "Specialized data export module for datamart integrations. Key features include a 'horizontal' layout for longitudinal projects, having one column per event per field. Supports exports to the host file system, intended for bind mounts mapped to external fileshares. This release requires REDCap version 13.7.3 or above. See the change log at https://yale-redcap.github.io/yes3-exporter-documentation/v1.0/changelog.html for important release notes.",
+    "description": "The successor to the original YES3 Exporter launched in 2022. Key features include a 'horizontal' layout for longitudinal projects, having one column per event per field. Supports tab-delimited and comma-delimited exports. Can optionally deliver ready-to-run SAS code tuned to the specific export, and designed for interactive or batch execution.",
 
     "documentation": "https://yale-redcap.github.io/yes3-exporter2-docs/",
 
@@ -16,15 +16,22 @@
             "name": "Peter Charpentier",
             "email": "redcap@yale.edu",
             "role": "developer",
+            "company": "FCRI Web Tools LLC",
             "institution": "Yale University"
         }
     ],
 
     "versions": [
         {
+            "version": "2.0.12",
+            "date": "2025-10-29",
+            "description": "ready for prime time",
+            "comments": "Major SAS code generator improvements. Better z-index handling for inline help popups, triggered by dragging."
+        },        
+        {
             "version": "2.0.11",
             "date": "2025-10-25",
-            "description": "ready for prime time",
+            "description": "still fine tuning",
             "comments": "Pending last-minute review..."
         },        
         {
