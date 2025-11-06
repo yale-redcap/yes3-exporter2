@@ -13,7 +13,6 @@ require "Yes3Trait.php";
 require "Yes3Export.php";
 require "Yes3ExportItem.php";
 require "Yes3SasCoder.php";
-require "Yes3ValueSetIndexer.php";
 require "Yes3ExportValidator.php";
 require "Yes3Fn.php"; // factory functions and constants
 

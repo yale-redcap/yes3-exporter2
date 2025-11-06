@@ -594,7 +594,9 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
                 <td class="propvalue"><span name='export_code_filename_base'>[export name]</span>_create_formats.sas</td>
                 <td>
                     A SAS code file that will create (or update) a permanent SAS format library containing PROC FORMAT code for all fields having choice sets (radio buttons, dropdown menus).
-                    One format is defined for each unique choice set among the fields in the Export specification.
+                    One format is defined for each unique value set among fields across the project.
+                    Refer to the <a href="https://yale-redcap.github.io/yes3-exporter2-docs/guides/technical-guide/#how-sas-formats-are-managed" target="_blank">YES3 Exporter II online documentation</a> 
+                    for details on how SAS formats are managed.
                 </td>
             </tr>
             <tr>
@@ -636,6 +638,14 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
             The generated SAS code uses the observed maximum lengths of REDCap field values to define the lengths of SAS character variables.
             In this way, the generated code will not truncate any data and the SAS dataset will be as compact as possible.
             We recommend that you regenerate and execute the updated SAS code each time you export data, as the maximum value lengths may change over time as you add or modify REDCap data.
+        </p>
+
+        <h6> SAS variable names </h6>
+        <p>
+            The generated SAS code uses SAS variable names based on the corresponding REDCap field names,
+            and modifies them as needed to ensure that they conform to SAS variable naming conventions. 
+            Refer to the <a href="https://yale-redcap.github.io/yes3-exporter2-docs/guides/technical-guide/#sas-variable-names" target="_blank">YES3 Exporter II online documentation</a> 
+            for details on how SAS variable names are derived.
         </p>
 
         <blockquote>
