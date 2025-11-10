@@ -161,7 +161,29 @@ String.prototype.isValidFilename = function()
     ;
 };  
 
-YES3.Functions.Open_docPage = function(){
+YES3.Functions.Open_docPage = function( topic ){
+
+    console.log("Open_docPage", topic );
+
+    topic = topic || "";
+
+    var url = YES3.documentationUrl;
+        
+    if ( topic && topic.length > 0 ) {
+        // Trim whitespace and normalize slashes
+        topic = topic.trim().replace(/^\/+|\/+$/g, "");
+
+        // Disallow anything that looks like a URL, absolute path, or traversal
+        if (/^https?:\/\//i.test(topic) || topic.includes("..")) {
+
+            console.error("Invalid Documentation topic parameter");
+        }
+        else {
+
+            // Construct the full URL safely
+            url = new URL(topic + "/", YES3.documentationUrl).toString();
+        }
+    }
 
     // adopt the same dims as the browser window, but max 1300x800
     const w = Math.min(window.innerWidth, 1300);
@@ -169,7 +191,7 @@ YES3.Functions.Open_docPage = function(){
 
     // attempt to open the documentation page in a new window
     const newWindow = window.open(
-        YES3.documentationUrl,
+        url,
         "Yes3DocPage",
         `height=${h},width=${w},left=10,top=10`
     );
@@ -624,14 +646,16 @@ YES3.setActionIconListeners = function( $parentElement )
     
     const $actionIcons = $parentElement.find("i.yes3-action-icon:not(.yes3-action-disabled):not(.yes3-nohandler)");
 
-    //console.log("YES3.setActionIconListeners: n=", $actionIcons.length, $parentElement);
+    console.log("YES3.setActionIconListeners: n=", $actionIcons.length, $parentElement);
 
     $actionIcons.off().on("click", function(){
 
         let action = $(this).attr("action");
 
+        let actionParam = $(this).attr("action-param") || ""
+
         if ( typeof YES3.Functions[action] === "function" ) {
-            YES3.Functions[action].call(this); // icon DOM element is passed as 'this' to the function, in case it would be useful
+            YES3.Functions[action].call(this, actionParam); // icon DOM element is passed as 'this' to the function, in case it would be useful
         }
         else {
             YES3.hello(`No can do: the feature 'YES3.Functions.${action}' has not been implemented yet.`);

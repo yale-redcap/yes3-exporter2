@@ -224,6 +224,11 @@ tr.yes3-fmapr-data-element.yes3-unsaved td.yes3-fmapr-row-number::before {
     content: "*";
 }
 
+tr.yes3-repeating td.yes3-fmapr-redcap-object-type {
+    font-weight:700 !important;
+}
+
+
 /**
  * all this to determine the color of the export item row label
  */

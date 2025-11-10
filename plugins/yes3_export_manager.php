@@ -256,7 +256,7 @@ $module->getCodeFor("yes3_export_manager", true);
 
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Help_openPanel" data-bs-toggle="tooltip" title="Open a navigation help panel."></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Open_docPage" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" action="Open_docPage" action-param="user-reference/export-manager" data-bs-toggle="tooltip" title="Open the YES3 Exporter2 online documentation."></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only yes3-tooltip-static" action="Theme_dark" data-bs-toggle="tooltip" title="Give in to the dark side (dark theme)."></i>
             <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only yes3-tooltip-static" action="Theme_light" data-bs-toggle="tooltip" title="Switch to the light theme."></i>
