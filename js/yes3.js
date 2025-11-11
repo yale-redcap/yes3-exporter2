@@ -104,9 +104,16 @@ String.prototype.isValidFilename = function()
 
     return reMultiple.test(this);
 }
-  
- // formats date as mm-dd-yyyy
- Date.prototype.mdy = function() {
+
+String.prototype.nameCase = function() {
+    return this
+    .toLowerCase()
+    .replace(/\b[a-z]/g, char => char.toUpperCase())
+    .trim(); 
+};
+
+// formats date as mm-dd-yyyy
+Date.prototype.mdy = function() {
     var mm = this.getMonth() + 1; // getMonth() is zero-based(!)
     var dd = this.getDate();
     return [
