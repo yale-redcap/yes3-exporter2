@@ -508,6 +508,9 @@ SASHEADER;
             elseif ( $dd_var_type == 'INTEGER' ) {
                 $length = strval($this->SASVarLenForNumeric( $row['max_value'] ));
             }
+            elseif ( $dd_var_type == 'FLOAT' ) {
+                $length = strval($this->SASVarLenForNumeric( $row['max_value'] ));
+            }
 
             $attrib .= "      " . $var_name . "\n";
             $attrib .= "          LENGTH = {$length}\n";
