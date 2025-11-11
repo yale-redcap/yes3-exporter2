@@ -440,7 +440,7 @@ SASHEADER;
                 $this->ascii, // whether to generate ASCII labels
             );
             $dd_var_type = $row['var_type'];
-            $dd_max_len = (int) $row['max_length']; 
+            $dd_max_len = intval($row['max_length']);
 
             if ( $var_name == $record_var_name ) {
 
@@ -505,6 +505,9 @@ SASHEADER;
                 $format = "DATETIME19.";
                 $informat = "ANYDTDTM.";
             }
+            elseif ( $dd_var_type == 'INTEGER' ) {
+                $length = strval($this->SASVarLenForNumeric( $row['max_value'] ));
+            }
 
             $attrib .= "      " . $var_name . "\n";
             $attrib .= "          LENGTH = {$length}\n";
@@ -547,6 +550,30 @@ SASHEADER;
             . $datastep_end 
             . $post_datastep_code
         ;
+    }
+
+    private function SASVarLenForNumeric( $max_value ) {
+
+        $max_abs_value = abs(intval($max_value));
+
+        if ( $max_abs_value <= 8192 ) {
+            return 3;
+        }
+        elseif ( $max_abs_value <= 2097152 ) {
+            return 4;
+        }
+        elseif ( $max_abs_value <= 536870912 ) {
+            return 5;
+        }
+        elseif ( $max_abs_value <= 137438953472 ) {
+            return 6;
+        }
+        elseif ( $max_abs_value <= 35184372088832 ) {
+            return 7;
+        }
+        else {
+            return 8;
+        }
     }
 
     /**

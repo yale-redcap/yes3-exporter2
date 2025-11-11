@@ -916,7 +916,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display navigation help for this page."></i>
 
-            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Open_docPage" title="Open the YES3 Exporter2 online documentation"></i>
+            <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Open_docPage" action-param="user-reference/export-editor" title="Open the YES3 Exporter2 online documentation"></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" data-bs-toggle="tooltip" action="Theme_dark" title="Switch to the dark side"></i>
             <i class="fas fa-sun yes3-action-icon yes3-action-icon-controlpanel yes3-dark-theme-only" data-bs-toggle="tooltip" action="Theme_light" title="Switch to the sunny side"></i>

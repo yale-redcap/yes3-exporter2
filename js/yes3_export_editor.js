@@ -266,7 +266,7 @@ FMAPR.tooltipSpecs = [
     { selector: "input[name=export_sascode]+span", opts: { placement: 'top' }, html: "If checked, executable SAS code will be included in full export payloads, either downloaded or written to the host file system.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
     { selector: "input[name=export_sascode_ascii]+span", opts: { placement: 'top' }, html: "If checked, executable SAS code will use ASCII encoding for variable and format labels.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
     { selector: "input[name=export_sascode_libref]", opts: { placement: 'right' }, html: "Enter the library reference name for the exported SAS code. This is a 1-8 character string that typically stands in for the project name.<br><br>Example 'lvbtr'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
-    { selector: "input[name=export_sascode_libref_path]", opts: { placement: 'right' }, html: "Enter the full path for the exported SAS dataset and format library. This is a file location that must exist for the code to run.<br><br>Example: 'C:\Users\criwebtools\livebetter\sascode'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
+    { selector: "input[name=export_sascode_libref_path]", opts: { placement: 'right' }, html: "Enter the full path for the exported SAS dataset and format library. This is a file location that must exist for the code to run.<br><br>Example: 'C:&#92;Users&#92;criwebtools&#92;livebetter&#92;sasdata'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
     { selector: "input[name=export_sascode_dsname]", opts: { placement: 'right' }, html: "Enter the name for the SAS dataset to be created by this export. <br><br>Example: 'patient_screen'.<br /><br />Click the <i class='far fa-question-circle'></i> icon next to <strong>Options for SAS code generation</strong> for more information." },
 
 ];
@@ -734,6 +734,39 @@ YES3.Functions.editExportItem = function()
     FMAPR.editNewExportItem();
 }
 
+FMAPR.injectREDCapObjectHtmlV2 = function(theRowBeforeWhich, yes3_fmapr_data_element_name, html)
+{
+    let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
+
+    if ( YES3.isEmpty( theRowBeforeWhich ) ){
+        theRowBeforeWhich = null; //FMAPR.getExportRapidEntryEditor();
+    }
+    mode = ( YES3.isEmpty(theRowBeforeWhich) ) ? "append" : "insert";
+
+    if ( mode==="insert" ){
+        $( html ).insertBefore( theRowBeforeWhich );
+    }
+    else {
+        $fmaprBody.append( html );
+    }
+
+    let elementRow = $(`tr.yes3-fmapr-data-element[data-yes3_fmapr_data_element_name='${yes3_fmapr_data_element_name}']`);
+
+    FMAPR.setRowSelectorListenerV2( elementRow );
+
+    FMAPR.setRepeatLayoutConstraints();
+
+    return yes3_fmapr_data_element_name;
+}
+
+FMAPR.setObjectInsertMode = function( theRowBeforeWhich )
+{
+    if ( typeof theRowBeforeWhich === "object" && theRowBeforeWhich.length > 0 ) {
+        return "insert"
+    };
+    return "append";
+}
+
 FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
 {   
    
@@ -797,6 +830,7 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
 
     if ( form_name == ALL_OF_THEM ){
 
+        form_label = "All Forms";
         object_repeating_class = "";
         object_repeating_class_title = "All forms are selected";
     } 
@@ -820,17 +854,32 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
 
     let rowId = FMAPR.dataElementRowId(yes3_fmapr_data_element_name);
 
-    let field_count = (form_name===ALL_OF_THEM) ? FMAPR.project.field_metadata.length : FMAPR.project.form_metadata[form_index].form_fields.length;
+    //let field_count = (form_name===ALL_OF_THEM) ? FMAPR.project.field_metadata.length : FMAPR.project.form_metadata[form_index].form_fields.length;
 
+    // row HTML begin
     let html = `<tr class='yes3-fmapr-redcap-form yes3-fmapr-data-element ${object_repeating_class} yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap form" id="${rowId}" data-element_origin="redcap" data-object_type="form" data-object_name="${form_name}" data-object_event="${event}">`;
+
+    // row selector cell
     html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+
+    // object type cell
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
+
+    // event cell (for longitudinal projects)
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="Form name: <strong>${form_name}</strong><br>Form label: ${form_label}<br>${object_repeating_class_title}">${form_label}</td>`;
+
+    // form (object name) cell
+    html += `<td class='yes3-fmapr-redcap-object-name yes3-fmapr-redcap-form-name yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title="Form name: <strong>${form_name}</strong><br>Form label: ${form_label}<br>${object_repeating_class_title}">${form_label}</td>`;
+
+    // field name ('ALL FIELDS' for forms) cell
+    html += `<td class='yes3-fmapr-redcap-field-name yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title="form: <strong>${form_label}</strong><br>field: <strong>all fields</strong><br>${object_repeating_class_title}">All Fields</td>`;
+
+    // trashcan cell
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'></i></td>`;
+
+    // row HTML end
     html += "</tr>";
 
     if ( batch ){
@@ -839,39 +888,6 @@ FMAPR.exportItemFormHtml = function( form_name, event, theRowBeforeWhich, yes3_f
     }
 
     return FMAPR.injectREDCapObjectHtmlV2(theRowBeforeWhich, yes3_fmapr_data_element_name, html);
-}
-
-FMAPR.injectREDCapObjectHtmlV2 = function(theRowBeforeWhich, yes3_fmapr_data_element_name, html)
-{
-    let $fmaprBody = $('table.yes3-fmapr-specification').first().find('tbody');
-
-    if ( YES3.isEmpty( theRowBeforeWhich ) ){
-        theRowBeforeWhich = null; //FMAPR.getExportRapidEntryEditor();
-    }
-    mode = ( YES3.isEmpty(theRowBeforeWhich) ) ? "append" : "insert";
-
-    if ( mode==="insert" ){
-        $( html ).insertBefore( theRowBeforeWhich );
-    }
-    else {
-        $fmaprBody.append( html );
-    }
-
-    let elementRow = $(`tr.yes3-fmapr-data-element[data-yes3_fmapr_data_element_name='${yes3_fmapr_data_element_name}']`);
-
-    FMAPR.setRowSelectorListenerV2( elementRow );
-
-    FMAPR.setRepeatLayoutConstraints();
-
-    return yes3_fmapr_data_element_name;
-}
-
-FMAPR.setObjectInsertMode = function( theRowBeforeWhich )
-{
-    if ( typeof theRowBeforeWhich === "object" && theRowBeforeWhich.length > 0 ) {
-        return "insert"
-    };
-    return "append";
 }
 
 FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3_fmapr_data_element_name, mode, unsaved, batch )
@@ -940,15 +956,30 @@ FMAPR.exportItemFieldHtml = function( field_name, event, theRowBeforeWhich, yes3
 
     let rowId = FMAPR.dataElementRowId(yes3_fmapr_data_element_name);
 
+    // row HTML begin
     let html = `<tr class='yes3-fmapr-redcap-field ${object_repeating_class} yes3-fmapr-data-element yes3-fmapr-sortable ${unsavedClass}' data-yes3_fmapr_data_element_name="${yes3_fmapr_data_element_name}" data-yes3_fmapr_data_element_description="REDCap field" id="${rowId}" data-element_origin="redcap" data-object_type="field" data-object_name="${field_name}" data-object_event="${event}">`;
+
+    // row selector cell
     html += `<td class='yes3-fmapr-row-number yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_selector}'>&nbsp;</td>`;
-    //html += `<td class='yes3-fmapr-redcap-object-editor yes3-bs-tooltip-placement-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_editor}'><i class='far fa-edit yes3-fmapr-item-editor' onclick='FMAPR.editExistingExportItem("${yes3_fmapr_data_element_name}");'></i></td>`;
+
+    // object type cell
     html += `<td class='yes3-fmapr-redcap-object-type' data-bs-toggle='tooltip' data-bs-html='true' title='${object_repeating_class_title}'>${object_type}</td>`;
+
+    // event cell (for longitudinal projects)
     if ( FMAPR.project.is_longitudinal ){
-        html += `<td class='yes3-fmapr-redcap-object-event' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
+        html += `<td class='yes3-fmapr-redcap-object-event yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.exportItemRowEventTooltip(event)}'>${FMAPR.exportItemRowEventLabel(event)}</td>`;
     }
-    html += `<td class='yes3-fmapr-redcap-object-name' data-bs-toggle='tooltip' data-bs-html='true' title="form: <strong>${form_label}</strong><br>field: <strong>${field_name}</strong><br>label: ${field_label}<br>${object_repeating_class_title}">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
+
+    // form name cell
+    html += `<td class='yes3-fmapr-redcap-form-name yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title="Form name: <strong>${form_name}</strong><br>Form label: ${form_label}<br>${object_repeating_class_title}">${form_label}</td>`;
+
+    // object (field) name cell
+    html += `<td class='yes3-fmapr-redcap-object-name yes3-fmapr-redcap-field-name yes3-fmapr-item-prop' data-bs-toggle='tooltip' data-bs-html='true' title="form: <strong>${form_label}</strong><br>field: <strong>${field_name}</strong><br>label: ${field_label}<br>${object_repeating_class_title}">${field_name}<span class='yes3-fmapr-field-label'> - ${field_label}</span></td>`;
+
+    // trashcan cell
     html += `<td class='yes3-gutter-right-top yes3-td-right yes3-fmapr-trashcan yes3-bs-tooltip-placement-left yes3-bs-tooltip-right' data-bs-toggle='tooltip' data-bs-html='true' title='${FMAPR.tooltips.row_trashcan}'><i class='far fa-trash-alt' onclick='FMAPR.removeDataElement("${yes3_fmapr_data_element_name}");'></i></td>`;
+
+    // row HTML end
     html += "</tr>";
 
     if ( batch ){
@@ -1148,8 +1179,14 @@ FMAPR.setNewItemOptionsObjectNameContent = function(){
     let objectEvent = $objectEvent.val();
 
     if ( !objectEvent || objectEvent==="") {
-        objectEvent = ALL_OF_THEM;
-        $objectEvent.val(objectEvent);
+        if ( FMAPR.project.is_longitudinal ){
+
+            return false;
+        }
+        else {
+            objectEvent = ALL_OF_THEM;
+            $objectEvent.val(objectEvent);
+        }
     }
 
     if ( objectType==="field" ){
@@ -1170,11 +1207,11 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
     $("input[type=radio][name=new_object_type]")
         .off()
         .on("change", function(){
-
+            /*
             const objectType =$("input[type=radio][name=new_object_type]:checked").val();
             const $formSelect = $("select#yes3-fmapr-rapidentry-form_name");
             const $fieldInput = $("input#yes3-fmapr-rapidentry-field_name");
-
+            
             if ( objectType==="field" ){
                 
                 $formSelect.hide();
@@ -1184,7 +1221,8 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
                 $fieldInput.hide();
                 $formSelect.show();
             }
-
+            */
+            FMAPR.rapidEntrySkipper();
             FMAPR.setNewItemOptionsObjectNameContent();
         }
     );
@@ -1193,6 +1231,7 @@ FMAPR.setNewItemOptionsSingletonListeners = function()
         .off()
         .on("change", function(){
 
+            FMAPR.rapidEntrySkipper();
             FMAPR.setNewItemOptionsObjectNameContent();
         }
     );
@@ -1522,11 +1561,11 @@ FMAPR.setNewItemOptionsSingletonListeners_deprecated = function()
 FMAPR.rapidEntrySkipper = function(){
 
     const objectType =$("input[type=radio][name=new_object_type]:checked").val();
- 
-    const $fieldName = $("input#yes3-fmapr-rapidentry-field_name");
-    const $formName = $("select#yes3-fmapr-rapidentry-form_name");
 
-    const objectName = ( objectType==="field" ) ? $fieldName.val() : $formName.val();
+    const $formSelect = $("select#yes3-fmapr-rapidentry-form_name");
+    const $fieldInput = $("input#yes3-fmapr-rapidentry-field_name");
+
+    const objectName = ( objectType==="field" ) ? $fieldInput.val() : $formSelect.val();
 
     const objectEvent=$("select#yes3-fmapr-rapidentry-object-event").val();
 
@@ -1536,6 +1575,30 @@ FMAPR.rapidEntrySkipper = function(){
     const $addAsFieldsButton = $("input#yes3-fmapr-rapidentry-object-add-fields");
 
     //console.warn("rapidEntrySkipper", objectType, objectName, objectEvent);
+
+    // if this is a longitudinal project, hide everything until event is selected
+    if ( FMAPR.project.is_longitudinal && !objectEvent ) {
+
+        $addAsFormsButton.hide();
+        $addAsFieldsButton.hide();
+        $addAsFormButton.hide();
+        $addAsFieldButton.hide();
+        $fieldInput.hide();
+        $formSelect.hide();
+
+        return false;
+    }
+        
+    // make sure the correct name input is shown
+    if ( objectType==="field" ){
+        
+        $formSelect.hide();
+        $fieldInput.show();
+    }
+    else {
+        $fieldInput.hide();
+        $formSelect.show();
+    }
 
     if ( !objectName || !objectType || (FMAPR.project.is_longitudinal && !objectEvent) ){
 
@@ -1749,7 +1812,7 @@ FMAPR.exportItemRowEventLabel = function(event)
 
     if ( event===ALL_OF_THEM ){
 
-        return "all events";
+        return "All Events";
     }
 
     // event may have been deleted
@@ -2292,42 +2355,27 @@ FMAPR.resizeExportItemsTable = function()
         - $fmaprFooter.outerHeight()
         //- $newItemsSection.outerHeight()
         - scrollbarWidth
+        -10 // extra padding
     ;
 
     //let tableWidth = $('div#yes3-fmapr-wrapper').width();
     const tableWidth = $fmaprTable.width();
 
     const rowNumberWidth = 40;
-    const editorLinkWidth = 30;
     const trashcanWidth = 30;
     const objectTypeWidth = 60;
-    const remainingWidth = tableWidth - scrollbarWidth - rowNumberWidth - editorLinkWidth - objectTypeWidth - trashcanWidth;
-    const objectEventNameWidth = (FMAPR.project.is_longitudinal) ? 0.4 * remainingWidth : 0;
-    const objectNameWidth = remainingWidth - objectEventNameWidth;
+    const remainingWidth = tableWidth - scrollbarWidth - rowNumberWidth - objectTypeWidth - trashcanWidth;
+    const objectPropertyWidth = (FMAPR.project.is_longitudinal) ? remainingWidth/3 : remainingWidth/2;
 
     $fmaprTableBody.css({'height': 'auto', 'max-height': bodyHeight+'px'});
 
     $fmaprWrapper.css({'height': tableWrapperHeight+'px'});
 
-    let c = 5; // the default number of columns
-
-    let thWidths = [rowNumberWidth, editorLinkWidth, objectTypeWidth];
-
     $fmaprTable.find('.yes3-fmapr-row-number').css({'width': rowNumberWidth+'px', 'min-width': rowNumberWidth+'px', 'max-width': rowNumberWidth+'px'});
-    $fmaprTable.find('.yes3-fmapr-redcap-object-editor').css({'width': editorLinkWidth+'px', 'min-width': editorLinkWidth+'px', 'max-width': editorLinkWidth+'px'});
     $fmaprTable.find('.yes3-fmapr-redcap-object-type').css({'width': objectTypeWidth+'px', 'min-width': objectTypeWidth+'px', 'max-width': objectTypeWidth+'px'});
-
-    if ( FMAPR.project.is_longitudinal ){
-        c++; // one more column for event
-        thWidths.push(objectEventNameWidth);
-        $fmaprTable.find('.yes3-fmapr-redcap-object-event').css({'width': objectEventNameWidth+'px', 'min-width': objectEventNameWidth+'px', 'max-width': objectEventNameWidth+'px'});
-    }
-
-    thWidths.push(objectNameWidth);
-    thWidths.push(trashcanWidth);
-
-    $fmaprTable.find('.yes3-fmapr-redcap-object-name').css({'width': objectNameWidth+'px', 'min-width': objectNameWidth+'px', 'max-width': objectNameWidth+'px'});
     $fmaprTable.find('.yes3-fmapr-trashcan').css({'width': trashcanWidth+'px', 'min-width': trashcanWidth+'px', 'max-width': trashcanWidth+'px'});
+
+    $fmaprTable.find('.yes3-fmapr-item-prop').css({'width': objectPropertyWidth+'px', 'min-width': objectPropertyWidth+'px', 'max-width': objectPropertyWidth+'px'});
 }
 
 FMAPR.resizeExportSettingsContainer = function(){
@@ -2354,6 +2402,7 @@ FMAPR.resizeExportSettingsContainer = function(){
         - $fmaprContainer.offset().top
         - $fmaprFooter.outerHeight()
         - scrollbarWidth  
+        - 10 // extra padding
     ;
 
     $fmaprContainer.css({'height': conHeight+'px'});
@@ -2475,7 +2524,8 @@ FMAPR.getAllEventOptionsHtml = function()
 
     if ( events.length > 1 ){
 
-        optionsHtml = `<option value="${ALL_OF_THEM}">ALL EVENTS</option>`;
+        optionsHtml = "<option value=''>-- select event --</option>" +
+            `<option value="${ALL_OF_THEM}">All Events</option>`;
     }
 
     for ( let e=0; e<events.length; e++ ){
@@ -2667,10 +2717,10 @@ FMAPR.getFormAutoCompleteSource = function(event, suppressAllForms)
     let events = [];
     let acSource = [];
 
-    let allFormsLabel = "ALL FORMS";
+    let allFormsLabel = "All Forms";
 
     if ( FMAPR.project.is_longitudinal && event !== ALL_OF_THEM ){
-        allFormsLabel = "ALL FORMS FOR EVENT";
+        allFormsLabel = "All Forms for Event";
     }
 
     for (let form_index=0; form_index<FMAPR.project.form_metadata.length; form_index++){
@@ -3036,14 +3086,16 @@ FMAPR.setNewItemModeLabel = function(){
 
     const modeClass = ( mode === "APPEND" ) ? "yes3-fmapr-mode-append" : "yes3-fmapr-mode-insert";
 
-    $newItemActionLabel.text(mode);
+    const modeName = mode.nameCase();
+
+    $newItemActionLabel.text(modeName);
 
     $newItemActionLabel.removeClass("yes3-fmapr-mode-append yes3-fmapr-mode-insert").addClass(modeClass);
 
-    $newItemAddFieldsButton.val(mode+" as individual fields");
-    $newItemAddFormsButton.val(mode+" as individual forms");
-    $newItemAddFieldButton.val(mode);
-    $newItemAddFormButton.val(mode);
+    $newItemAddFieldsButton.val(modeName+" as Fields");
+    $newItemAddFormsButton.val(modeName+" as Forms");
+    $newItemAddFieldButton.val(modeName);
+    $newItemAddFormButton.val(modeName);
 
     FMAPR.setBsToolTipsForNewItemOptions(); // a tooltip is attached to the label
 }
@@ -3361,13 +3413,14 @@ FMAPR.getExportItemRowCount = function()
 
 FMAPR.exportItemAlreadyExists = function( object_type, object_name, object_event, yes3_fmapr_data_element_name )
 {
+    const object_form_name = ( object_type === "form" ) ? object_name : FMAPR.getFormForField( object_name );
+
     let allRows = FMAPR.getExportItemRows();
 
     let this_object_event = "";
     let this_object_type = "";
     let this_object_name = "";
     let this_object_id = "";
-    let exists = false;
 
     yes3_fmapr_data_element_name = yes3_fmapr_data_element_name || "null";
 
@@ -3390,15 +3443,21 @@ FMAPR.exportItemAlreadyExists = function( object_type, object_name, object_event
                 this_object_event = ( FMAPR.project.is_longitudinal ) ? allRows.eq(i).attr("data-object_event") : "";
                 this_object_type = allRows.eq(i).attr("data-object_type");
                 this_object_name = allRows.eq(i).attr("data-object_name");
-
-                //YES3.debugMessage("---> checking", this_object_type, this_object_name, this_object_event, typeof this_object_event);
                 
+                // exact match on type, name, event
                 if ( this_object_event===object_event && this_object_name===object_name && this_object_type===object_type ){
 
                     return true;
                 }
                 
+                // match on name and type when event is "all"
                 if ( this_object_event===ALL_OF_THEM && this_object_name===object_name && this_object_type===object_type ){
+
+                    return true;
+                }
+
+                // handle adding a field object when the form object already exists
+                if ( object_type === "field" && this_object_type === "form" && this_object_name === object_form_name ){
 
                     return true;
                 }
@@ -4618,6 +4677,7 @@ FMAPR.populateExportItemsTableHead = function(){
         return html;
     }
 
+    // build the header row
     html = '<tr>';
 
     // row number column
@@ -4628,11 +4688,14 @@ FMAPR.populateExportItemsTableHead = function(){
 
     if ( FMAPR.project.is_longitudinal ){
         // event column
-        html += '<th class="yes3-fmapr-redcap-object-event yes3-text-left">Event name (hover for details)</th>';
+        html += '<th class="yes3-fmapr-redcap-object-event yes3-text-left yes3-fmapr-item-prop">Event (hover for details)</th>';
     }
 
-    // object name column
-    html += '<th class="yes3-fmapr-redcap-object-name yes3-text-left">Form or field name (hover for details)</th>';
+    // form name column
+    html += '<th class="yes3-fmapr-redcap-form-name yes3-text-left yes3-fmapr-item-prop">Form (hover for details)</th>';
+
+    // field name column
+    html += '<th class="yes3-fmapr-redcap-field-name yes3-text-left yes3-fmapr-item-prop">Field (hover for details)</th>';
 
     // trashcan column
     html += '<th class="yes3-fmapr-trashcan yes3-text-right">&nbsp;</th>';

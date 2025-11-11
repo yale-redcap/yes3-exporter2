@@ -754,9 +754,9 @@ FMAPR.openValidator = function()
  */
 FMAPR.editExport = function( log_id ){
 
-    const _MAX_WIDTH_ = 2000;
+    const _MAX_WIDTH_ = 1220;
     const _MIN_WIDTH_ = 500;
-    const _MAX_HEIGHT_ = 2000;
+    const _MAX_HEIGHT_ = 1040;
     const _MIN_HEIGHT_ = 450;
 
     FMAPR.selectRow( log_id );
