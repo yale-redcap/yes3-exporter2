@@ -376,6 +376,12 @@ FMAPR.warnIfMixedRepeating = function( allForms, allEvents ) {
     if ( nonRepeaters && ( repeating_forms || repeating_events ) ) {
 
         FMAPR.postWarningMessage("Warning! Mixed repeating and non-repeating forms and/or events.");
+
+        // allow to remove repeaters
+        if ( !allForms ) {
+
+            console.warn("mixed repeating and non-repeating forms/events: offer to clean up");
+        }
     }
     else {
 
@@ -1620,7 +1626,10 @@ FMAPR.rapidEntrySkipper = function(){
     else if ( objectType==="form" && objectName === ALL_OF_THEM ){
 
         $addAsFieldButton.hide();
-        $addAsFormButton.show();
+
+        //$addAsFormButton.show();
+        $addAsFormButton.hide();
+
         $addAsFormsButton.show();
         $addAsFieldsButton.show();
     }
@@ -3901,6 +3910,8 @@ FMAPR.contextMenuRemoveRowSelections = function()
     YES3.contextMenuClose();
 
     FMAPR.setNewItemModeLabel();
+    
+    FMAPR.warnIfMixedRepeating();
 }
 
 FMAPR.contextMenuClearRowSelections = function()

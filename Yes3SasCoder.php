@@ -439,8 +439,14 @@ SASHEADER;
                 Yes3Fn::SAS_LENGTH_MAX_LABEL,
                 $this->ascii, // whether to generate ASCII labels
             );
+
             $dd_var_type = $row['var_type'];
             $dd_max_len = intval($row['max_length']);
+
+            $dd_abs_max_value = abs(floatval($row['max_value'] ?? 0));
+            $dd_abs_min_value = abs(floatval($row['min_value'] ?? 0));
+
+            $dd_max_abs_value = max( $dd_abs_max_value, $dd_abs_min_value );
 
             if ( $var_name == $record_var_name ) {
 
@@ -506,10 +512,10 @@ SASHEADER;
                 $informat = "ANYDTDTM.";
             }
             elseif ( $dd_var_type == 'INTEGER' ) {
-                $length = strval($this->SASVarLenForNumeric( $row['max_value'] ));
+                $length = strval($this->SASVarLenForNumeric( $dd_max_abs_value ));
             }
             elseif ( $dd_var_type == 'FLOAT' ) {
-                $length = strval($this->SASVarLenForNumeric( $row['max_value'] ));
+                $length = strval($this->SASVarLenForNumeric( $dd_max_abs_value ));
             }
 
             $attrib .= "      " . $var_name . "\n";
@@ -810,33 +816,11 @@ SASHEADER;
 
         return $header . $procDatasets . $run . $quit;
     }
-
-    private function formatName( $index, $sas_var_type ) {
-
-        // Generate a format name based on the index
-        $suffix = "_" . str_pad($index, 4, '0', STR_PAD_LEFT) ."f";
-
-        $len = strlen($this->dataset_name);
-
-        if ( $len + strlen($suffix) > Yes3Fn::SAS_LENGTH_MAX_FMTNAME ) {
-
-            // if the format name is too long, truncate the dataset name
-            $fmtname_base = substr($this->dataset_name, 0, Yes3Fn::SAS_LENGTH_MAX_FMTNAME - strlen($suffix));
-        } else {
-            $fmtname_base = $this->dataset_name;
-        }
-
-        if ( $sas_var_type == "CHAR" ) {
-            $fmtname_base = '$' . $fmtname_base; // prefix with $ for character formats
-        }
-
-        return $fmtname_base . $suffix;
-    }
-
+    
     // name based on valueset registry
     private function formatName2( $valueset_id, $sas_var_type ) {
 
-        // Generate a format name based on the valueset ID
+        // Generate a format name based on the valueset ID 
         // SAS format names begin and end with a letter or underscore, can contain letters, numbers, and underscores,
         // and can be up to 32 characters long.
         $fmtname = "fmt_" . str_pad($valueset_id, 6, '0', STR_PAD_LEFT) ."f";

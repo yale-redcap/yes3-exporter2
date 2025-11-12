@@ -900,7 +900,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         <div class="yes3-flex-col-33 yes3-flex-hleft yes3-ellipsis">
 
-            <span class="yes3-fmapr-subtitle yes3-fmapr-export-name">Hang on there, friend</span>
+            <span class="yes3-fmapr-subtitle yes3-fmapr-export-name">Loading page...</span>
 
         </div>
 
@@ -943,7 +943,7 @@ $enable_host_filesystem_exports = $module->getProjectSetting('enable-host-filesy
 
         </div>
 
-        <div id="yes3-export-editor-warning" class="yes3-flex-hleft yes3-flex-col-33 yes3-warning yes3-ellipsis"></div>
+        <div id="yes3-export-editor-warning" class="yes3-flex-hleft yes3-flex-col-33 yes3-warning"></div>
 
         <div class="yes3-flex-hright yes3-flex-col-33 yes3-dashboard-title yes3-ellipsis"></div>
 

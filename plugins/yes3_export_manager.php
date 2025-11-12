@@ -388,7 +388,7 @@ $module->getCodeFor("yes3_export_manager", true);
                 </td>
             </tr>
 
-            <tr><td colspan="2">
+            <!--tr><td colspan="2">
 
                 <p class="yes3-panel-subtitle yes3-duck">July 2025 notice</p>
 
@@ -404,7 +404,7 @@ $module->getCodeFor("yes3_export_manager", true);
                     </p>
 
                 </div>
-            </td></tr>
+            </td></tr-->
 
         </table>
 

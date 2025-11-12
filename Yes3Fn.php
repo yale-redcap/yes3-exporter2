@@ -9,8 +9,8 @@ use Generator;
 use Project;
 
 use REDCap;
-
 class Yes3Fn {
+    
 
     public const DEBUG_LOG_TABLE = 'ydcclib_debug_messages';
     public const LOG_DEBUG_MESSAGES = 1; // 0 for no logging, 1 for logging
@@ -94,7 +94,6 @@ class Yes3Fn {
         
         return $escaped;
     }
-
     
     /**
      * Encodes a number in base 36 (0-9, a-z)
@@ -115,7 +114,7 @@ class Yes3Fn {
 
         return $encoded;
     }
-
+    
     public static function compactTimestamp() {
         $currentTimestamp = time();
         return self::base36Encode($currentTimestamp);
