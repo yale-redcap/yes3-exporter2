@@ -20,13 +20,12 @@ use Exception;
 use REDCap;
 use ZipArchive;
 use Project;
-use Records;
 
 class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 {
     public $sysmsg = "";
     public $errmsg = "";
-
+    
     private $project_id = 0;
     private $date_shift_max = 0;
     private $project_salt = "";
