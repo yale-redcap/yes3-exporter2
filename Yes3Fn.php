@@ -7,13 +7,14 @@ use ExternalModules\ExternalModules;
 use Exception;
 use Generator;
 use Project;
+use Random\RandomException;
+use System;
 
 use REDCap;
 class Yes3Fn {
     
-
     public const DEBUG_LOG_TABLE = 'ydcclib_debug_messages';
-    public const LOG_DEBUG_MESSAGES = 1; // 0 for no logging, 1 for logging
+    public const LOG_DEBUG_MESSAGES = 0; // 0 for no logging, 1 for logging
     
     public const YES3_MODULE_NAME = "Yes3Exporter2";
     public const YES3_MODULE_PREFIX = "yes3_exporter2";
@@ -47,54 +48,55 @@ class Yes3Fn {
     }
 
     /**
+     *  
+     * returns a standard 36-character UUIDv4 string
+     * 
+     * @return string 
+     * @throws RandomException 
+     */
+    static function UUIDv4() {
+
+        $data = random_bytes(16);
+
+        // Set version (4)
+        $data[6] = chr((ord($data[6]) & 0x0f) | 0x40);
+
+        // Set variant (RFC 4122)
+        $data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+    }
+
+    /**
      * Compacts a UUIDv4 to a 22-character base64 string (URL-safe)
      * NOTE: The output is a URL-safe base64-encoded string (not strict base64).
      *       This operation trims padding and replaces '+' and '/' with '-' and '_'.
      *       If reversal is needed, reapply the transformations: '-' → '+' and '_' → '/'.
      */
-    public static function compactUUIDv4() {
+    static function compactUUIDv4() {
+            
+        $bytes = random_bytes(16);
 
-        // Generate a UUIDv4
-        $uuid = bin2hex(random_bytes(16));
-        
-        // Convert hex UUID to binary data
-        $binaryUUID = '';
-        for ($i = 0; $i < strlen($uuid); $i += 2) {
-            $binaryUUID .= chr(hexdec($uuid[$i] . $uuid[$i + 1]));
-        }
-        
-        // Base64 encode the binary data, apply url-safe transform,  and remove padding
-        $base64UUID = rtrim(strtr(base64_encode($binaryUUID), '+/', '-_'), '=');
-        
-        return $base64UUID;
+        // Set version (4)
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+
+        // Set variant (RFC 4122)
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+
+        return rtrim(strtr(base64_encode($bytes), '+/', '-_'), '=');
     }
 
     /**
-     * Escapes a string to ensure it is 22 characters long
-     * and contains only "safe for URL" Base64 characters.
-     *
-     * @param string $input The string to escape
-     * @return string Escaped string
+     * Returns a url-friendly compact UUID with marginally higher entropy (by 6 bits) than UUIDv4
+     * 
+     * @return string 
+     * @throws RandomException 
      */
-    public static function escapeUUIDv4String($input) {
-        // Allowed Base64 URL-safe characters
-        $allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-        
-        // Remove any characters not in the allowed set
-        $escaped = preg_replace('/[^' . preg_quote($allowedChars, '/') . ']/', '', $input);
-        
-        // Ensure the string is exactly 22 characters
-        if (strlen($escaped) < 22) {
-            // Pad with 'A' (arbitrary choice) if shorter
-            $escaped = str_pad($escaped, 22, 'A');
-        } elseif (strlen($escaped) > 22) {
-            // Truncate if longer
-            $escaped = substr($escaped, 0, 22);
-        }
-        
-        return $escaped;
+    static function compactUUID() {
+        $bytes = random_bytes(16);
+        return rtrim(strtr(base64_encode($bytes), '+/', '-_'), '=');
     }
-    
+
     /**
      * Encodes a number in base 36 (0-9, a-z)
      * 
@@ -134,6 +136,25 @@ class Yes3Fn {
          }
       }
    }
+
+    public static function recordGeneratorUnbuffered( $sql, $parameters = [] )
+    {
+        global $rc_connection;
+
+        $result = System::queryWithParameters($rc_connection, $sql, $parameters, MYSQLI_USE_RESULT);
+
+        try {
+            while ($row = $result->fetch_assoc()) {
+                yield $row;
+            }
+        } catch (\Throwable $e) {
+            // Handle exception (optional: log or rethrow)
+            throw $e;
+        } finally {
+            // Free the result set; required for unbuffered queries
+            if ($result) {$result->free();}
+        }
+    }
 
    public static function fetchRecords($sql, $parameters = [])
    {
@@ -291,7 +312,29 @@ class Yes3Fn {
          
          return self::getFirstREDCapEventId($project_id);
    }
- 
+
+    public static function getREDcapEventsForForm($form_name, $project_id=0)
+    {
+        if ( !$project_id ){
+            $project_id = self::getProjectId();
+        }
+
+        if ( !self::isLongitudinal() ) return self::getFirstREDCapEventId($project_id);
+
+        $sql = "SELECT e.event_id
+        FROM redcap_events_metadata e
+            INNER JOIN redcap_events_arms a ON a.arm_id=e.arm_id
+            INNER JOIN redcap_events_forms ef ON ef.form_name=? AND ef.event_id=e.event_id
+        WHERE a.project_id=?
+        ORDER BY e.day_offset, e.event_id";
+
+        $eventRecords = self::fetchRecords($sql, [$form_name, $project_id]);
+
+        if ( !$eventRecords ) return [];
+
+        return array_column($eventRecords, 'event_id');
+    }
+
    public static function getREDCapEventIdForField( string $field_name )
    {
       return self::getREDCapEventIdForForm( self::getREDCapFormForField($field_name) );
@@ -1686,4 +1729,41 @@ class Yes3Fn {
         return intval(self::fetchValue($sql, [ $directoryPrefix ]) ?? 0);
     }
 
+    public static function tableExists($table_name)
+    {
+        $dbname = self::fetchValue("SELECT DATABASE() AS DB");
+        if ( !$dbname ) return false;
+        $sql = "SELECT COUNT(*) FROM information_schema.tables"
+            ." WHERE table_schema=?"
+            ." AND table_name=?"
+        ;
+        return self::fetchValue($sql, [$dbname, $table_name]);
+    }
+
+    /*
+    * LOGGING DEBUG INFO
+    * Call this function to log messages intended for debugging, for example an SQL statement.
+    * The log database must exist and its name stored in the DEBUG_LOG_TABLE constant.
+    * Required columns: project_id(INT), debug_message_category(VARCHAR(100)), debug_message(TEXT).
+    * (best to add an autoincrement id field). Sample table-create query:
+    *
+            CREATE TABLE ydcclib_debug_messages
+            (
+                debug_id               INT AUTO_INCREMENT PRIMARY KEY,
+                project_id             INT                                 NULL,
+                debug_message_category VARCHAR(100)                        NULL,
+                debug_message          TEXT                                NULL,
+                debug_timestamp        TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP
+            );
+
+        */
+
+    public static function logDebugMessage($project_id, $msg, $msgcat="") 
+    {   
+        if ( !self::LOG_DEBUG_MESSAGES || !self::tableExists(self::DEBUG_LOG_TABLE) ) return false;
+
+        $sql = "INSERT INTO `".self::DEBUG_LOG_TABLE."` (project_id, debug_message, debug_message_category) VALUES (?,?,?)";
+
+        return self::query($sql, [$project_id, $msg, $msgcat]);
+    }
 }

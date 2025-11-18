@@ -45,25 +45,32 @@ class Yes3ExportItem {
             $this->$propName = $propValue;
         }
 
+        if ( !$this->redcap_form_name && $this->redcap_field_name ) {
+
+            $this->redcap_form_name = Yes3Fn::getREDCapFormForField( $this->redcap_field_name );
+        }   
+
+        if ( !Yes3Fn::isLongitudinal() && $this->redcap_form_name){
+
+            $this->form_repeats = Yes3Fn::isRepeatingInstrument( $this->redcap_form_name );
+            $this->repeatable = $this->form_repeats;
+        }
         // If the item is a repeatable form or event, we set the repeatable flags
-        if ( isset( $exportItemProperties['redcap_form_name']) && isset( $exportItemProperties['redcap_event_id'] ) ) {
+        else if ( $this->redcap_form_name && $this->redcap_event_id ) {
 
             $form_repeats_this_event = 0;
             $event_repeats = 0;
 
-            if ( isset( $exportItemProperties['redcap_event_id'] ) ) {
-
-                $event_repeats = Yes3Fn::isRepeatingEvent( $exportItemProperties['redcap_event_id'] );
-            
-                $form_repeats_this_event = Yes3Fn::isRepeatingInstrumentForEvent( 
-                    $exportItemProperties['redcap_form_name'], 
-                    $exportItemProperties['redcap_event_id'] 
-                );
-            }
-            
+            $event_repeats = Yes3Fn::isRepeatingEvent( $this->redcap_event_id );
+        
+            $form_repeats_this_event = Yes3Fn::isRepeatingInstrumentForEvent( 
+                $this->redcap_form_name, 
+                $this->redcap_event_id 
+            );
+        
             $this->repeatable =  ( $event_repeats | $form_repeats_this_event );  // this is what counts, as it indicates that the instance must be on the export
             $this->form_repeats = $form_repeats_this_event;
             $this->event_repeats = $event_repeats;
-        } 
+        }
     }
 }

@@ -170,7 +170,7 @@ Date.prototype.mdy = function() {
 
 YES3.Functions.Open_docPage = function( topic ){
 
-    console.log("Open_docPage", topic );
+    //console.log("Open_docPage", topic );
 
     topic = topic || "";
 
@@ -653,7 +653,7 @@ YES3.setActionIconListeners = function( $parentElement )
     
     const $actionIcons = $parentElement.find("i.yes3-action-icon:not(.yes3-action-disabled):not(.yes3-nohandler)");
 
-    console.log("YES3.setActionIconListeners: n=", $actionIcons.length, $parentElement);
+    //console.log("YES3.setActionIconListeners: n=", $actionIcons.length, $parentElement);
 
     $actionIcons.off().on("click", function(){
 
@@ -1274,6 +1274,13 @@ YES3.setBsTooltipListenersForContainer = function( container ){
                 return [0, 8];
             }
 
+        });
+
+        // prevent tooltip from showing when YES3 is busy
+        el.addEventListener('show.bs.tooltip', function (event) {
+            if (YES3.busy) {
+                event.preventDefault(); // Suppresses the tooltip
+            }
         });
 
         // close tooltip when element is clicked (eg. action icons)

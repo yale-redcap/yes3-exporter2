@@ -292,7 +292,7 @@ function addExportSpecification()
         $qParams
     );
 
-    //$module->logDebugMessage($module->getProjectId(), print_r($qParams, true), 'saveExportSpecification' );
+    //Yes3Fn::logDebugMessage($module->getProjectId(), print_r($qParams, true), 'saveExportSpecification' );
     if ( $log_id ){
         return "Success: new export parameters saved to EM log record# ".$log_id;
     }
@@ -304,7 +304,7 @@ function saveExportSpecification()
 {
     global $module;
 
-    $column_count_changed = $_POST['column_count_changed'] ?? 0;
+    //$column_count_changed = $_POST['column_count_changed'] ?? 0;
 
     $qParams = [
         'removed' => ""
@@ -368,9 +368,9 @@ function saveExportSpecification()
         $qParams
     );
 
-    //$module->logDebugMessage($module->getProjectId(), print_r($qParams, true), 'saveExportSpecification' );
+    //Yes3Fn::logDebugMessage($module->getProjectId(), print_r($qParams, true), 'saveExportSpecification' );
 
-    $debug = Yes3Fn::safe_debug_output($qParams);
+    //$debug = Yes3Fn::safe_debug_output($qParams);
 
     if ( $log_id ){
 
@@ -418,11 +418,11 @@ function getExportSpecification()
         $get_other_export_names = 0;
     }
 
-    //$module->logDebugMessage(0, "log_id={$log_id}, export_uuid={$export_uuid}", "getExportSpecification: params");
+    //Yes3Fn::logDebugMessage(0, "log_id={$log_id}, export_uuid={$export_uuid}", "getExportSpecification: params");
 
     $specification = $module->getExportSpecification( $export_uuid, $log_id );
 
-    //$module->logDebugMessage(0, print_r($specification, true), "getExportSpecification:specification");
+    //Yes3Fn::logDebugMessage(0, print_r($specification, true), "getExportSpecification:specification");
 
     // designers always have permission for editing, not necessarily for exporting
     $permission_design = ( $module->getUser()->hasDesignRights() ) ? true:false;
@@ -470,7 +470,7 @@ function getExportSpecificationList():string
 
     $form_export_permissions = $module->getFormExportPermissions();
 
-    //$module->logDebugMessage($module->getProjectId(), print_r($form_export_permissions, true), "getExportSpecificationList:form_export_permissions");
+    //Yes3Fn::logDebugMessage($module->getProjectId(), print_r($form_export_permissions, true), "getExportSpecificationList:form_export_permissions");
 
     // handle some easy permission cases
 
@@ -520,7 +520,7 @@ function getExportSpecificationList():string
         $params[] = $export_uuid;
     }
 
-    $UUIDs = $module->fetchRecords($sqlUUID, $params);
+    $UUIDs = Yes3Fn::fetchRecords($sqlUUID, $params);
 
     $data = [];
 
@@ -629,7 +629,7 @@ function getExportNames()
         $params[] = $except_uuid;
     }
 
-    $UUIDs = $module->fetchRecords($sqlUUID, $params);
+    $UUIDs = Yes3Fn::fetchRecords($sqlUUID, $params);
 
     $data = [];
 
@@ -668,7 +668,7 @@ function getExportSpecificationList2( $get_removed=0 )
     WHERE x.external_module_id=? AND x.project_id=? AND x.message=?
     ";
 
-    $UUIDs = $module->fetchRecords($sqlUUID, [$module->getModuleId(), $module->getProjectId(), $module::EMLOG_MSG_EXPORT_SPECIFICATION]);
+    $UUIDs = Yes3Fn::fetchRecords($sqlUUID, [$module->getModuleId(), $module->getProjectId(), $module::EMLOG_MSG_EXPORT_SPECIFICATION]);
 
     $data = [];
 
@@ -776,7 +776,7 @@ function getExportLogRecord()
     global $module;
     $log_id = $_POST['log_id'];
 
-    return json_encode( $module->fetchRecord( getExportLogRecordSQL($log_id), [ $log_id ] ) );
+    return json_encode( Yes3Fn::fetchRecord( getExportLogRecordSQL($log_id), [ $log_id ] ) );
 }
 
 function downloadExportLog()
@@ -803,7 +803,7 @@ function downloadExportLog()
 
     $bytes = 0;
 
-    foreach ( $module->recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
+    foreach ( Yes3Fn::recordGenerator($sql, [ $module->getModuleId(), $module->getProjectId(), $module::EMLOG_TYPE_EXPORT_LOG_ENTRY, $export_uuid ]) as $x ){
 
         if ( !$bytes ) {
 
@@ -898,7 +898,7 @@ WHERE x.external_module_id=? AND x.project_id=? AND p1.`value`=? AND p2.`value`=
 
     $sql = "SELECT * FROM ( " . $subSql . " ) y ORDER BY y.log_id ASC";
 
-    $data = $module->fetchRecords($sql, $params);
+    $data = Yes3Fn::fetchRecords($sql, $params);
 
     $observed_usernames = [];
     $observed_date0 = "";
@@ -1286,7 +1286,7 @@ function get_field_mappings()
                         'yes3_fmapr_data_element_name' => "redcap_element_1",
                         'element_origin' => "redcap",
                         'redcap_field_name' => \REDCap::getRecordIdField(),
-                        'redcap_event_id' => $module->getFirstREDCapEventId(),
+                        'redcap_event_id' => Yes3Fn::getFirstREDCapEventId(),
                         'redcap_object_type' => "field",
                         'redcap_form_name' => "",
                         'values' => []
@@ -1366,7 +1366,7 @@ function get_project_settings():string
         'repeating_forms' => $repeating_forms,
         'field_index' => $field_metadata_structures['field_index'],
         'field_metadata' => $field_metadata_structures['field_metadata'],
-        'field_count' => $module->fetchValue($sqlCount, [$module->getProjectId(), \REDCap::getRecordIdField()]),
+        'field_count' => Yes3Fn::fetchValue($sqlCount, [$module->getProjectId(), \REDCap::getRecordIdField()]),
         'field_autoselect_source' => $field_metadata_structures['field_autoselect_source'],
         'form_index' => $form_metadata_structures['form_index'],
         'form_metadata' => $form_metadata_structures['form_metadata'],
@@ -1385,7 +1385,7 @@ function get_project_settings():string
     // if failed determine the error
     if ( $json===false ){
 
-        //$module->logDebugMessage($module->getProjectId(), "json_encode failed: " . json_last_error_msg(), 'get_project_settings' );
+        //Yes3Fn::logDebugMessage($module->getProjectId(), "json_encode failed: " . json_last_error_msg(), 'get_project_settings' );
 
         return json_encode([
             'error' => json_last_error_msg()
@@ -1465,7 +1465,7 @@ function get_fields():array
 {
    global $module;
 
-   $fields = $module->fetchRecords("
+   $fields = Yes3Fn::fetchRecords("
 SELECT m.`field_name`, m.`element_label`, m.`element_type`, m.`element_enum`
 FROM redcap_metadata m
 WHERE m.`project_id`={$module->getProjectId()}
@@ -1527,7 +1527,7 @@ WHERE a.project_id=?
 ORDER BY e.day_offset
     ";
 
-    $ee = $module->fetchRecords($sql, [$module->getProjectId()]);
+    $ee = Yes3Fn::fetchRecords($sql, [$module->getProjectId()]);
 
     $event_metadata = [];
 
@@ -1562,7 +1562,7 @@ WHERE a.project_id=?
 ORDER BY e.day_offset
     ";
 
-    $ee = $module->fetchRecords($sql, [$module->getProjectId()]);
+    $ee = Yes3Fn::fetchRecords($sql, [$module->getProjectId()]);
 
     $project_event_metadata = [];
 
@@ -1604,7 +1604,7 @@ function get_first_event_id()
    ORDER BY e.day_offset, e.event_id
    LIMIT 1";
 
-   return $module->fetchValue($sql, [$module->getProjectId()]);
+   return Yes3Fn::fetchValue($sql, [$module->getProjectId()]);
 }
 
 function get_event_select_options_html()
@@ -1617,7 +1617,7 @@ function get_event_select_options_html()
     WHERE a.project_id=?
     ORDER BY e.day_offset, e.event_id";
 
-    $events = $module->fetchRecords($sql, [$module->getProjectId()]);
+    $events = Yes3Fn::fetchRecords($sql, [$module->getProjectId()]);
 
     $eventSelectOptionsHtml = "<option value=''></option>";
     foreach ($events as $event){
@@ -1643,7 +1643,7 @@ function listNamespaceFunctions()
         }
     }
 
-    //$module->logDebugMessage( 0, $registry_list, 'yes3 exporter service functions' );
+    //Yes3Fn::logDebugMessage( 0, $registry_list, 'yes3 exporter service functions' );
 
     return $registry_list;
 }

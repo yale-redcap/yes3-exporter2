@@ -23,6 +23,12 @@
 
     "versions": [
         {
+            "version": "2.0.18",
+            "date": "2025-11-16",
+            "description": "refactroring, bug fix",
+            "comments": "Yes3Trait and Yes3Fn reconciled. Bug fix for repeating instruments in non-longitudinal projects: redcap_repeat_instance was not included in exports."
+        },        
+        {
             "version": "2.0.17",
             "date": "2025-11-11",
             "description": "more minor tweaks",

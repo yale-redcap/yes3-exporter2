@@ -255,7 +255,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $export_specification['export_target_folder'] = $this->get_export_target_folder();
 
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($export_specification, true), "buildExportDataDictionary");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($export_specification, true), "buildExportDataDictionary");
 
         /**
          * export object
@@ -346,9 +346,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             $allowed['group_id'] = $uRights['group_id'];
         }
 /*
-        //$this->logDebugMessage($this->getProjectId(), print_r($export_specification, true), "buildExportDataDictionary: export_specification");
-        //$this->logDebugMessage($this->getProjectId(), print_r($export, true), "buildExportDataDictionary: export");
-        //$this->logDebugMessage($this->getProjectId(), print_r($allowed, true), "buildExportDataDictionary: allowed");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($export_specification, true), "buildExportDataDictionary: export_specification");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($export, true), "buildExportDataDictionary: export");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($allowed, true), "buildExportDataDictionary: allowed");
         throw new Exception("Have a nice day");
 */   
         /**
@@ -388,7 +388,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
          */
         $field_name = $this->getRecordIdField();
 
-        $this->addExportItem_REDCapField( $export, $field_name, $this->getREDCapEventIdForField($field_name), $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
+        $this->addExportItem_REDCapField( $export, $field_name, Yes3Fn::getREDCapEventIdForField($field_name), $fields, $forms, $event_settings, $allowed, $uRights['form_export_permissions'] );
 
         if ( $groupNames = $this->getGroupNames() ) {
 
@@ -407,7 +407,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         if ( $export->export_layout !== "h" && $this->isLongitudinal() ) {
 
             $event_valueset = [];
-            if ($eventNames = $this->getEventNames(true)) {
+            if ($eventNames = Yes3Fn::getEventNames(true)) {
                 foreach ($eventNames as $value => $label) {
                     $event_valueset[] = [
                         'value' => Yes3Fn::sanitizeForText((string)$value, 0, true, false, true),
@@ -446,8 +446,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         $fields_rejected = 0; // always zero: we don't dynamically remove columns any more
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($uRights['form_permissions'], true), "buildExportDataDictionary:fp");
-        //$this->logDebugMessage($this->getProjectId(), print_r($export->export_items, true), "buildExportDataDictionary:fp");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($uRights['form_permissions'], true), "buildExportDataDictionary:fp");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($export->export_items, true), "buildExportDataDictionary:fp");
 
         foreach( $export->export_items as $export_item ){
 
@@ -966,7 +966,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         $dd_index = []; // dd index for a given REDCap field_name and event_id (horizontal) or field_name (vertical)
         $dd_multiselect_index = []; // dd index for a multiselect option 
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($dd, true), "writeExportDataFile: dd");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($dd, true), "writeExportDataFile: dd");
 
         for ($i=0; $i<count($dd); $i++){
 
@@ -1178,15 +1178,15 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
         //$sql .= " LIMIT 10";
 
-        //$this->logDebugMessage($this->getProjectId(), $sql, "writeExportDataFile: CritX SQL");
-        //$this->logDebugMessage($this->getProjectId(), implode(",", $sqlParams), "writeExportDataFile: CritX Params");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), $sql, "writeExportDataFile: CritX SQL");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), implode(",", $sqlParams), "writeExportDataFile: CritX Params");
 
         /**
          * BUILD AND SORT THE RECORD LIST
          */
 
         $records = [];
-        foreach ( $this->recordGeneratorUnbuffered($sql, $sqlParams) as $x ){
+        foreach ( Yes3Fn::recordGeneratorUnbuffered($sql, $sqlParams) as $x ){
 
             $records[] = [ 'record' => $x['record'], 'group_id' => $x['dag_id'] ];
         }
@@ -1197,7 +1197,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             return strnatcasecmp($a['record'], $b['record']);
         });
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($records, true), "writeExportDataFile: Records to export");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($records, true), "writeExportDataFile: Records to export");
         
         /**
          * More helper arrays, required by writeExportDataForRecord()
@@ -1222,9 +1222,9 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             }
         }
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($field_events, true), 'writeX:field_events');
-        //$this->logDebugMessage($this->getProjectId(), $sqlSelect, 'writeX:sqlSelect');
-        //$this->logDebugMessage($this->getProjectId(), print_r($sqlEventParams, true), 'writeX:sqlEventParams');
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($field_events, true), 'writeX:field_events');
+        //Yes3Fn::logDebugMessage($this->getProjectId(), $sqlSelect, 'writeX:sqlSelect');
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($sqlEventParams, true), 'writeX:sqlEventParams');
 
         $K = 0; // datum count
         $R = 0; // export row count
@@ -1240,8 +1240,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
 
             $sqlSelectParams = array_merge([$this->getProjectId(), $record], $sqlEventParams);
 
-            //$this->logDebugMessage($this->getProjectId(), $sqlSelect, "writeExportDataFile: sqlSelect");
-            //$this->logDebugMessage($this->getProjectId(), print_r($sqlSelectParams, true), "writeExportDataFile: sqlSelectParams");
+            //Yes3Fn::logDebugMessage($this->getProjectId(), $sqlSelect, "writeExportDataFile: sqlSelect");
+            //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($sqlSelectParams, true), "writeExportDataFile: sqlSelectParams");
 
             $recLen = $this->writeExportDataForRecord(
                 $export,
@@ -1322,7 +1322,7 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
                 $maxRecLen
 
             );
-            /*$this->logDebugMessage(
+            /*Yes3Fn::logDebugMessage(
                 $this->getProjectId(),
                 print_r($sasCoderInitializationResponse['message'], true),
                 "export_sascode_dsname: " . $export_sascode_dsname
@@ -1460,8 +1460,8 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
             $params
         );
 
-        //$this->logDebugMessage($this->getProjectId(), "message: {$message}", "logExport:log_id: {$log_id}");
-        //$this->logDebugMessage($this->getProjectId(), print_r($params, true), "logExport:log_id: {$log_id}");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), "message: {$message}", "logExport:log_id: {$log_id}");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($params, true), "logExport:log_id: {$log_id}");
 
         return $log_id;
     }
@@ -1872,7 +1872,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $exportValues = 0;
 
-        foreach ( $this->recordGeneratorUnbuffered($sqlSelect, $sqlSelectParams) as $x ){
+        foreach ( Yes3Fn::recordGeneratorUnbuffered($sqlSelect, $sqlSelectParams) as $x ){
 
             $x_instance = $x['instance']; if ( !$x_instance ) $x_instance="1";
 
@@ -1894,8 +1894,8 @@ WHERE project_id=? AND log_entry_type=?
            
             if ( $BOR ) {
 
-                //$this->logDebugMessage($this->getProjectId(), "BOR for REDCap record {$record}, event_id {$x['event_id']}, instance {$x_instance}", "writeExportDataForRecord: BOR");
-                //$this->logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR data so far");
+                //Yes3Fn::logDebugMessage($this->getProjectId(), "BOR for REDCap record {$record}, event_id {$x['event_id']}, instance {$x_instance}", "writeExportDataForRecord: BOR");
+                //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR data so far");
 
                 // BE AWARE: this code is repeated in the EOR block below
                 if ( $y && $exportValues && $h !== false ){
@@ -1929,7 +1929,7 @@ WHERE project_id=? AND log_entry_type=?
                     }
                 }
 
-                //$this->logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR new record init");
+                //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($y, true), "writeExportDataForRecord: BOR new record init");
 
                 $y[$RecordIdField] = $record;
 
@@ -2059,7 +2059,7 @@ WHERE project_id=? AND log_entry_type=?
                     }
                 }
 
-                //$this->logDebugMessage(
+                //Yes3Fn::logDebugMessage(
                 //    $this->getProjectId(),
                 //    "record: {$record}, event_id: {$event_id}, instance: {$instance}, field_name: {$field_name}, value: {$REDCapValue}",
                 //    "writeExportDataForRecord: var_name: " . $dd[$field_index]['var_name']
@@ -2733,7 +2733,7 @@ WHERE project_id=? AND log_entry_type=?
 
             return [
                 [
-                    'event_id' => (string) $this->getFirstREDCapEventId(),
+                    'event_id' => (string) Yes3Fn::getFirstREDCapEventId(),
                     'event_name' => "Event_1_arm_1",
                     'event_prefix' => ""
                 ]
@@ -2800,7 +2800,7 @@ WHERE project_id=? AND log_entry_type=?
 
         $all_forms = array_keys( $form_export_permissions );
 
-        if ( $isLongitudinal ) $all_event_ids = array_keys( $this->getEventNames(true) );
+        if ( $isLongitudinal ) $all_event_ids = array_keys( Yes3Fn::getEventNames(true) );
         else $all_event_ids = [ $this->getEventId() ];
 
         $errors = 0;
@@ -2810,8 +2810,8 @@ WHERE project_id=? AND log_entry_type=?
         $error_messages = [];
         $warning_messages = [];
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($export_items, true), $specification['export_name'] . ":export_items");
-        //$this->logDebugMessage($this->getProjectId(), print_r($all_forms, true), $specification['export_name'] . ":all_forms");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($export_items, true), $specification['export_name'] . ":export_items");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($all_forms, true), $specification['export_name'] . ":all_forms");
 
         //throw new Exception("confirmSpecificationPermissions() is not yet implemented.");
 
@@ -2851,7 +2851,7 @@ WHERE project_id=? AND log_entry_type=?
 
                         foreach($all_forms as $form_name){
 
-                            $form_events = $this->getREDcapEventsForForm($form_name);
+                            $form_events = Yes3Fn::getREDcapEventsForForm($form_name);
 
                             if  ( $form_events && in_array($redcap_event_id, $form_events) ){
   
@@ -2884,7 +2884,7 @@ WHERE project_id=? AND log_entry_type=?
             // export item is a single field (there is no 'all fields' option in the UI)
             if ( $redcap_field_name ){
 
-                $form_name = $this->getREDCapFormForField( $redcap_field_name );
+                $form_name = Yes3Fn::getREDCapFormForField( $redcap_field_name );
 
                 if ( !$form_name ){
 
@@ -2901,7 +2901,7 @@ WHERE project_id=? AND log_entry_type=?
             $errors += $item_errors;
         }
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($specification_forms, true), $specification['export_name'] . ":specification_forms");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($specification_forms, true), $specification['export_name'] . ":specification_forms");
 
         // deny export permission if no forms are involved, e.g. export design error or other mischief
         if ( !$specification_forms ){
@@ -2932,7 +2932,7 @@ WHERE project_id=? AND log_entry_type=?
             $permission_denied++;
         }   
         
-        //$this->logDebugMessage($this->getProjectId(), "export permission approved" . $form_name, $specification['export_name'] . ":approval");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), "export permission approved" . $form_name, $specification['export_name'] . ":approval");
 
         $specification['permission_export'] = ( $permission_denied === 0 ) ? true : false;
         $specification['error_messages'] = $error_messages;
@@ -3003,7 +3003,7 @@ WHERE project_id=? AND log_entry_type=?
 
     public function getEmLogParameter( $log_id, $key_name ){
 
-        return $this->fetchValue(
+        return Yes3Fn::fetchValue(
             "SELECT `value` FROM redcap_external_modules_log_parameters WHERE log_id=? AND `name`=?",
             [ 
                 $log_id, 
@@ -3017,7 +3017,7 @@ WHERE project_id=? AND log_entry_type=?
         if ( !$this->logIsThisEmAndProject($log_id) ) return false; // must be this EM and project
 
         $sqle = "SELECT COUNT(*) FROM redcap_external_modules_log_parameters WHERE log_id=? AND `name`=?";
-        $parmRecordExists = $this->fetchValue($sqle, [$log_id, $parameter]);
+        $parmRecordExists = Yes3Fn::fetchValue($sqle, [$log_id, $parameter]);
 
         if ( $parmRecordExists ){
 
@@ -3032,7 +3032,7 @@ WHERE project_id=? AND log_entry_type=?
 
         // confirm the update
         $sqlv = "SELECT COUNT(*) FROM redcap_external_modules_log_parameters WHERE log_id=? AND `name`=? AND value=?";
-        return $this->fetchValue($sqlv, [$log_id, $parameter, $value]);
+        return Yes3Fn::fetchValue($sqlv, [$log_id, $parameter, $value]);
     }
 
     /**
@@ -3086,7 +3086,7 @@ WHERE project_id=? AND log_entry_type=?
         , export_has_repeatables
         ";
 
-        //$this->logDebugMessage($this->getProjectId(), $export_uuid, "getExportSpecification");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), $export_uuid, "getExportSpecification");
 
         if ( $log_id ){
 
@@ -3104,8 +3104,8 @@ WHERE project_id=? AND log_entry_type=?
 
         if ( $history ){
 
-            //$this->logDebugMessage($this->getProjectId(), $this->getQueryLogsSql($pSql), 'getExportSpecification');
-            //$this->logDebugMessage($this->getProjectId(), print_r($params, true), 'getExportSpecification');
+            //Yes3Fn::logDebugMessage($this->getProjectId(), $this->getQueryLogsSql($pSql), 'getExportSpecification');
+            //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($params, true), 'getExportSpecification');
 
             $qResult = $this->queryLogs($pSql, $params);
 
@@ -3185,7 +3185,7 @@ WHERE project_id=? AND log_entry_type=?
                     
                     $specification = json_decode($specification_settings['export_specification_json']);
 
-                    //$this->logDebugMessage($this->getProjectId(), print_r($specification, true), "getExportSpecifications:object");
+                    //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($specification, true), "getExportSpecifications:object");
 
                     if ( is_object($specification) ){
 
@@ -3214,7 +3214,7 @@ WHERE project_id=? AND log_entry_type=?
             return [];
         }
 
-        $events = $this->getEventNames(true);
+        $events = Yes3Fn::getEventNames(true);
 
         $maxUniquePrefixLen = 8;
         $uniquePrefixLen = 0;
@@ -3312,7 +3312,7 @@ WHERE project_id=? AND log_entry_type=?
         } else {
 
             $events = [[ 
-                'event_id' => $this->getFirstREDCapEventId(),
+                'event_id' => Yes3Fn::getFirstREDCapEventId(),
                 'descrip' => "Event 1",
                 'event_label' => "Event_1"
             ]];
@@ -3325,10 +3325,10 @@ WHERE project_id=? AND log_entry_type=?
 
         }
 
-        $mm = $this->fetchRecords($sql, [$this->getProjectId()]);
+        $mm = Yes3Fn::fetchRecords($sql, [$this->getProjectId()]);
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($form_export_permissions, true), "form_export_permissions");
-        //$this->logDebugMessage($this->getProjectId(), print_r($mm, true), "form metadata");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($form_export_permissions, true), "form_export_permissions");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($mm, true), "form metadata");
 
         $form_metadata = [];
 
@@ -3363,7 +3363,7 @@ FROM redcap_events_forms ef
 WHERE ea.project_id=? and ef.form_name=?
                 ";
 
-                $ee = $this->fetchRecords($sqlE, [$this->getProjectId(), $m['form_name']]);
+                $ee = Yes3Fn::fetchRecords($sqlE, [$this->getProjectId(), $m['form_name']]);
 
                 $events = [];
 
@@ -3388,7 +3388,7 @@ WHERE ea.project_id=? and ef.form_name=?
 
             $form_fields = [];
 
-            $fields = $this->fetchRecords($sqlF, [$this->getProjectId(), $m['form_name']]);
+            $fields = Yes3Fn::fetchRecords($sqlF, [$this->getProjectId(), $m['form_name']]);
             foreach ( $fields as $field ){
                 $form_fields[] = $field['field_name'];
             }
@@ -3424,7 +3424,7 @@ WHERE ea.project_id=? and ef.form_name=?
 
         $event_id = intval($event_id); if ( !$event_id ) return "";
 
-        return $this->getEventNames(true, true, $event_id);
+        return Yes3Fn::getEventNames(true, true, $event_id);
     }
 
     private function getFormDataEntryFieldMetadata($form_name)
@@ -3459,9 +3459,9 @@ WHERE ea.project_id=? and ef.form_name=?
 
         $sql .= " ORDER BY m.field_order";
 
-        //$this->logDebugMessage($this->getProjectId(), $sql, "getFormDataEntryFieldMetadata:" . $form_name);
+        //Yes3Fn::logDebugMessage($this->getProjectId(), $sql, "getFormDataEntryFieldMetadata:" . $form_name);
 
-        return $this->fetchRecords($sql, $params);
+        return Yes3Fn::fetchRecords($sql, $params);
     }
 
     public function getFieldMetadata($field_name)
@@ -3472,7 +3472,7 @@ WHERE ea.project_id=? and ef.form_name=?
         WHERE m.project_id=? AND m.field_name=?
         ";
 
-        return $this->fetchRecords($sql, [$this->getProjectId(), $field_name]);
+        return Yes3Fn::fetchRecords($sql, [$this->getProjectId(), $field_name]);
     }
 
     public function getFieldMetadataStructures(): array
@@ -3503,7 +3503,7 @@ WHERE ea.project_id=? and ef.form_name=?
             ";
         }
 
-        $fields = $this->fetchRecords($sql, [$this->getProjectId()]);
+        $fields = Yes3Fn::fetchRecords($sql, [$this->getProjectId()]);
 
         $field_metadata = [];
 
@@ -4028,7 +4028,7 @@ WHERE ea.project_id=? and ef.form_name=?
 
             $projCronLog = "Starting the \"{$cronInfo['cron_description']}\" cron job at " . strftime("%F %T") . " for project #{$localProjectId}";
 
-            //$this->logDebugMessage($localProjectId, "project {$localProjectId} has YES3 Exporter module enabled", "yes3_exporter_cron");
+            //Yes3Fn::logDebugMessage($localProjectId, "project {$localProjectId} has YES3 Exporter module enabled", "yes3_exporter_cron");
 
             // BATCH EXPORT
 
@@ -4311,7 +4311,7 @@ WHERE ea.project_id=? and ef.form_name=?
         WHERE c1.field_name = 'project_contact_email'
         ";
 
-        return $this->fetchRecord( $sql );
+        return Yes3Fn::fetchRecord( $sql );
     }
 
     private function emailTableCell( $TdOrTh, $content ){
@@ -4333,7 +4333,7 @@ WHERE ea.project_id=? and ef.form_name=?
 
         if ( !count($exports) ) return "hk_generations: Nothing to do since project has no export backups saved.";
 
-        //$this->logDebugMessage($this->getProjectId(), print_r($exports, true), "hk_generations");
+        //Yes3Fn::logDebugMessage($this->getProjectId(), print_r($exports, true), "hk_generations");
 
         foreach($exports as $export){
 
@@ -4390,7 +4390,7 @@ WHERE ea.project_id=? and ef.form_name=?
         WHERE x.external_module_id=? and x.project_id=? and x.message=?
         ";
 
-        $UUIDs = $this->fetchRecords($sqlUUID, [$this->getModuleId(), $this->getProjectId(), self::EMLOG_MSG_EXPORT_SPECIFICATION]);
+        $UUIDs = Yes3Fn::fetchRecords($sqlUUID, [$this->getModuleId(), $this->getProjectId(), self::EMLOG_MSG_EXPORT_SPECIFICATION]);
 
         $data = [];
 
