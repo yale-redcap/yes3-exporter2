@@ -4,11 +4,6 @@ namespace Yale\Yes3Exporter2;
 
 use REDCap;
 use Project;
-use ExternalModules\ExternalModules as EM;
-use System;
-
-use \DateTime;
-use \DateTimeZone;
 use \Exception;
 use \Throwable;
 
@@ -100,7 +95,7 @@ trait Yes3Trait {
 
         $longitudinal = $this->isLongitudinal();
 
-        //$this->logDebugMessage($this->project_id, print_r($user, true), "user rights");
+        //Yes3Fn::logDebugMessage($this->project_id, print_r($user, true), "user rights");
 
         /**
          * The rank order of export permission codes
@@ -130,7 +125,7 @@ trait Yes3Trait {
                 $form_name = $formPermParts[0];
 
                 // for longitudinal projects, only include forms that are on the event grid
-                if ( !$longitudinal || $this->getREDCapEventsForForm($form_name) ){
+                if ( !$longitudinal || Yes3Fn::getREDCapEventsForForm($form_name) ){
                     // designers can always edit
                     $formPermissions[ $form_name ] = ($isDesigner) ? 1 : (int) $formPermParts[1];
                 }
@@ -164,7 +159,7 @@ trait Yes3Trait {
         // 'data_export_instruments' is a v12+ property
         if ( isset($user['data_export_instruments'])) {
 
-            //$this->logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
+            //Yes3Fn::logDebugMessage($this->project_id, print_r($user['data_export_instruments'], true), "user[data_export_instruments]");
 
             /**
              * the data_export_instruments string looks like this:
@@ -195,7 +190,7 @@ trait Yes3Trait {
                     $form_name = $formExportPermParts[0];
 
                     // for longitudinal projects, only include forms that are on the event grid
-                    if ( !$longitudinal || $this->getREDCapEventsForForm($form_name) ){
+                    if ( !$longitudinal || Yes3Fn::getREDCapEventsForForm($form_name) ){
 
                         // set the simulated pre-v12-style 'export_tool' property to the highest-ranked permission we find
                         if ( $exportPermRank[$xPerm] > $exportPermRank[$export_tool] ){
@@ -235,7 +230,7 @@ trait Yes3Trait {
             }
         }
 
-        //$this->logDebugMessage($this->project_id, print_r($formPermissions, true), "form permissions");
+        //Yes3Fn::logDebugMessage($this->project_id, print_r($formPermissions, true), "form permissions");
         
         return [
 
@@ -357,63 +352,12 @@ trait Yes3Trait {
 
         if ( method_exists('REDCap', "getDataTable") ) {
 
-            //$this->logDebugMessage($project_id, "using REDCap::getDataTable: project_id={$project_id}, dataTable=".REDCap::getDataTable($project_id), "getDataTable");
+            //Yes3Fn::logDebugMessage($project_id, "using REDCap::getDataTable: project_id={$project_id}, dataTable=".REDCap::getDataTable($project_id), "getDataTable");
             
             return REDCap::getDataTable($project_id);
         }
 
         return "redcap_data";
-    }
-
-    /**
-     * record generators: buffered and unbuffered
-     * Note: unbuffered required faith that the global $rc_connection is available
-     */
-
-    public function recordGenerator( $sql, $parameters = [] )
-    {
-        $resultSet = $this->query($sql, $parameters);
-
-        while ($row = $resultSet->fetch_assoc()) {
-
-            yield $row;
-        }
-    }
-
-    public function recordGeneratorUnbuffered( $sql, $parameters = [] )
-    {
-        global $rc_connection;
-
-        $result = System::queryWithParameters($rc_connection, $sql, $parameters, MYSQLI_USE_RESULT);
-
-        try {
-            while ($row = $result->fetch_assoc()) {
-                yield $row;
-            }
-        } catch (\Throwable $e) {
-            // Handle exception (optional: log or rethrow)
-            throw $e;
-        } finally {
-            // Free the result set; required for unbuffered queries
-            if ($result) {$result->free();}
-        }
-    }
-
-    /**
-     * Fetch multiple records as an array of associative arrays
-     */
-    public function fetchRecords($sql, $parameters = [])
-    {
-
-        $rows = [];
-        $resultSet = $this->query($sql, $parameters);
-        if ( $resultSet->num_rows > 0 ) {
-            while ($row = $resultSet->fetch_assoc()) {
-                $rows[] = $row;
-            }
-        }
-
-        return $rows;
     }
 
     private function sql_limit_1( $sql )
@@ -425,34 +369,6 @@ trait Yes3Trait {
             return $sql;
         }
 
-    }
-
-    /**
-     * Fetch a single record as an associative array
-     */
-    public function fetchRecord($sql, $parameters = [])
-    {
-
-        return $this->query($this->sql_limit_1($sql), $parameters)->fetch_assoc();
-    }
-
-    /**
-     * Fetch a single value
-     */
-    public function fetchValue($sql, $parameters = [])
-    {
-        return $this->query($this->sql_limit_1($sql), $parameters)->fetch_row()[0];
-    }
-
-    public function tableExists($table_name)
-    {
-        $dbname = $this->fetchValue("SELECT DATABASE() AS DB");
-        if ( !$dbname ) return false;
-        $sql = "SELECT COUNT(*) FROM information_schema.tables"
-            ." WHERE table_schema=?"
-            ." AND table_name=?"
-        ;
-        return $this->fetchValue($sql, [$dbname, $table_name]);
     }
 
     public function json_encode_pretty( $x )
@@ -472,278 +388,9 @@ trait Yes3Trait {
         return true;
     }
 
-    public function getFirstREDCapEventId(int $project_id=null)
-    {
-        if ( !$project_id ){
-            $project_id = $this->getProjectId();
-        }
-
-        $sql = "SELECT e.event_id
-        FROM redcap_events_metadata e
-            INNER JOIN redcap_events_arms a ON a.arm_id=e.arm_id
-        WHERE a.project_id=?
-        ORDER BY e.day_offset, e.event_id
-        LIMIT 1";
-
-        return $this->fetchValue($sql, [$project_id]);
-    }
-
-    public function getREDCapEventIdForField( string $field_name, int $project_id=null )
-    {
-        return $this->getREDCapEventIdForForm( $this->getREDCapFormForField($field_name, $project_id) );
-    }
-
-    /**
-    * Returns first event_id associated with form
-    * Only useful if form is on a single event
-    * 
-    * function: getREDCapEventIdForForm
-    * 
-    * @param string $form_name
-    * @param int|null $project_id
-    * 
-    * @return mixed
-    * @throws Exception
-    */
-    public function getREDCapEventIdForForm( string $form_name, int $project_id=null )
-    {
-        if ( !$project_id ){
-            $project_id = $this->getProjectId();
-        }
-
-        if ( $this->isLongitudinal() ) {     
-            $sql = "SELECT e.event_id
-            FROM redcap_events_metadata e
-                INNER JOIN redcap_events_arms a ON a.arm_id=e.arm_id
-                INNER JOIN redcap_events_forms ef ON ef.form_name=? AND ef.event_id=e.event_id
-            WHERE a.project_id=?
-            ORDER BY e.day_offset, e.event_id
-            LIMIT 1";
-
-            return $this->fetchValue($sql, [$form_name, $project_id]) ?? 0;
-        }
-        
-        return $this->getFirstREDCapEventId($project_id);
-    }
-
-    public function getREDcapEventsForForm($form_name, $project_id=null)
-    {
-        if ( !$project_id ){
-            $project_id = $this->getProjectId();
-        }
-
-        if ( !$this->isLongitudinal() ) return $this->getFirstREDCapEventId($project_id);
-
-        $sql = "SELECT e.event_id
-        FROM redcap_events_metadata e
-            INNER JOIN redcap_events_arms a ON a.arm_id=e.arm_id
-            INNER JOIN redcap_events_forms ef ON ef.form_name=? AND ef.event_id=e.event_id
-        WHERE a.project_id=?
-        ORDER BY e.day_offset, e.event_id";
-
-        $eventRecords = $this->fetchRecords($sql, [$form_name, $project_id]);
-
-        if ( !$eventRecords ) return [];
-
-        return array_column($eventRecords, 'event_id');
-    }
-
-    public function getEventIdForDescription( int $project_id, string $descrip)
-    {
-        return (int) $this->fetchValue(
-            "SELECT e.event_id
-            from redcap_events_metadata e
-            INNER join redcap_events_arms a on a.arm_id=e.arm_id
-            where a.project_id=? and e.descrip=?",
-            [$project_id, $descrip]
-        );
-    }
-
-    public function getREDCapFormForField( string $field_name, int $project_id=null )
-    {
-        if ( !$project_id ){
-            $project_id = $this->getProjectId();
-        }
-
-        $sql = "SELECT m.form_name
-        FROM redcap_metadata m
-        WHERE m.project_id=? AND m.field_name=?
-        LIMIT 1";
-
-        return $this->fetchValue($sql, [$project_id, $field_name]);
-    }
-
-    public function getREDCapValue( string $record, string $field_name, int $event_id=null, $instance=1 )
-    {
-        $project_id = $this->getProjectId();
-
-        if ( !$event_id ) {
-            $event_id = $this->getREDCapEventIdForField($field_name, $project_id);
-        }
-
-        $redcap_data = $this->getDataTable($project_id);
-
-        $sql = "
-    SELECT `value` 
-    FROM $redcap_data 
-    WHERE `project_id`=? AND `event_id`=? AND `record`=? AND `field_name`=? AND ifnull(instance, 1)=? LIMIT 1
-    ";
-        return $this->fetchValue($sql, [$project_id, $event_id, $record, $event_id, $instance]);
-    }
-
-    public function REDCapDateTimeString()
-    {
-        return strftime("%Y-%m-%d %H:%M");
-    }
-
     public function timeStampString()
     {
         return strftime("%y%m%d%H%M%S");
-    }
-
-    public function inoffensiveFieldName( $s )
-    {
-
-        if ( is_null($s) ){
-
-            return "";
-        }
-
-        if ( !strlen($s) ){
-
-            return "";
-        }
-
-        /**
-         * @psalm-suppress InvalidReturnStatement
-         */
-        return preg_replace("/[^a-zA-Z0-9_]+/", "", str_replace(' ', '_', $s));
-    }
-
-
-    /**
-     * Converts every ASCII/UTF-8 quotation mark-like character to straight quote (including html entities)
-     * 
-     * adapted from:
-     * https://stackoverflow.com/questions/20025030/convert-all-types-of-smart-quotes-with-php
-     * 
-     * function: straightQuoter
-     * 
-     * @param $s
-     * 
-     * @return string
-     */
-    public function straightQuoter( $s ):string
-    {  
-
-        if ( is_null($s) ){
-
-            return "";
-        }
-
-        if ( !strlen($s) ){
-
-            return "";
-        }
-
-        $qSearch = [
-
-            '"',
-
-            // Windows codepage 1252
-
-            "\xC2\x82", // U+0082⇒U+201A single low-9 quotation mark
-            "\xC2\x84", // U+0084⇒U+201E double low-9 quotation mark
-            "\xC2\x8B", // U+008B⇒U+2039 single left-pointing angle quotation mark
-            "\xC2\x91", // U+0091⇒U+2018 left single quotation mark
-            "\xC2\x92", // U+0092⇒U+2019 right single quotation mark
-            "\xC2\x93", // U+0093⇒U+201C left double quotation mark
-            "\xC2\x94", // U+0094⇒U+201D right double quotation mark
-            "\xC2\x9B", // U+009B⇒U+203A single right-pointing angle quotation mark
-        
-            // Regular Unicode  
-            
-            "\x22"        , // U+0022 quotation mark (")
-            "\x60"        , // U+0060 grave accent
-
-            "\xC2\xB4"    , // U+00B4 acute accent
-            "\xC2\xAB"    , // U+00AB left-pointing double angle quotation mark
-            "\xC2\xBB"    , // U+00BB right-pointing double angle quotation mark
-            "\xE2\x80\x98", // U+2018 left single quotation mark
-            "\xE2\x80\x99", // U+2019 right single quotation mark
-            "\xE2\x80\x9A", // U+201A single low-9 quotation mark
-            "\xE2\x80\x9B", // U+201B single high-reversed-9 quotation mark
-            "\xE2\x80\x9C", // U+201C left double quotation mark
-            "\xE2\x80\x9D", // U+201D right double quotation mark
-            "\xE2\x80\x9E", // U+201E double low-9 quotation mark
-            "\xE2\x80\x9F", // U+201F double high-reversed-9 quotation mark
-            "\xE2\x80\xB9", // U+2039 single left-pointing angle quotation mark
-            "\xE2\x80\xBA"  // U+203A single right-pointing angle quotation mark         
-        ];
-
-        return str_replace($qSearch, "'", $s);
-    }
-
-    /**
-     * Tries to guarantee inoffensive text, suitable for labels or SAS text fields
-     * 
-     * - trimmed
-     * - stripped of HTML tags
-     * - control chars (0-31, 127) converted to spaces
-     * - all flavors of quotes converted to straight quote (apostrophe)
-     * - converted to UTF-8 encoding
-     * 
-     * regexp from: https://stackoverflow.com/questions/1176904/how-to-remove-all-non-printable-characters-in-a-string
-     * 
-     * function: inoffensiveText
-     * DEPRECATED: use Yes3Fn::sanitizeForText() instead
-     * 
-     * @param $s
-     * @param int $maxLen
-     * 
-     * @return string
-     */
-    public function inoffensiveText( $s, $maxLen=0 ):string
-    {
-        if ( is_null($s) ){
-
-            return "";
-        }
-
-        if ( !strlen($s) ){
-
-            return "";
-        }
-        
-        $s = preg_replace('/[\x00-\x1F\x7F]/u', ' ', $this->straightQuoter( strip_tags($s)) ); 
-
-        if ( $maxLen ) $s = $this->truncate($s, $maxLen);
-
-        return mb_convert_encoding($s, 'UTF-8');     
-    }
-
-    /**
-     * Allows ASCII alphanumerics
-     * 
-     * function: alphaNumericString
-     * 
-     * @param $s
-     * 
-     * @return string
-     */
-    public function alphaNumericString( $s ):string
-    {
-        if ( is_null($s) ){
-
-            return "";
-        }
-
-        if ( !strlen($s) ){
-
-            return "";
-        }
-        
-        return preg_replace("/[^a-zA-Z0-9_ ]+/", "", $s);
     }
 
     /**
@@ -791,25 +438,6 @@ trait Yes3Trait {
         return REDCap::escapeHtml($s);
     }
 
-    public function ellipsis( $s, $len=64 )
-    {
-        if ( is_null($s) ){
-
-            return "";
-        }
-
-        if ( !strlen($s) ){
-
-            return "";
-        }
-
-        $s = trim($s);
-        if ( $len > 0 &&  strlen($s) > $len-3 ) {
-            return substr($s, 0, $len-3)."...";
-        }
-        return $s;
-    }
-
     public function truncate( $s, $len=64 )
     {
         if ( is_null($s) ){
@@ -828,33 +456,6 @@ trait Yes3Trait {
         }
 
         return $s;
-    }
-
-    /*
-    * LOGGING DEBUG INFO
-    * Call this function to log messages intended for debugging, for example an SQL statement.
-    * The log database must exist and its name stored in the DEBUG_LOG_TABLE constant.
-    * Required columns: project_id(INT), debug_message_category(VARCHAR(100)), debug_message(TEXT).
-    * (best to add an autoincrement id field). Sample table-create query:
-    *
-            CREATE TABLE ydcclib_debug_messages
-            (
-                debug_id               INT AUTO_INCREMENT PRIMARY KEY,
-                project_id             INT                                 NULL,
-                debug_message_category VARCHAR(100)                        NULL,
-                debug_message          TEXT                                NULL,
-                debug_timestamp        TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP
-            );
-
-        */
-
-    public function logDebugMessage($project_id, $msg, $msgcat="") 
-    {   
-        if ( !Yes3Fn::LOG_DEBUG_MESSAGES || !$this->tableExists(Yes3Fn::DEBUG_LOG_TABLE) ) return false;
-
-        $sql = "INSERT INTO `".Yes3Fn::DEBUG_LOG_TABLE."` (project_id, debug_message, debug_message_category) VALUES (?,?,?)";
-
-        return $this->query($sql, [$project_id, $msg, $msgcat]);
     }
     
     /**
@@ -904,49 +505,4 @@ trait Yes3Trait {
 		return $groups;
 
     }
-
-    public function getEventNames($unique_names=false, $append_arm_name=false, $event_id=null)
-    {
-        $Proj = new Project($this->getProjectId());
-
-		// Make sure project is longitudinal, else return FALSE
-		if (!$this->isLongitudinal()) return false;
-
-		// If $event_id is not valid, then return FALSE
-		if ($event_id != null && !isset($Proj->eventInfo[$event_id])) return false;
-		// Get and return events
-		if ($unique_names) {
-			$events = $Proj->getUniqueEventNames($event_id);
-		} else {
-			// Validate $append_arm_name
-			$append_arm_name = ($append_arm_name === true);
-			// Loop through all events and collect event_id and name to return as array
-			$events = array();
-			foreach ($Proj->eventInfo as $this_event_id=>$attr) {
-				// If event_id was specified, return only its event name
-				if ($this_event_id == $event_id) {
-					return ($append_arm_name ? $attr['name_ext'] : $attr['name']);
-				} else {
-					$events[$this_event_id] = ($append_arm_name ? $attr['name_ext'] : $attr['name']);
-				}
-			}
-		}
-		// Return events as array
-		return $events;
-	}
-
-    public function UTC2Local( $utcTimestamp ){
-        // Create DateTime object in UTC timezone
-        $date = new DateTime($utcTimestamp, new DateTimeZone('UTC'));
-
-        // Get the server's local timezone
-        $localTimezone = new DateTimeZone(date_default_timezone_get());
-
-        // Convert to the local timezone
-        $date->setTimezone($localTimezone);
-
-        // Display the local date and time
-        return $date->format('Y-m-d H:i:s');
-    }
-
 }

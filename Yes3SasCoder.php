@@ -380,7 +380,7 @@ OPTIONS ERRORCHECK = STRICT;
 OPTIONS NOSOURCE; /* comment this out to include the source code in the log */
 
 * OPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';
-OPTIONS PS=55 LS=132;
+* OPTIONS PS=55 LS=132;
 /*
    export metadata macro variables
 */
@@ -683,8 +683,8 @@ SASHEADER;
 
         $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} format library creation program';\n";
 
-        $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
-        $header .= "\nOPTIONS PS=55 LS=72;\n";
+        $header .= "\n* OPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
+        $header .= "\n* OPTIONS PS=55 LS=72;\n";
         $header .= "\nOPTIONS FMTSEARCH=({$this->libref}, work);\n";
 
         $header .= "\nLIBNAME {$this->libref} '{$this->libref_path}';\n";
@@ -779,8 +779,8 @@ SASHEADER;
 
         $header .= "\nTITLE1 '{$this->info['export_properties']['export_name']} format assignments program';\n";
 
-        $header .= "\nOPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
-        $header .= "\nOPTIONS PS=55 LS=72;\n";
+        $header .= "\n* OPTIONS FORMCHAR = '|----|+|---+=|-/\<>*';";
+        $header .= "\n* OPTIONS PS=55 LS=72;\n";
         $header .= "\nOPTIONS FMTSEARCH=({$this->libref}, work);\n";
 
         $header .= "\nLIBNAME {$this->libref} '{$this->libref_path}';\n";

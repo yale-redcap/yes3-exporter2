@@ -3466,7 +3466,7 @@ FMAPR.exportItemAlreadyExists = function( object_type, object_name, object_event
                 }
 
                 // handle adding a field object when the form object already exists
-                if ( object_type === "field" && this_object_type === "form" && this_object_name === object_form_name ){
+                if ( (this_object_event===ALL_OF_THEM || this_object_event===object_event) && object_type === "field" && this_object_type === "form" && this_object_name === object_form_name ){
 
                     return true;
                 }
