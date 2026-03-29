@@ -16,16 +16,22 @@
             "name": "Peter Charpentier",
             "email": "redcap@yale.edu",
             "role": "developer",
-            "company": "FCRI Web Tools LLC",
+            "company": "CRI Web Tools LLC",
             "institution": "Yale University"
         }
     ],
 
     "versions": [
         {
+            "version": "2.0.19",
+            "date": "2026-03-29",
+            "description": "bug fixes, feature enhancement",
+            "comments": "Ordering of forms and fields corrected in export editor selection dropdowns. Special handling for checkbox field values without labels. Codebook popup added to main icon group."
+        },        
+        {
             "version": "2.0.18",
             "date": "2025-11-16",
-            "description": "refactroring, bug fix",
+            "description": "refactoring, bug fix",
             "comments": "Yes3Trait and Yes3Fn reconciled. Bug fix for repeating instruments in non-longitudinal projects: redcap_repeat_instance was not included in exports."
         },        
         {
@@ -212,7 +218,7 @@
         },
         {
             "key": "notification-email-ran-at",
-            "name": "Time email notifications were last sent succesfully",
+            "name": "Time email notifications were last sent successfully",
             "type": "text",
             "required": false,
             "branchingLogic": {

@@ -135,6 +135,11 @@ class Yes3Exporter2 extends \ExternalModules\AbstractExternalModule
         return $this->getUrl('services/services.php');
     }
 
+    public function getCodebookUrl(){
+
+        return APP_PATH_WEBROOT . 'Design/data_dictionary_codebook.php?popup=1&pid=' . $this->getProjectId();
+    }
+
     public function getDocumentationUrl(){
 
         return "https://yale-redcap.github.io/yes3-exporter2-docs/";
@@ -3321,6 +3326,7 @@ WHERE project_id=? AND log_entry_type=?
             SELECT m.form_name, m.form_menu_description
             FROM redcap_metadata m
             WHERE m.project_id=? AND m.form_menu_description IS NOT NULL
+            ORDER BY m.field_order
             ";
 
         }
@@ -3470,6 +3476,7 @@ WHERE ea.project_id=? and ef.form_name=?
         SELECT m.field_order, m.form_name, m.field_name, m.element_type, m.element_label, m.element_enum, m.element_validation_type, m.field_phi
         FROM redcap_metadata m
         WHERE m.project_id=? AND m.field_name=?
+        ORDER BY m.field_order
         ";
 
         return Yes3Fn::fetchRecords($sql, [$this->getProjectId(), $field_name]);
@@ -3553,7 +3560,9 @@ WHERE ea.project_id=? and ef.form_name=?
             $valueset = [];
 
             if ( $field['element_type']==="radio" || $field['element_type']==="select" || $field['element_type']==="checkbox"){
-                $vv = $this->getChoiceLabels($field_name);
+                
+                $vv = $this->getChoiceLabels2($field_name);
+                
                 foreach ( $vv as $value => $label) {
                     $valueset[] = [
                         'value' => Yes3Fn::sanitizeForText((string)$value, 0, true, false, true),
@@ -4484,6 +4493,30 @@ WHERE ea.project_id=? and ef.form_name=?
     /*
         === VALUE SET MANAGEMENT ===
     */
+
+    public function getChoiceLabels2( $field_name )
+    {
+        $choiceLabels = $this->getChoiceLabels( $field_name ); // Framework function
+        $choice_labels = [];
+        if ( is_array($choiceLabels) ){
+            foreach( $choiceLabels as $key => $label ){
+
+                // framework function can return malformed key for single choice fields
+                // result is null label, and key that ends in a comma followed by zero or more spaces.
+                // so we strip the trailing comma and any trailing whitespace from the key
+                // and assign the corrected key and label to the new array
+                if ( !strlen($label) && preg_match('/^(.*?)(, ?)$/', $key, $matches) ){
+                    $key = $matches[1];
+                    $label = strval($key);
+                }
+
+                if ( strlen($key) && strlen($label) ){
+                    $choice_labels[$key] = $label;
+                }
+            }
+        }
+        return $choice_labels;
+    }
 
     /**
      * returns a default value set (element_enum) for a given field type (yesno, truefalse)
