@@ -282,6 +282,8 @@ trait Yes3Trait {
 
         $js .= "\nYES3.serviceUrl = '" . $this->getServiceUrl() . "';";
 
+        $js .= "\nYES3.codebookUrl = '" . $this->getCodebookUrl() . "';";
+
         $js .= "\nYES3.documentationUrl = '" . $this->getDocumentationUrl() . "';";
 
         $js .= "\nYES3.changelogUrl = '" . $this->getChangelogUrl() . "';";

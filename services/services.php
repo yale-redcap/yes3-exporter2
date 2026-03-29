@@ -1477,7 +1477,7 @@ ORDER BY m.`field_order`
    foreach ($fields as $field){
       $choices = [];
       if ( $field['element_type']==="radio" ){
-         $vv = $module->getChoiceLabels($field['field_name']);
+         $vv = $module->getChoiceLabels2($field['field_name']);
          foreach ( $vv as $value => $label) {
             $choices[] = [
                'value' => $value,

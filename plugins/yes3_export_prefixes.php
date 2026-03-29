@@ -174,6 +174,8 @@ $module->getCodeFor("yes3_export_prefixes", true);
             <i class="fas fa-reply yes3-action-icon yes3-action-icon-controlpanel yes3-fmapr-display-when-dirty yes3-designer-only" data-bs-toggle="tooltip" action="Exportspecifications_undoSettings" title="Restore all settings on this page to their stored values (undo)."></i>
             <i class="fas fa-question yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Help_openPanel" title="Display the Prefix Editor Help panel"></i>
 
+            <i class="fas fa-book yes3-action-icon yes3-action-icon-controlpanel" data-bs-toggle="tooltip" action="Open_codeBook" title="Open REDCap's built-in codebook for this project."></i>
+
             <i class="fas fa-book-reader yes3-action-icon yes3-action-icon-controlpanel yes3-tooltip-static" data-bs-toggle="tooltip" action="Open_docPage" action-param="user-reference/event-prefixes" title="Open the YES3 Exporter2 online documentation."></i>
 
             <i class="fas fa-moon yes3-action-icon yes3-action-icon-controlpanel yes3-light-theme-only" data-bs-toggle="tooltip" action="Theme_dark" title="Switch to the dark side"></i>

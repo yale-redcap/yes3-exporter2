@@ -166,7 +166,12 @@ Date.prototype.mdy = function() {
                 this.getSeconds()
             ].join(':')
     ;
-};  
+};
+
+YES3.Functions.Open_codeBook = function(){
+
+    window.open(YES3.codebookUrl, "codeBookWin", "width=1000, height=600, toolbar=0, menubar=0, location=0, status=0, scrollbars=1, resizable=1");
+}
 
 YES3.Functions.Open_docPage = function( topic ){
 

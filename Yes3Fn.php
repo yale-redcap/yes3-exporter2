@@ -1184,6 +1184,8 @@ class Yes3Fn {
         $varPrefix = '';
         $varSuffix = '';
 
+        $varname_preserved = $varname; // preserve the original variable name for reference/debugging
+
         // Convert to lowercase
         $varname = strtolower($varname);
 
@@ -1250,7 +1252,11 @@ class Yes3Fn {
         // remove any trailing underscores from $varname
         if ( preg_match('/^(.*?)(_+)$/', $varname, $matches)) {
 
-            $varname = $matches(1);
+            try {
+                $varname = $matches[1];
+            } catch (\Throwable $e) {
+                throw new \Exception("Yes3Fn::sanitizeForSASVarname: Failed to remove trailing underscores from variable name '$varname'. Input variable name was '$varname_preserved'. varSuffix='$varSuffix', varPrefix='$varPrefix'");
+            }
         }
 
         return $varname;
