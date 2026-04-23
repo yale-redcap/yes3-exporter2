@@ -2030,7 +2030,7 @@ WHERE project_id=? AND log_entry_type=?
             // do the things required for the RecordId field
             if ( $field_name === $RecordIdField ){
 
-                $dd[0] = $this->doValidationCalculations($dd[0], $record, true);
+                $dd[0] = $this->doValidationCalculations($dd[0], $record, false); // edited 2026-04-23, 'countonly' param set from true to false to allow recordid length/max calculations
             }
             // do the things required for other columns
             elseif ( $acceptable  ){
@@ -3955,7 +3955,7 @@ WHERE ea.project_id=? and ef.form_name=?
         if ( $field_validation === "datetime_seconds_ymd" ) return "DATETIME";
         if ( $field_validation === "datetime_seconds_dmy" ) return "DATETIME";
         if ( $field_validation === "time" ) return "TIME";
-        if ( $field_validation === "float" ) return "FLOAT";
+        if ( $field_validation === "float" ) return "FLOAT"; // note: this maps to the validation label 'number' in the UI
         if ( $field_validation === "int" ) return "INTEGER";
 
         return "TEXT";
