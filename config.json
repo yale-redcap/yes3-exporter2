@@ -23,6 +23,12 @@
 
     "versions": [
         {
+            "version": "2.0.20",
+            "date": "2026-04-23",
+            "description": "critical bug fix",
+            "comments": "Fixed: SAS length assignments for id fields not properly set."
+        },        
+        {
             "version": "2.0.19",
             "date": "2026-03-29",
             "description": "bug fixes, feature enhancement",
