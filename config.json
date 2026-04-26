@@ -23,10 +23,10 @@
 
     "versions": [
         {
-            "version": "2.0.21",
+            "version": "2.0.22",
             "date": "2026-04-26",
-            "description": "Prep for deployment",
-            "comments": "Minor tweaks to prepare for deployment to Vanderbilt."
+            "description": "Framework, min REDCap version updated.",
+            "comments": "Framework updated to 16, per VUMC upload scan recommendation."
         },        
         {
             "version": "2.0.20",
@@ -384,8 +384,8 @@
     "compatibility": {
     "php-version-min": "8.1",
     "php-version-max": "8.99",
-    "redcap-version-min": "14.0.0"
+    "redcap-version-min": "14.6.4"
     },
 
-    "framework-version": 15
+    "framework-version": 16
 }
