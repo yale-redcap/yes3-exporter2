@@ -3,7 +3,7 @@
 
     "namespace": "Yale\\Yes3Exporter2",
 
-    "description": "The successor to the original YES3 Exporter launched in 2022. Key features include a horizontal layout for longitudinal projects, with one column per event per field. It supports tab- or comma-delimited formats, payloads that include export-specific data dictionaries and data distribution summaries, and can generate ready-to-run SAS code tailored to each export for interactive or batch use.",
+    "description": "The successor to the original YES3 Exporter launched in 2022. Key features include a horizontal layout for longitudinal projects, with one column per event per field. It supports tab- or comma-delimited formats, payloads that include export-specific data dictionaries and data distribution summaries, and can generate ready-to-run SAS code tailored to each export for interactive or batch use.  NOTE: See the change log (https://yale-redcap.github.io/yes3-exporter2-docs/logs/change-log/) for important feature updates and bug fixes.",
 
     "documentation": "https://yale-redcap.github.io/yes3-exporter2-docs/",
 
@@ -22,6 +22,12 @@
     ],
 
     "versions": [
+        {
+            "version": "2.0.21",
+            "date": "2026-04-26",
+            "description": "Prep for deployment",
+            "comments": "Minor tweaks to prepare for deployment to Vanderbilt."
+        },        
         {
             "version": "2.0.20",
             "date": "2026-04-23",
